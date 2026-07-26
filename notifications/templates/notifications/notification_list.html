@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        Notifications
+    </title>
+
+</head>
+
+<body>
+
+    <h1>
+        Notifications
+    </h1>
+
+
+    {% if notifications %}
+
+        {% for notification in notifications %}
+
+            <div>
+
+                {% if notification.is_read %}
+
+                    <p>
+                        {{ notification.message }}
+                    </p>
+
+                {% else %}
+
+                    <strong>
+
+                        <p>
+                            {{ notification.message }}
+                        </p>
+
+                    </strong>
+
+                {% endif %}
+
+
+                <p>
+
+                    <small>
+                        {{ notification.created_at }}
+                    </small>
+
+                </p>
+
+
+                {% if not notification.is_read %}
+
+                    <a
+                        href="{% url 'mark_notification_read' notification.id %}"
+                    >
+                        View Notification
+                    </a>
+
+                {% else %}
+
+                    {% if notification.course %}
+
+                        <a
+                            href="{% url 'course_detail' notification.course.id %}"
+                        >
+                            View Course
+                        </a>
+
+                    {% endif %}
+
+                {% endif %}
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            You have no notifications.
+        </p>
+
+    {% endif %}
+
+
+    <br>
+
+
+    <a href="{% url 'student_dashboard' %}">
+        Back to Dashboard
+    </a>
+
+</body>
+
+</html>

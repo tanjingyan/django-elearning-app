@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        Leave Feedback - {{ course.title }}
+    </title>
+
+</head>
+
+<body>
+
+    <h1>
+        Leave Feedback
+    </h1>
+
+    <h2>
+        {{ course.title }}
+    </h2>
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">
+            Submit Feedback
+        </button>
+
+    </form>
+
+
+    <br>
+
+    <a href="{% url 'course_detail' course.id %}">
+        Back to Course
+    </a>
+
+</body>
+
+</html>

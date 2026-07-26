@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        Upload Material - {{ course.title }}
+    </title>
+
+</head>
+
+<body>
+
+    <h1>
+        Upload Course Material
+    </h1>
+
+    <h2>
+        {{ course.title }}
+    </h2>
+
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">
+            Upload Material
+        </button>
+
+    </form>
+
+
+    <br>
+
+    <a href="{% url 'course_detail' course.id %}">
+        Back to Course
+    </a>
+
+</body>
+
+</html>

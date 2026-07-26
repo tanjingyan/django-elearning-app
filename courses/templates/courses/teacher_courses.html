@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        My Courses
+    </title>
+
+</head>
+
+<body>
+
+    <h1>
+        My Courses
+    </h1>
+
+
+    {% if courses %}
+
+        {% for course in courses %}
+
+            <div>
+
+                <h2>
+                    {{ course.title }}
+                </h2>
+
+                <p>
+                    {{ course.description }}
+                </p>
+
+                <p>
+                    Created on:
+                    {{ course.created_at }}
+                </p>
+
+
+                <!-- View Course -->
+
+                <a href="{% url 'course_detail' course.id %}">
+                    View Course
+                </a>
+
+                &nbsp; | &nbsp;
+
+
+                <!-- Manage Enrolled Students -->
+
+                <a href="{% url 'course_students' course.id %}">
+                    Manage Students
+                </a>
+
+                &nbsp; | &nbsp;
+
+
+                <!-- Upload Teaching Material -->
+
+                <a href="{% url 'upload_material' course.id %}">
+                    Upload Teaching Material
+                </a>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            You have not created any courses yet.
+        </p>
+
+    {% endif %}
+
+
+    <br>
+
+
+    <!-- Create New Course -->
+
+    <a href="{% url 'create_course' %}">
+        Create New Course
+    </a>
+
+
+    <br>
+    <br>
+
+
+    <!-- Back to Teacher Dashboard -->
+
+    <a href="{% url 'teacher_dashboard' %}">
+        Back to Dashboard
+    </a>
+
+
+</body>
+
+</html>

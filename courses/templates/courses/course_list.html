@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Available Courses</title>
+
+</head>
+
+<body>
+
+    <h1>Available Courses</h1>
+
+
+    {% if courses %}
+
+        {% for course in courses %}
+
+            <div>
+
+                <h2>
+                    {{ course.title }}
+                </h2>
+
+                <p>
+                    {{ course.description }}
+                </p>
+
+                <p>
+                    Teacher:
+                    {{ course.teacher.username }}
+                </p>
+
+                <a href="{% url 'course_detail' course.id %}">
+                    View Course
+                </a>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No courses are available yet.
+        </p>
+
+    {% endif %}
+
+
+</body>
+
+</html>

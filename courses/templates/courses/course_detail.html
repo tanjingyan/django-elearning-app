@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        {{ course.title }}
+    </title>
+
+</head>
+
+<body>
+
+    <!-- ========================= -->
+    <!-- COURSE INFORMATION -->
+    <!-- ========================= -->
+
+    <h1>
+        {{ course.title }}
+    </h1>
+
+    <p>
+        {{ course.description }}
+    </p>
+
+    <p>
+        <strong>Teacher:</strong>
+        {{ course.teacher.username }}
+    </p>
+
+
+    <hr>
+
+
+    <!-- ========================= -->
+    <!-- ENROLMENT SECTION -->
+    <!-- ========================= -->
+
+    {% if is_enrolled %}
+
+        <p>
+            You are enrolled in this course.
+        </p>
+
+    {% else %}
+
+        <p>
+            You are not enrolled in this course.
+        </p>
+
+        {% if request.user.role == "student" %}
+
+            <a href="{% url 'enrol_course' course.id %}">
+                Enrol on this Course
+            </a>
+
+        {% endif %}
+
+    {% endif %}
+
+
+    <hr>
+
+
+    <!-- ========================= -->
+    <!-- COURSE MATERIALS -->
+    <!-- ========================= -->
+
+    <h2>
+        Course Materials
+    </h2>
+
+
+    {% if materials %}
+
+        {% for material in materials %}
+
+            <div>
+
+                <h3>
+                    {{ material.title }}
+                </h3>
+
+
+                {% if material.description %}
+
+                    <p>
+                        {{ material.description }}
+                    </p>
+
+                {% endif %}
+
+
+                <p>
+                    <strong>Uploaded by:</strong>
+                    {{ material.teacher.username }}
+                </p>
+
+
+                <p>
+                    <strong>Uploaded on:</strong>
+                    {{ material.uploaded_at }}
+                </p>
+
+
+                <a
+                    href="{{ material.file.url }}"
+                    target="_blank"
+                >
+                    View / Download Material
+                </a>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No course materials have been uploaded yet.
+        </p>
+
+    {% endif %}
+
+
+    <hr>
+
+
+    <!-- ========================= -->
+    <!-- COURSE FEEDBACK -->
+    <!-- ========================= -->
+
+    <h2>
+        Course Feedback
+    </h2>
+
+
+    {% if feedback_list %}
+
+        {% for feedback in feedback_list %}
+
+            <div>
+
+                <p>
+                    <strong>
+                        {{ feedback.student.username }}
+                    </strong>
+                </p>
+
+
+                <p>
+                    <strong>
+                        Rating:
+                    </strong>
+
+                    {{ feedback.rating }}/5
+                </p>
+
+
+                <p>
+                    {{ feedback.comment }}
+                </p>
+
+
+                <small>
+                    Posted on {{ feedback.created_at }}
+                </small>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No feedback has been submitted yet.
+        </p>
+
+    {% endif %}
+
+
+    <!-- ========================= -->
+    <!-- LEAVE FEEDBACK -->
+    <!-- ========================= -->
+
+    {% if is_enrolled %}
+
+        {% if not has_feedback %}
+
+            <a href="{% url 'create_feedback' course.id %}">
+                Leave Feedback
+            </a>
+
+        {% else %}
+
+            <p>
+                You have already submitted feedback for this course.
+            </p>
+
+        {% endif %}
+
+    {% endif %}
+
+
+    <br>
+    <br>
+
+
+    <!-- ========================= -->
+    <!-- BACK TO COURSES -->
+    <!-- ========================= -->
+
+    <a href="{% url 'course_list' %}">
+        Back to Courses
+    </a>
+
+
+</body>
+
+</html>

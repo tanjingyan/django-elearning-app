@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ user_profile.username }} - Profile</title>
+</head>
+
+<body>
+
+    <h1>
+        {{ user_profile.first_name }}
+        {{ user_profile.last_name }}
+    </h1>
+
+    {% if user_profile.profile_picture %}
+
+        <img
+            src="{{ user_profile.profile_picture.url }}"
+            alt="Profile Picture"
+            width="150"
+        >
+
+    {% endif %}
+
+    <p>
+        <strong>Username:</strong>
+        {{ user_profile.username }}
+    </p>
+
+    <p>
+        <strong>Email:</strong>
+        {{ user_profile.email }}
+    </p>
+
+    <p>
+        <strong>Role:</strong>
+        {{ user_profile.role }}
+    </p>
+
+    <p>
+        <strong>Bio:</strong>
+        {{ user_profile.bio }}
+    </p>
+
+
+    <hr>
+
+
+    <h2>Status Updates</h2>
+
+
+    {% if statuses %}
+
+        {% for status in statuses %}
+
+            <div>
+
+                <p>
+                    {{ status.content }}
+                </p>
+
+                <small>
+                    Posted on {{ status.created_at }}
+                </small>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No status updates yet.
+        </p>
+
+    {% endif %}
+
+
+    {% if request.user.is_authenticated %}
+
+        {% if request.user.username == user_profile.username %}
+
+            <br>
+
+            <a href="{% url 'create_status' %}">
+                + Add Status Update
+            </a>
+
+        {% endif %}
+
+    {% endif %}
+
+
+    <br><br>
+
+
+    {% if request.user.is_authenticated %}
+
+        {% if request.user.username == user_profile.username %}
+
+            <a href="{% url 'student_dashboard' %}">
+                Back to Dashboard
+            </a>
+
+        {% else %}
+
+            <a href="javascript:history.back()">
+                Back
+            </a>
+
+        {% endif %}
+
+    {% endif %}
+
+
+</body>
+
+</html>

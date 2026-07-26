@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        Students - {{ course.title }}
+    </title>
+
+</head>
+
+<body>
+
+    <h1>
+        Students Enrolled in {{ course.title }}
+    </h1>
+
+
+    {% if enrolments %}
+
+        {% for enrolment in enrolments %}
+
+            <div>
+
+                <h3>
+                    {{ enrolment.student.first_name }}
+                    {{ enrolment.student.last_name }}
+                </h3>
+
+                <p>
+                    Username:
+                    {{ enrolment.student.username }}
+                </p>
+
+                <p>
+                    Email:
+                    {{ enrolment.student.email }}
+                </p>
+
+                <p>
+                    Enrolled:
+                    {{ enrolment.enrolled_at }}
+                </p>
+
+
+                <!-- Remove Student -->
+
+                <form
+                    method="POST"
+                    action="{% url 'remove_student' course.id enrolment.student.id %}"
+                    style="display: inline;"
+                    onsubmit="return confirm(
+                        'Are you sure you want to remove {{ enrolment.student.username }} from this course?'
+                    );"
+                >
+
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        Remove Student
+                    </button>
+
+                </form>
+
+
+                <!-- Block Student -->
+
+                <form
+                    method="POST"
+                    action="{% url 'block_student' course.id enrolment.student.id %}"
+                    style="display: inline;"
+                    onsubmit="return confirm(
+                        'Are you sure you want to block {{ enrolment.student.username }} from this course? They will also be removed from the course.'
+                    );"
+                >
+
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        Block Student
+                    </button>
+
+                </form>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            There are no students enrolled in this course.
+        </p>
+
+    {% endif %}
+
+
+    <br>
+
+    <a href="{% url 'teacher_courses' %}">
+        Back to My Courses
+    </a>
+
+</body>
+
+</html>
