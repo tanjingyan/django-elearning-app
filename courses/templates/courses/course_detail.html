@@ -2,11 +2,9 @@
 <html>
 
 <head>
-
     <title>
         {{ course.title }}
     </title>
-
 </head>
 
 <body>
@@ -36,7 +34,13 @@
     <!-- ENROLMENT SECTION -->
     <!-- ========================= -->
 
-    {% if is_enrolled %}
+    {% if request.user == course.teacher %}
+
+        <p>
+            You are the teacher of this course.
+        </p>
+
+    {% elif is_enrolled %}
 
         <p>
             You are enrolled in this course.
@@ -151,10 +155,7 @@
 
 
                 <p>
-                    <strong>
-                        Rating:
-                    </strong>
-
+                    <strong>Rating:</strong>
                     {{ feedback.rating }}/5
                 </p>
 
@@ -202,6 +203,40 @@
             </p>
 
         {% endif %}
+
+    {% endif %}
+
+
+    <br>
+    <br>
+
+
+    <hr>
+
+
+    <!-- ========================= -->
+    <!-- LIVE DISCUSSION -->
+    <!-- ========================= -->
+
+    <h2>
+        Live Discussion
+    </h2>
+
+    {% if request.user == course.teacher or is_enrolled %}
+
+        <p>
+            Discuss this course with your teacher and classmates in real time.
+        </p>
+
+        <a href="{% url 'course_chat' course.id %}">
+            Open Live Discussion
+        </a>
+
+    {% else %}
+
+        <p>
+            Enrol in this course to participate in the live discussion.
+        </p>
 
     {% endif %}
 

@@ -19,14 +19,11 @@
         You are logged in as a teacher.
     </p>
 
-
     <hr>
-
 
     <h2>
         Teacher Dashboard
     </h2>
-
 
     <p>
         <a href="{% url 'teacher_courses' %}">
@@ -34,13 +31,24 @@
         </a>
     </p>
 
-
     <p>
         <a href="{% url 'create_course' %}">
             Create New Course
         </a>
     </p>
 
+    <p>
+        <a href="{% url 'search_users' %}">
+            Search Users
+        </a>
+    </p>
+
+    <!-- Add this section -->
+    <p>
+        <a href="{% url 'notification_list' %}">
+            My Notifications
+        </a>
+    </p>
 
     <p>
         <a href="{% url 'logout' %}">

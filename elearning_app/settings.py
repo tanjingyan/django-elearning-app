@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    
     # Django Apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,6 +43,8 @@ INSTALLED_APPS = [
 
     # Third Party Apps
     'rest_framework',
+
+    "channels",
 
     # Local Apps
     'accounts',
@@ -79,7 +83,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'elearning_app.wsgi.application'
-
+ASGI_APPLICATION = "elearning_app.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -133,3 +137,12 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}

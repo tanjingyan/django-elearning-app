@@ -114,9 +114,7 @@ def enrol_course(request, course_id):
     if request.user.role != "student":
         return redirect("teacher_dashboard")
 
-    course = Course.objects.get(
-        id=course_id
-    )
+    course = Course.objects.get(id=course_id)
 
     is_blocked = CourseBlock.objects.filter(
         student=request.user,
@@ -129,10 +127,20 @@ def enrol_course(request, course_id):
             course_id=course.id
         )
 
-    Enrolment.objects.get_or_create(
+    enrolment, created = Enrolment.objects.get_or_create(
         student=request.user,
         course=course
     )
+
+    if created:
+        Notification.objects.create(
+            recipient=course.teacher,
+            course=course,
+            message=(
+                f'{request.user.username} enrolled in '
+                f'"{course.title}".'
+            )
+        )
 
     return redirect(
         "course_detail",

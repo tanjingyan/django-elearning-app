@@ -5,33 +5,35 @@ from django.urls import include, path
 
 
 urlpatterns = [
-
     path(
         "admin/",
-        admin.site.urls
+        admin.site.urls,
     ),
 
     path(
         "",
-        include("accounts.urls")
+        include("accounts.urls"),
     ),
 
     path(
         "courses/",
-        include("courses.urls")
+        include("courses.urls"),
     ),
 
     path(
         "notifications/",
-        include("notifications.urls")
+        include("notifications.urls"),
     ),
 
+    path(
+        "chat/",
+        include("chat.urls"),
+    ),
 ]
 
 
 if settings.DEBUG:
-
     urlpatterns += static(
         settings.MEDIA_URL,
-        document_root=settings.MEDIA_ROOT
+        document_root=settings.MEDIA_ROOT,
     )
