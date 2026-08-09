@@ -1,99 +1,116 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
+{% block title %}
+    Notifications
+{% endblock %}
 
-    <title>
-        Notifications
-    </title>
+{% block content %}
 
-</head>
+    <div class="mb-4">
 
-<body>
+        <h1 class="page-heading">
+            Notifications
+        </h1>
 
-    <h1>
-        Notifications
-    </h1>
+        <p class="page-subheading">
+            View your latest course and enrolment updates.
+        </p>
+
+    </div>
 
 
     {% if notifications %}
 
-        {% for notification in notifications %}
+        <div class="row g-3">
 
-            <div>
+            {% for notification in notifications %}
 
-                {% if notification.is_read %}
+                <div class="col-12">
 
-                    <p>
-                        {{ notification.message }}
-                    </p>
+                    <div class="card content-card">
 
-                {% else %}
+                        <div class="card-body">
 
-                    <strong>
+                            <div class="d-flex gap-3">
 
-                        <p>
-                            {{ notification.message }}
-                        </p>
+                                <div
+                                    class="
+                                        rounded-circle
+                                        bg-primary-subtle
+                                        text-primary
+                                        d-flex
+                                        align-items-center
+                                        justify-content-center
+                                        flex-shrink-0
+                                    "
+                                    style="
+                                        width: 52px;
+                                        height: 52px;
+                                        font-size: 1.3rem;
+                                    "
+                                >
+                                    🔔
+                                </div>
 
-                    </strong>
 
-                {% endif %}
+                                <div class="flex-grow-1">
 
+                                    <p class="fw-semibold mb-1">
+                                        {{ notification.message }}
+                                    </p>
 
-                <p>
-
-                    <small>
-                        {{ notification.created_at }}
-                    </small>
-
-                </p>
+                                    <p class="text-muted small mb-3">
+                                        {{ notification.created_at|date:"d M Y, g:i A" }}
+                                    </p>
 
 
-                {% if not notification.is_read %}
+                                    {% if notification.course %}
 
-                    <a
-                        href="{% url 'mark_notification_read' notification.id %}"
-                    >
-                        View Notification
-                    </a>
+                                        <a
+                                            href="{% url 'course_detail' notification.course.id %}"
+                                            class="btn btn-outline-primary btn-sm"
+                                        >
+                                            View Course
+                                        </a>
 
-                {% else %}
+                                    {% endif %}
 
-                    {% if notification.course %}
+                                </div>
 
-                        <a
-                            href="{% url 'course_detail' notification.course.id %}"
-                        >
-                            View Course
-                        </a>
+                            </div>
 
-                    {% endif %}
+                        </div>
 
-                {% endif %}
+                    </div>
 
-            </div>
+                </div>
 
-            <hr>
+            {% endfor %}
 
-        {% endfor %}
+        </div>
 
     {% else %}
 
-        <p>
-            You have no notifications.
-        </p>
+        <div class="card content-card">
+
+            <div class="card-body text-center py-5">
+
+                <div class="display-5 mb-3">
+                    🔕
+                </div>
+
+                <h4>
+                    No notifications
+                </h4>
+
+                <p class="text-muted mb-0">
+                    New enrolments and course material updates will appear here.
+                </p>
+
+            </div>
+
+        </div>
 
     {% endif %}
 
-
-    <br>
-
-
-    <a href="{% url 'student_dashboard' %}">
-        Back to Dashboard
-    </a>
-
-</body>
-
-</html>
+{% endblock %}

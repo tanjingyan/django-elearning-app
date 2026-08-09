@@ -1,50 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}eLearning System{% endblock %}</title>
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+            eLearning Platform
+        {% endblock %}
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        body {
+            background-color: #f5f7fb;
+            min-height: 100vh;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .page-container {
+            padding-top: 32px;
+            padding-bottom: 48px;
+        }
+
+        .content-card {
+            border: 0;
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .page-heading {
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-subheading {
+            color: #6c757d;
+            margin-bottom: 24px;
+        }
+
+        .profile-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s ease;
+        }
+
+        .profile-link:hover {
+            color: #ffffff;
+            opacity: 0.8;
+        }
+    </style>
+
+    {% block extra_css %}
+    {% endblock %}
 </head>
 
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
 
-        <a class="navbar-brand" href="#">
-            eLearning
-        </a>
+        <div class="container">
 
-        <div class="ms-auto">
+            <a
+                class="navbar-brand"
+                href="{% if request.user.is_authenticated %}{% if request.user.role == 'teacher' %}{% url 'teacher_dashboard' %}{% else %}{% url 'student_dashboard' %}{% endif %}{% else %}{% url 'login' %}{% endif %}"
+            >
+                LearnSpace
+            </a>
 
-            {% if user.is_authenticated %}
+            {% if request.user.is_authenticated %}
 
-                <span class="text-white me-3">
-                    Welcome, {{ user.first_name }}
-                </span>
-
-                <a class="btn btn-light btn-sm"
-                   href="{% url 'logout' %}">
-                    Logout
-                </a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
             {% endif %}
 
+            <div
+                class="collapse navbar-collapse"
+                id="mainNavbar"
+            >
+
+                {% if request.user.is_authenticated %}
+
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                        {% if request.user.role == "teacher" %}
+
+                            <li class="nav-item">
+
+                                <a
+                                    class="nav-link"
+                                    href="{% url 'teacher_dashboard' %}"
+                                >
+                                    Dashboard
+                                </a>
+
+                            </li>
+
+                            <li class="nav-item">
+
+                                <a
+                                    class="nav-link"
+                                    href="{% url 'teacher_courses' %}"
+                                >
+                                    My Courses
+                                </a>
+
+                            </li>
+
+                            <li class="nav-item">
+
+                                <a
+                                    class="nav-link"
+                                    href="{% url 'create_course' %}"
+                                >
+                                    Create Course
+                                </a>
+
+                            </li>
+
+                            <li class="nav-item">
+
+                                <a
+                                    class="nav-link"
+                                    href="{% url 'search_users' %}"
+                                >
+                                    Search Users
+                                </a>
+
+                            </li>
+
+                        {% else %}
+
+                            <li class="nav-item">
+
+                                <a
+                                    class="nav-link"
+                                    href="{% url 'student_dashboard' %}"
+                                >
+                                    Dashboard
+                                </a>
+
+                            </li>
+
+                            <li class="nav-item">
+
+                                <a
+                                    class="nav-link"
+                                    href="{% url 'course_list' %}"
+                                >
+                                    Courses
+                                </a>
+
+                            </li>
+
+                        {% endif %}
+
+                        <li class="nav-item">
+
+                            <a
+                                class="nav-link"
+                                href="{% url 'notification_list' %}"
+                            >
+                                Notifications
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <a
+                            href="{% url 'profile' request.user.username %}"
+                            class="profile-link"
+                            title="View Profile"
+                        >
+                            👤 {{ request.user.username }}
+                        </a>
+
+                        <a
+                            class="btn btn-light btn-sm"
+                            href="{% url 'logout' %}"
+                        >
+                            Logout
+                        </a>
+
+                    </div>
+
+                {% else %}
+
+                    <!--
+                        Login and Register links are already shown
+                        inside their respective forms.
+                    -->
+
+                {% endif %}
+
+            </div>
+
         </div>
 
-    </div>
-</nav>
+    </nav>
 
-<div class="container mt-5">
 
-    {% block content %}
+    <main class="container page-container">
 
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div
+                    class="
+                        alert
+
+                        {% if message.tags %}
+                            alert-{{ message.tags }}
+                        {% else %}
+                            alert-info
+                        {% endif %}
+
+                        alert-dismissible
+                        fade
+                        show
+                    "
+                    role="alert"
+                >
+
+                    {{ message }}
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                    ></button>
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    {% block extra_js %}
     {% endblock %}
 
-</div>
-
 </body>
+
 </html>

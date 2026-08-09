@@ -26,16 +26,18 @@
         .discussion-wrapper {
             max-width: 900px;
             margin: 40px auto;
+            padding: 0 12px;
         }
 
         .chat-card {
-            height: 75vh;
+            height: 78vh;
+            min-height: 600px;
             display: flex;
             flex-direction: column;
         }
 
         .chat-header {
-            background-color: white;
+            background-color: #ffffff;
             border-bottom: 1px solid #dee2e6;
         }
 
@@ -60,10 +62,12 @@
         }
 
         .message-bubble {
-            max-width: 70%;
+            max-width: 72%;
+            min-width: 160px;
             padding: 12px 16px;
             border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 1px 3px
+                rgba(0, 0, 0, 0.12);
         }
 
         .own-message .message-bubble {
@@ -77,13 +81,13 @@
         }
 
         .student-message .message-bubble {
-            background-color: white;
+            background-color: #ffffff;
             border-bottom-left-radius: 4px;
         }
 
         .message-meta {
             font-size: 0.8rem;
-            margin-bottom: 4px;
+            margin-bottom: 7px;
         }
 
         .message-text {
@@ -93,13 +97,35 @@
         }
 
         .chat-footer {
-            background-color: white;
+            background-color: #ffffff;
             border-top: 1px solid #dee2e6;
             padding: 15px;
         }
 
         .connection-status {
             font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .chat-error {
+            display: none;
+        }
+
+        @media (max-width: 576px) {
+            .discussion-wrapper {
+                margin: 0;
+                padding: 0;
+            }
+
+            .chat-card {
+                height: 100vh;
+                min-height: 100vh;
+                border-radius: 0;
+            }
+
+            .message-bubble {
+                max-width: 88%;
+            }
         }
     </style>
 </head>
@@ -110,11 +136,20 @@
 
         <div class="card shadow chat-card">
 
+            <!-- Chat heading -->
             <div class="chat-header p-3">
 
-                <div class="d-flex justify-content-between align-items-center">
+                <div
+                    class="
+                        d-flex
+                        justify-content-between
+                        align-items-start
+                        gap-3
+                    "
+                >
 
                     <div>
+
                         <h2 class="mb-1">
                             {{ course.title }}
                         </h2>
@@ -122,28 +157,53 @@
                         <p class="mb-0 text-muted">
                             Live Discussion
                         </p>
+
                     </div>
 
-                    <div>
-                        <span
-                            id="connection-status"
-                            class="connection-status text-warning"
-                        >
-                            Connecting...
-                        </span>
-                    </div>
+                    <span
+                        id="connection-status"
+                        class="
+                            connection-status
+                            text-warning
+                            text-nowrap
+                        "
+                    >
+                        ● Connecting...
+                    </span>
 
                 </div>
 
                 <p class="mt-2 mb-0">
+
                     Logged in as
-                    <strong>{{ request.user.username }}</strong>
+
+                    <strong>
+                        {{ request.user.username }}
+                    </strong>
+
                     ({{ request.user.role|title }})
+
                 </p>
+
+                <div
+                    id="chat-error"
+                    class="
+                        chat-error
+                        alert
+                        alert-warning
+                        mt-3
+                        mb-0
+                        py-2
+                    "
+                >
+                    The discussion connection was interrupted.
+                    Reconnecting automatically…
+                </div>
 
             </div>
 
 
+            <!-- Existing chat messages -->
             <div
                 id="chat-messages"
                 class="chat-messages"
@@ -154,6 +214,7 @@
                     {% for chat_message in messages %}
 
                         <div
+                            data-message-id="{{ chat_message.id }}"
                             class="
                                 message-row
 
@@ -178,18 +239,24 @@
                                     <strong>
 
                                         {% if chat_message.sender.role == "teacher" %}
+
                                             🧑‍🏫
                                             {{ chat_message.sender.username }}
                                             (Teacher)
+
                                         {% else %}
+
                                             👨‍🎓
                                             {{ chat_message.sender.username }}
                                             (Student)
+
                                         {% endif %}
 
                                     </strong>
 
-                                    <span class="text-muted ms-2">
+                                    <span
+                                        class="text-muted ms-2"
+                                    >
                                         {{ chat_message.created_at|date:"g:i A" }}
                                     </span>
 
@@ -219,6 +286,7 @@
             </div>
 
 
+            <!-- Message input -->
             <div class="chat-footer">
 
                 <form
@@ -234,22 +302,51 @@
                         placeholder="Type your message..."
                         autocomplete="off"
                         required
+                        disabled
                     >
 
                     <button
+                        id="send-button"
                         class="btn btn-primary"
                         type="submit"
+                        disabled
                     >
                         Send
                     </button>
 
                 </form>
 
+                <div
+                    class="
+                        d-flex
+                        justify-content-between
+                        align-items-center
+                        mt-2
+                    "
+                >
+
+                    <small class="text-muted">
+                        Maximum 1,000 characters
+                    </small>
+
+                    <small
+                        id="character-count"
+                        class="text-muted"
+                    >
+                        0 / 1000
+                    </small>
+
+                </div>
+
                 <div class="mt-3">
 
                     <a
                         href="{% url 'course_detail' course.id %}"
-                        class="btn btn-outline-secondary btn-sm"
+                        class="
+                            btn
+                            btn-outline-secondary
+                            btn-sm
+                        "
                     >
                         Back to Course
                     </a>
@@ -264,6 +361,7 @@
 
 
     {{ course.id|json_script:"course-id" }}
+
     {{ request.user.username|json_script:"current-username" }}
 
 
@@ -285,10 +383,11 @@
                 ? "wss"
                 : "ws";
 
-        const chatSocket = new WebSocket(
-            `${websocketScheme}://${window.location.host}` +
-            `/ws/chat/course/${courseId}/`
-        );
+        const websocketUrl =
+            `${websocketScheme}://` +
+            `${window.location.host}` +
+            `/ws/chat/course/${courseId}/`;
+
 
         const chatMessages =
             document.getElementById(
@@ -305,25 +404,219 @@
                 "chat-message-input"
             );
 
+        const sendButton =
+            document.getElementById(
+                "send-button"
+            );
+
         const connectionStatus =
             document.getElementById(
                 "connection-status"
             );
 
+        const chatError =
+            document.getElementById(
+                "chat-error"
+            );
 
-        chatSocket.onopen = function () {
+        const characterCount =
+            document.getElementById(
+                "character-count"
+            );
+
+
+        let chatSocket = null;
+        let reconnectTimer = null;
+        let reconnectAttempts = 0;
+        let pageIsClosing = false;
+
+        const maximumReconnectDelay = 10000;
+
+
+        function setConnectedState() {
             connectionStatus.textContent =
                 "● Connected";
 
             connectionStatus.className =
-                "connection-status text-success";
-        };
+                "connection-status text-success text-nowrap";
+
+            chatError.style.display =
+                "none";
+
+            messageInput.disabled =
+                false;
+
+            sendButton.disabled =
+                false;
+        }
 
 
-        chatSocket.onmessage = function (event) {
-            const data = JSON.parse(
-                event.data
+        function setConnectingState() {
+            connectionStatus.textContent =
+                "● Connecting...";
+
+            connectionStatus.className =
+                "connection-status text-warning text-nowrap";
+
+            messageInput.disabled =
+                true;
+
+            sendButton.disabled =
+                true;
+        }
+
+
+        function setDisconnectedState() {
+            connectionStatus.textContent =
+                "● Disconnected — reconnecting...";
+
+            connectionStatus.className =
+                "connection-status text-danger text-nowrap";
+
+            chatError.style.display =
+                "block";
+
+            messageInput.disabled =
+                true;
+
+            sendButton.disabled =
+                true;
+        }
+
+
+        function connectWebSocket() {
+            if (
+                chatSocket &&
+                (
+                    chatSocket.readyState ===
+                    WebSocket.OPEN ||
+
+                    chatSocket.readyState ===
+                    WebSocket.CONNECTING
+                )
+            ) {
+                return;
+            }
+
+            setConnectingState();
+
+            chatSocket =
+                new WebSocket(
+                    websocketUrl
+                );
+
+
+            chatSocket.onopen = function () {
+                reconnectAttempts = 0;
+
+                if (reconnectTimer) {
+                    clearTimeout(
+                        reconnectTimer
+                    );
+
+                    reconnectTimer = null;
+                }
+
+                setConnectedState();
+
+                messageInput.focus();
+            };
+
+
+            chatSocket.onmessage = function (event) {
+                const data =
+                    JSON.parse(
+                        event.data
+                    );
+
+                displayMessage(data);
+            };
+
+
+            chatSocket.onclose = function (event) {
+                console.log(
+                    "WebSocket closed:",
+                    {
+                        code: event.code,
+                        reason: event.reason,
+                        wasClean: event.wasClean
+                    }
+                );
+
+                chatSocket = null;
+
+                if (pageIsClosing) {
+                    return;
+                }
+
+                setDisconnectedState();
+
+                scheduleReconnect();
+            };
+
+
+            chatSocket.onerror = function (error) {
+                console.error(
+                    "WebSocket error:",
+                    error
+                );
+
+                if (chatSocket) {
+                    chatSocket.close();
+                }
+            };
+        }
+
+
+        function scheduleReconnect() {
+            if (
+                reconnectTimer ||
+                pageIsClosing
+            ) {
+                return;
+            }
+
+            reconnectAttempts += 1;
+
+            const delay = Math.min(
+                1000 * reconnectAttempts,
+                maximumReconnectDelay
             );
+
+            reconnectTimer = setTimeout(
+                function () {
+                    reconnectTimer = null;
+
+                    connectWebSocket();
+                },
+                delay
+            );
+        }
+
+
+        function messageAlreadyDisplayed(
+            messageId
+        ) {
+            if (!messageId) {
+                return false;
+            }
+
+            return Boolean(
+                document.querySelector(
+                    `[data-message-id="${messageId}"]`
+                )
+            );
+        }
+
+
+        function displayMessage(data) {
+            if (
+                messageAlreadyDisplayed(
+                    data.id
+                )
+            ) {
+                return;
+            }
 
             const noMessages =
                 document.getElementById(
@@ -334,15 +627,26 @@
                 noMessages.remove();
             }
 
+
             const messageRow =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             messageRow.classList.add(
                 "message-row"
             );
 
+            if (data.id) {
+                messageRow.dataset.messageId =
+                    data.id;
+            }
+
+
             const isOwnMessage =
-                data.username === currentUsername;
+                data.username ===
+                currentUsername;
+
 
             if (isOwnMessage) {
                 messageRow.classList.add(
@@ -354,7 +658,10 @@
                     "other-message"
                 );
 
-                if (data.role === "teacher") {
+                if (
+                    data.role ===
+                    "teacher"
+                ) {
                     messageRow.classList.add(
                         "teacher-message"
                     );
@@ -366,24 +673,36 @@
                 }
             }
 
+
             const bubble =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             bubble.classList.add(
                 "message-bubble"
             );
 
+
             const meta =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             meta.classList.add(
                 "message-meta"
             );
 
-            const sender =
-                document.createElement("strong");
 
-            if (data.role === "teacher") {
+            const sender =
+                document.createElement(
+                    "strong"
+                );
+
+            if (
+                data.role ===
+                "teacher"
+            ) {
                 sender.textContent =
                     `🧑‍🏫 ${data.username} (Teacher)`;
             }
@@ -392,8 +711,11 @@
                     `👨‍🎓 ${data.username} (Student)`;
             }
 
+
             const timestamp =
-                document.createElement("span");
+                document.createElement(
+                    "span"
+                );
 
             timestamp.classList.add(
                 "text-muted",
@@ -403,15 +725,21 @@
             timestamp.textContent =
                 data.created_at;
 
+
             const message =
-                document.createElement("p");
+                document.createElement(
+                    "p"
+                );
 
             message.classList.add(
                 "message-text"
             );
 
+            // textContent protects against
+            // HTML and script injection.
             message.textContent =
                 data.message;
+
 
             meta.appendChild(sender);
             meta.appendChild(timestamp);
@@ -425,27 +753,14 @@
                 messageRow
             );
 
+            scrollToLatestMessage();
+        }
+
+
+        function scrollToLatestMessage() {
             chatMessages.scrollTop =
                 chatMessages.scrollHeight;
-        };
-
-
-        chatSocket.onclose = function () {
-            connectionStatus.textContent =
-                "● Disconnected";
-
-            connectionStatus.className =
-                "connection-status text-danger";
-        };
-
-
-        chatSocket.onerror = function () {
-            connectionStatus.textContent =
-                "● Connection Error";
-
-            connectionStatus.className =
-                "connection-status text-danger";
-        };
+        }
 
 
         chatForm.addEventListener(
@@ -461,11 +776,26 @@
                 }
 
                 if (
+                    message.length > 1000
+                ) {
+                    alert(
+                        "Messages cannot exceed 1,000 characters."
+                    );
+
+                    return;
+                }
+
+                if (
+                    !chatSocket ||
                     chatSocket.readyState !==
                     WebSocket.OPEN
                 ) {
+                    setDisconnectedState();
+
+                    connectWebSocket();
+
                     alert(
-                        "The live discussion connection is not ready."
+                        "The discussion is reconnecting. Please try again shortly."
                     );
 
                     return;
@@ -474,19 +804,103 @@
                 chatSocket.send(
                     JSON.stringify(
                         {
-                            message: message,
+                            message: message
                         }
                     )
                 );
 
                 messageInput.value = "";
+
+                characterCount.textContent =
+                    "0 / 1000";
+
                 messageInput.focus();
             }
         );
 
 
-        chatMessages.scrollTop =
-            chatMessages.scrollHeight;
+        messageInput.addEventListener(
+            "input",
+            function () {
+                characterCount.textContent =
+                    `${messageInput.value.length} / 1000`;
+            }
+        );
+
+
+        /*
+         * Reconnect as soon as the user
+         * returns to the browser tab.
+         */
+        document.addEventListener(
+            "visibilitychange",
+            function () {
+                if (
+                    document.visibilityState ===
+                    "visible"
+                ) {
+                    if (
+                        !chatSocket ||
+                        chatSocket.readyState ===
+                        WebSocket.CLOSED
+                    ) {
+                        connectWebSocket();
+                    }
+                }
+            }
+        );
+
+
+        /*
+         * Also reconnect when the browser
+         * window receives focus.
+         */
+        window.addEventListener(
+            "focus",
+            function () {
+                if (
+                    !chatSocket ||
+                    chatSocket.readyState ===
+                    WebSocket.CLOSED
+                ) {
+                    connectWebSocket();
+                }
+            }
+        );
+
+
+        /*
+         * Avoid reconnecting while the
+         * user is leaving the page.
+         */
+        window.addEventListener(
+            "beforeunload",
+            function () {
+                pageIsClosing = true;
+
+                if (reconnectTimer) {
+                    clearTimeout(
+                        reconnectTimer
+                    );
+                }
+
+                if (
+                    chatSocket &&
+                    chatSocket.readyState ===
+                    WebSocket.OPEN
+                ) {
+                    chatSocket.close(
+                        1000,
+                        "Page closed"
+                    );
+                }
+            }
+        );
+
+
+        connectWebSocket();
+
+        scrollToLatestMessage();
     </script>
 
 </body>

@@ -1,120 +1,367 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>{{ user_profile.username }} - Profile</title>
-</head>
+{% block title %}
+    {{ profile_user.username }} Profile
+{% endblock %}
 
-<body>
+{% block content %}
 
-    <h1>
-        {{ user_profile.first_name }}
-        {{ user_profile.last_name }}
-    </h1>
+    <div class="row g-4">
 
-    {% if user_profile.profile_picture %}
+        <!-- Profile information -->
+        <div class="col-lg-4">
 
-        <img
-            src="{{ user_profile.profile_picture.url }}"
-            alt="Profile Picture"
-            width="150"
-        >
+            <div class="card content-card">
 
-    {% endif %}
+                <div class="card-body p-4 text-center">
 
-    <p>
-        <strong>Username:</strong>
-        {{ user_profile.username }}
-    </p>
+                    {% if profile_user.profile_picture %}
 
-    <p>
-        <strong>Email:</strong>
-        {{ user_profile.email }}
-    </p>
+                        <img
+                            src="{{ profile_user.profile_picture.url }}"
+                            alt="{{ profile_user.username }}"
+                            class="rounded-circle mb-3"
+                            style="
+                                width: 130px;
+                                height: 130px;
+                                object-fit: cover;
+                            "
+                        >
 
-    <p>
-        <strong>Role:</strong>
-        {{ user_profile.role }}
-    </p>
+                    {% else %}
 
-    <p>
-        <strong>Bio:</strong>
-        {{ user_profile.bio }}
-    </p>
+                        <div
+                            class="
+                                rounded-circle
+                                bg-primary-subtle
+                                text-primary
+                                d-flex
+                                align-items-center
+                                justify-content-center
+                                mx-auto
+                                mb-3
+                                fw-bold
+                            "
+                            style="
+                                width: 130px;
+                                height: 130px;
+                                font-size: 2.7rem;
+                            "
+                        >
+                            {{ profile_user.username|first|upper }}
+                        </div>
+
+                    {% endif %}
 
 
-    <hr>
+                    <h2 class="mb-1">
+
+                        {% if profile_user.first_name or profile_user.last_name %}
+                            {{ profile_user.first_name }}
+                            {{ profile_user.last_name }}
+                        {% else %}
+                            {{ profile_user.username }}
+                        {% endif %}
+
+                    </h2>
 
 
-    <h2>Status Updates</h2>
+                    <p class="text-muted mb-3">
+                        @{{ profile_user.username }}
+                    </p>
 
 
-    {% if statuses %}
+                    <span
+                        class="
+                            badge
 
-        {% for status in statuses %}
+                            {% if profile_user.role == 'teacher' %}
+                                text-bg-primary
+                            {% else %}
+                                text-bg-success
+                            {% endif %}
+                        "
+                    >
+                        {{ profile_user.role|title }}
+                    </span>
 
-            <div>
 
-                <p>
-                    {{ status.content }}
-                </p>
+                    {% if request.user == profile_user %}
 
-                <small>
-                    Posted on {{ status.created_at }}
-                </small>
+                        <div class="mt-3">
+
+                            <a
+                                href="{% url 'edit_profile' %}"
+                                class="btn btn-outline-primary"
+                            >
+                                Edit Profile
+                            </a>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <hr class="my-4">
+
+
+                    <div class="text-start">
+
+                        <p class="mb-2">
+
+                            <strong>Email:</strong>
+
+                            {% if profile_user.email %}
+                                {{ profile_user.email }}
+                            {% else %}
+                                Not provided
+                            {% endif %}
+
+                        </p>
+
+
+                        <p class="mb-1">
+                            <strong>Bio:</strong>
+                        </p>
+
+                        <p class="text-muted mb-0">
+
+                            {% if profile_user.bio %}
+                                {{ profile_user.bio }}
+                            {% else %}
+                                No bio has been added yet.
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+                </div>
 
             </div>
 
-            <hr>
-
-        {% endfor %}
-
-    {% else %}
-
-        <p>
-            No status updates yet.
-        </p>
-
-    {% endif %}
+        </div>
 
 
-    {% if request.user.is_authenticated %}
+        <!-- Statistics and statuses -->
+        <div class="col-lg-8">
 
-        {% if request.user.username == user_profile.username %}
+            <div class="row g-3 mb-4">
 
-            <br>
+                {% if profile_user.role == "teacher" %}
 
-            <a href="{% url 'create_status' %}">
-                + Add Status Update
-            </a>
+                    <div class="col-md-6">
 
-        {% endif %}
+                        <div class="card content-card h-100">
 
-    {% endif %}
+                            <div class="card-body">
+
+                                <p class="text-muted mb-1">
+                                    Courses Created
+                                </p>
+
+                                <h3 class="mb-0">
+                                    {{ courses_created_count }}
+                                </h3>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="col-md-6">
+
+                        <div class="card content-card h-100">
+
+                            <div class="card-body">
+
+                                <p class="text-muted mb-1">
+                                    Courses Enrolled
+                                </p>
+
+                                <h3 class="mb-0">
+                                    {{ courses_enrolled_count }}
+                                </h3>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
 
 
-    <br><br>
+                <div class="col-md-6">
+
+                    <div class="card content-card h-100">
+
+                        <div class="card-body">
+
+                            <p class="text-muted mb-1">
+                                Status Updates
+                            </p>
+
+                            <h3 class="mb-0">
+                                {{ status_count }}
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
 
-    {% if request.user.is_authenticated %}
+            <div class="card content-card">
 
-        {% if request.user.username == user_profile.username %}
+                <div class="card-body p-4">
 
-            <a href="{% url 'student_dashboard' %}">
-                Back to Dashboard
-            </a>
+                    <div
+                        class="
+                            d-flex
+                            flex-column
+                            flex-md-row
+                            justify-content-between
+                            align-items-md-center
+                            gap-3
+                            mb-4
+                        "
+                    >
 
-        {% else %}
+                        <div>
 
-            <a href="javascript:history.back()">
-                Back
-            </a>
+                            <h2 class="h4 mb-1">
+                                Status Updates
+                            </h2>
 
-        {% endif %}
+                            <p class="text-muted mb-0">
+                                Recent updates shared by this user.
+                            </p>
 
-    {% endif %}
+                        </div>
 
 
-</body>
+                        {% if request.user == profile_user %}
 
-</html>
+                            <a
+                                href="{% url 'create_status' %}"
+                                class="btn btn-primary"
+                            >
+                                Add Status Update
+                            </a>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    {% if status_updates %}
+
+                        <div class="d-grid gap-3">
+
+                            {% for status in status_updates %}
+
+                                <div class="border rounded-3 p-3">
+
+                                    <div class="d-flex gap-3">
+
+                                        {% if profile_user.profile_picture %}
+
+                                            <img
+                                                src="{{ profile_user.profile_picture.url }}"
+                                                alt="{{ profile_user.username }}"
+                                                class="rounded-circle flex-shrink-0"
+                                                style="
+                                                    width: 48px;
+                                                    height: 48px;
+                                                    object-fit: cover;
+                                                "
+                                            >
+
+                                        {% else %}
+
+                                            <div
+                                                class="
+                                                    rounded-circle
+                                                    bg-primary-subtle
+                                                    text-primary
+                                                    d-flex
+                                                    align-items-center
+                                                    justify-content-center
+                                                    fw-bold
+                                                    flex-shrink-0
+                                                "
+                                                style="
+                                                    width: 48px;
+                                                    height: 48px;
+                                                "
+                                            >
+                                                {{ profile_user.username|first|upper }}
+                                            </div>
+
+                                        {% endif %}
+
+
+                                        <div>
+
+                                            <div class="mb-2">
+
+                                                <strong>
+                                                    {{ profile_user.username }}
+                                                </strong>
+
+                                                <small class="text-muted ms-2">
+                                                    {{ status.created_at|date:"d M Y, g:i A" }}
+                                                </small>
+
+                                            </div>
+
+                                            <p class="mb-0">
+                                                {{ status.content }}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="text-center py-5">
+
+                            <div class="display-5 mb-3">
+                                📝
+                            </div>
+
+                            <h5>
+                                No status updates yet
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                Status updates will appear here.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

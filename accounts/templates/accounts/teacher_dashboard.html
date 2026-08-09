@@ -1,61 +1,99 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
+{% block title %}
+    Teacher Dashboard
+{% endblock %}
 
-    <title>
-        Teacher Dashboard
-    </title>
+{% block content %}
 
-</head>
+    <div class="mb-4">
+        <h1 class="page-heading">
+            Welcome back, {{ request.user.first_name|default:request.user.username }}
+        </h1>
 
-<body>
+        <p class="page-subheading">
+            Manage your courses, students and teaching materials.
+        </p>
+    </div>
 
-    <h1>
-        Welcome {{ request.user.username }}
-    </h1>
+    <div class="row g-4">
 
-    <p>
-        You are logged in as a teacher.
-    </p>
+        <div class="col-md-6 col-xl-3">
+            <div class="card content-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">My Courses</h5>
 
-    <hr>
+                    <p class="card-text text-muted">
+                        View and manage the courses you teach.
+                    </p>
 
-    <h2>
-        Teacher Dashboard
-    </h2>
+                    <a
+                        href="{% url 'teacher_courses' %}"
+                        class="btn btn-primary"
+                    >
+                        View Courses
+                    </a>
+                </div>
+            </div>
+        </div>
 
-    <p>
-        <a href="{% url 'teacher_courses' %}">
-            My Courses
-        </a>
-    </p>
+        <div class="col-md-6 col-xl-3">
+            <div class="card content-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Create Course</h5>
 
-    <p>
-        <a href="{% url 'create_course' %}">
-            Create New Course
-        </a>
-    </p>
+                    <p class="card-text text-muted">
+                        Add a new course to the platform.
+                    </p>
 
-    <p>
-        <a href="{% url 'search_users' %}">
-            Search Users
-        </a>
-    </p>
+                    <a
+                        href="{% url 'create_course' %}"
+                        class="btn btn-primary"
+                    >
+                        Create Course
+                    </a>
+                </div>
+            </div>
+        </div>
 
-    <!-- Add this section -->
-    <p>
-        <a href="{% url 'notification_list' %}">
-            My Notifications
-        </a>
-    </p>
+        <div class="col-md-6 col-xl-3">
+            <div class="card content-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Search Users</h5>
 
-    <p>
-        <a href="{% url 'logout' %}">
-            Logout
-        </a>
-    </p>
+                    <p class="card-text text-muted">
+                        Find students and other teachers.
+                    </p>
 
-</body>
+                    <a
+                        href="{% url 'search_users' %}"
+                        class="btn btn-primary"
+                    >
+                        Search
+                    </a>
+                </div>
+            </div>
+        </div>
 
-</html>
+        <div class="col-md-6 col-xl-3">
+            <div class="card content-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Notifications</h5>
+
+                    <p class="card-text text-muted">
+                        View enrolment and course activity notifications.
+                    </p>
+
+                    <a
+                        href="{% url 'notification_list' %}"
+                        class="btn btn-primary"
+                    >
+                        View Notifications
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

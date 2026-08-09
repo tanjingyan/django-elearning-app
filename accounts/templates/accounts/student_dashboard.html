@@ -1,36 +1,83 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student Dashboard</title>
-</head>
+{% extends "base.html" %}
 
-<body>
 
-    <h1>
-        Welcome {{ request.user.username }}
-    </h1>
+{% block title %}
+    Student Dashboard
+{% endblock %}
 
-    <p>
-        You are logged in as a student.
-    </p>
 
-    <p>
-        <a href="{% url 'course_list' %}">
-            Available Courses
-        </a>
-    </p>
+{% block content %}
 
-    <p>
-        <a href="{% url 'notification_list' %}">
-            My Notifications
-        </a>
-    </p>
+    <div class="mb-4">
 
-    <p>
-        <a href="{% url 'logout' %}">
-            Logout
-        </a>
-    </p>
+        <h1 class="page-heading">
+            Welcome back, {{ request.user.first_name|default:request.user.username }}
+        </h1>
 
-</body>
-</html>
+        <p class="page-subheading">
+            Browse courses, review notifications and continue your learning.
+        </p>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+
+            <div class="card content-card h-100">
+
+                <div class="card-body">
+
+                    <h5 class="card-title">
+                        Available Courses
+                    </h5>
+
+                    <p class="card-text text-muted">
+                        Browse courses and enrol in the ones you are interested in.
+                    </p>
+
+                    <a
+                        href="{% url 'course_list' %}"
+                        class="btn btn-primary"
+                    >
+                        Browse Courses
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <div class="card content-card h-100">
+
+                <div class="card-body">
+
+                    <h5 class="card-title">
+                        My Notifications
+                    </h5>
+
+                    <p class="card-text text-muted">
+                        Check for new course materials and other updates.
+                    </p>
+
+                    <a
+                        href="{% url 'notification_list' %}"
+                        class="btn btn-primary"
+                    >
+                        View Notifications
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

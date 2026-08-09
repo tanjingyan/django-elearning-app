@@ -1,259 +1,468 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>
-        {{ course.title }}
-    </title>
-</head>
+{% block title %}
+    {{ course.title }}
+{% endblock %}
 
-<body>
+{% block content %}
 
     <!-- ========================= -->
-    <!-- COURSE INFORMATION -->
+    <!-- COURSE HEADER -->
     <!-- ========================= -->
 
-    <h1>
-        {{ course.title }}
-    </h1>
+    <div class="card content-card overflow-hidden mb-4">
 
-    <p>
-        {{ course.description }}
-    </p>
+        {% if course.image %}
 
-    <p>
-        <strong>Teacher:</strong>
-        {{ course.teacher.username }}
-    </p>
+            <img
+                src="{{ course.image.url }}"
+                alt="{{ course.title }}"
+                style="
+                    width: 100%;
+                    height: 320px;
+                    object-fit: cover;
+                "
+            >
 
+        {% else %}
 
-    <hr>
-
-
-    <!-- ========================= -->
-    <!-- ENROLMENT SECTION -->
-    <!-- ========================= -->
-
-    {% if request.user == course.teacher %}
-
-        <p>
-            You are the teacher of this course.
-        </p>
-
-    {% elif is_enrolled %}
-
-        <p>
-            You are enrolled in this course.
-        </p>
-
-    {% else %}
-
-        <p>
-            You are not enrolled in this course.
-        </p>
-
-        {% if request.user.role == "student" %}
-
-            <a href="{% url 'enrol_course' course.id %}">
-                Enrol on this Course
-            </a>
+            <div
+                class="
+                    bg-primary-subtle
+                    text-primary
+                    d-flex
+                    align-items-center
+                    justify-content-center
+                "
+                style="height: 260px;"
+            >
+                <span class="display-1">
+                    📚
+                </span>
+            </div>
 
         {% endif %}
 
-    {% endif %}
 
+        <div class="card-body p-4">
 
-    <hr>
+            <div
+                class="
+                    d-flex
+                    flex-column
+                    flex-lg-row
+                    justify-content-between
+                    align-items-lg-start
+                    gap-3
+                "
+            >
 
+                <div>
 
-    <!-- ========================= -->
-    <!-- COURSE MATERIALS -->
-    <!-- ========================= -->
+                    <span class="badge text-bg-primary mb-2">
+                        Course
+                    </span>
 
-    <h2>
-        Course Materials
-    </h2>
+                    <h1 class="page-heading mb-2">
+                        {{ course.title }}
+                    </h1>
 
-
-    {% if materials %}
-
-        {% for material in materials %}
-
-            <div>
-
-                <h3>
-                    {{ material.title }}
-                </h3>
-
-
-                {% if material.description %}
-
-                    <p>
-                        {{ material.description }}
+                    <p class="text-muted mb-3">
+                        {{ course.description }}
                     </p>
 
-                {% endif %}
+                    <p class="mb-0">
+                        <strong>Teacher:</strong>
+                        {{ course.teacher.username }}
+                    </p>
+
+                </div>
 
 
-                <p>
-                    <strong>Uploaded by:</strong>
-                    {{ material.teacher.username }}
-                </p>
+                <div class="d-flex flex-wrap gap-2">
 
+                    {% if request.user == course.teacher %}
 
-                <p>
-                    <strong>Uploaded on:</strong>
-                    {{ material.uploaded_at }}
-                </p>
+                        <a
+                            href="{% url 'edit_course' course.id %}"
+                            class="btn btn-outline-primary"
+                        >
+                            Edit Course
+                        </a>
 
+                        <a
+                            href="{% url 'upload_material' course.id %}"
+                            class="btn btn-outline-success"
+                        >
+                            Upload Material
+                        </a>
 
-                <a
-                    href="{{ material.file.url }}"
-                    target="_blank"
-                >
-                    View / Download Material
-                </a>
+                    {% endif %}
+
+                </div>
 
             </div>
 
-            <hr>
+        </div>
 
-        {% endfor %}
-
-    {% else %}
-
-        <p>
-            No course materials have been uploaded yet.
-        </p>
-
-    {% endif %}
+    </div>
 
 
-    <hr>
+    <!-- ========================= -->
+    <!-- ENROLMENT -->
+    <!-- ========================= -->
+
+    <div class="card content-card mb-4">
+
+        <div class="card-body">
+
+            <h2 class="h4 mb-3">
+                Course Access
+            </h2>
+
+            {% if request.user == course.teacher %}
+
+                <div class="alert alert-primary mb-0">
+                    You are the teacher of this course.
+                </div>
+
+            {% elif is_enrolled %}
+
+                <div class="alert alert-success mb-0">
+                    You are enrolled in this course.
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-warning">
+
+                    You are not enrolled in this course.
+
+                </div>
+
+                {% if request.user.role == "student" %}
+
+                    <a
+                        href="{% url 'enrol_course' course.id %}"
+                        class="btn btn-primary"
+                    >
+                        Enrol on this Course
+                    </a>
+
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- ========================= -->
+        <!-- COURSE MATERIALS -->
+        <!-- ========================= -->
+
+        <div class="col-lg-7">
+
+            <div class="card content-card h-100">
+
+                <div class="card-body">
+
+                    <div
+                        class="
+                            d-flex
+                            justify-content-between
+                            align-items-center
+                            mb-3
+                        "
+                    >
+
+                        <h2 class="h4 mb-0">
+                            Course Materials
+                        </h2>
+
+                        {% if request.user == course.teacher %}
+
+                            <a
+                                href="{% url 'upload_material' course.id %}"
+                                class="btn btn-sm btn-outline-success"
+                            >
+                                Upload Material
+                            </a>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    {% if materials %}
+
+                        <div class="list-group list-group-flush">
+
+                            {% for material in materials %}
+
+                                <div class="list-group-item px-0">
+
+                                    <div
+                                        class="
+                                            d-flex
+                                            justify-content-between
+                                            align-items-start
+                                            gap-3
+                                        "
+                                    >
+
+                                        <div>
+
+                                            <h5 class="mb-1">
+                                                📄 {{ material.title }}
+                                            </h5>
+
+                                            {% if material.description %}
+
+                                                <p class="text-muted mb-2">
+                                                    {{ material.description }}
+                                                </p>
+
+                                            {% endif %}
+
+                                            <small class="text-muted d-block">
+                                                Uploaded by
+                                                {{ material.teacher.username }}
+                                            </small>
+
+                                            <small class="text-muted">
+                                                {{ material.uploaded_at|date:"d M Y, g:i A" }}
+                                            </small>
+
+                                        </div>
+
+
+                                        <a
+                                            href="{{ material.file.url }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary btn-sm"
+                                        >
+                                            View
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="text-center py-5">
+
+                            <div class="display-5 mb-3">
+                                📂
+                            </div>
+
+                            <h5>
+                                No materials yet
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                Teaching materials will appear here.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- LIVE DISCUSSION -->
+        <!-- ========================= -->
+
+        <div class="col-lg-5">
+
+            <div class="card content-card h-100">
+
+                <div class="card-body d-flex flex-column">
+
+                    <div class="display-5 mb-3">
+                        💬
+                    </div>
+
+                    <h2 class="h4">
+                        Live Discussion
+                    </h2>
+
+                    <p class="text-muted flex-grow-1">
+                        Discuss this course with the teacher and enrolled students in real time.
+                    </p>
+
+                    {% if request.user == course.teacher or is_enrolled %}
+
+                        <a
+                            href="{% url 'course_chat' course.id %}"
+                            class="btn btn-primary"
+                        >
+                            Open Live Discussion
+                        </a>
+
+                    {% else %}
+
+                        <div class="alert alert-secondary mb-0">
+                            Enrol in this course to join the live discussion.
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 
     <!-- ========================= -->
     <!-- COURSE FEEDBACK -->
     <!-- ========================= -->
 
-    <h2>
-        Course Feedback
-    </h2>
+    <div class="card content-card mt-4">
+
+        <div class="card-body">
+
+            <div
+                class="
+                    d-flex
+                    justify-content-between
+                    align-items-center
+                    mb-4
+                "
+            >
+
+                <div>
+
+                    <h2 class="h4 mb-1">
+                        Course Feedback
+                    </h2>
+
+                    <p class="text-muted mb-0">
+                        Read what students think about this course.
+                    </p>
+
+                </div>
 
 
-    {% if feedback_list %}
+                {% if is_enrolled and not has_feedback %}
 
-        {% for feedback in feedback_list %}
+                    <a
+                        href="{% url 'create_feedback' course.id %}"
+                        class="btn btn-outline-primary"
+                    >
+                        Leave Feedback
+                    </a>
 
-            <div>
-
-                <p>
-                    <strong>
-                        {{ feedback.student.username }}
-                    </strong>
-                </p>
-
-
-                <p>
-                    <strong>Rating:</strong>
-                    {{ feedback.rating }}/5
-                </p>
-
-
-                <p>
-                    {{ feedback.comment }}
-                </p>
-
-
-                <small>
-                    Posted on {{ feedback.created_at }}
-                </small>
+                {% endif %}
 
             </div>
 
-            <hr>
 
-        {% endfor %}
+            {% if feedback_list %}
 
-    {% else %}
+                <div class="row g-3">
 
-        <p>
-            No feedback has been submitted yet.
-        </p>
+                    {% for feedback in feedback_list %}
 
-    {% endif %}
+                        <div class="col-md-6">
+
+                            <div class="border rounded p-3 h-100">
+
+                                <div
+                                    class="
+                                        d-flex
+                                        justify-content-between
+                                        align-items-start
+                                        mb-2
+                                    "
+                                >
+
+                                    <strong>
+                                        {{ feedback.student.username }}
+                                    </strong>
+
+                                    <span class="badge text-bg-warning">
+                                        {{ feedback.rating }}/5
+                                    </span>
+
+                                </div>
+
+                                <p class="mb-3">
+                                    {{ feedback.comment }}
+                                </p>
+
+                                <small class="text-muted">
+                                    {{ feedback.created_at|date:"d M Y, g:i A" }}
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="text-center py-5">
+
+                    <div class="display-5 mb-3">
+                        ⭐
+                    </div>
+
+                    <h5>
+                        No feedback yet
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        Student reviews will appear here.
+                    </p>
+
+                </div>
+
+            {% endif %}
 
 
-    <!-- ========================= -->
-    <!-- LEAVE FEEDBACK -->
-    <!-- ========================= -->
+            {% if is_enrolled and has_feedback %}
 
-    {% if is_enrolled %}
+                <div class="alert alert-info mt-4 mb-0">
+                    You have already submitted feedback for this course.
+                </div>
 
-        {% if not has_feedback %}
+            {% endif %}
 
-            <a href="{% url 'create_feedback' course.id %}">
-                Leave Feedback
-            </a>
+        </div>
 
-        {% else %}
-
-            <p>
-                You have already submitted feedback for this course.
-            </p>
-
-        {% endif %}
-
-    {% endif %}
+    </div>
 
 
-    <br>
-    <br>
+    <div class="mt-4">
 
-
-    <hr>
-
-
-    <!-- ========================= -->
-    <!-- LIVE DISCUSSION -->
-    <!-- ========================= -->
-
-    <h2>
-        Live Discussion
-    </h2>
-
-    {% if request.user == course.teacher or is_enrolled %}
-
-        <p>
-            Discuss this course with your teacher and classmates in real time.
-        </p>
-
-        <a href="{% url 'course_chat' course.id %}">
-            Open Live Discussion
+        <a
+            href="{% url 'course_list' %}"
+            class="btn btn-outline-secondary"
+        >
+            Back to Courses
         </a>
 
-    {% else %}
+    </div>
 
-        <p>
-            Enrol in this course to participate in the live discussion.
-        </p>
-
-    {% endif %}
-
-
-    <br>
-    <br>
-
-
-    <!-- ========================= -->
-    <!-- BACK TO COURSES -->
-    <!-- ========================= -->
-
-    <a href="{% url 'course_list' %}">
-        Back to Courses
-    </a>
-
-
-</body>
-
-</html>
+{% endblock %}

@@ -65,4 +65,10 @@ urlpatterns = [
         name="upload_material"
     ),
 
+    path(
+        "<int:course_id>/edit/",
+        views.edit_course,
+        name="edit_course",
+    ),
+
 ]

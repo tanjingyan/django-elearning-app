@@ -36,3 +36,53 @@ class StatusUpdateForm(forms.ModelForm):
                 }
             )
         }
+
+class EditProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+
+        fields = (
+            "first_name",
+            "last_name",
+            "email",
+            "profile_picture",
+            "bio",
+        )
+
+        widgets = {
+            "first_name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Enter your first name",
+                }
+            ),
+
+            "last_name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Enter your last name",
+                }
+            ),
+
+            "email": forms.EmailInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Enter your email address",
+                }
+            ),
+
+            "profile_picture": forms.ClearableFileInput(
+                attrs={
+                    "class": "form-control",
+                    "accept": "image/*",
+                }
+            ),
+
+            "bio": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 5,
+                    "placeholder": "Write a short bio",
+                }
+            ),
+        }

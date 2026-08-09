@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
+
 {% block title %}
-    Create Course
+    Edit Course
 {% endblock %}
+
 
 {% block content %}
 
@@ -15,12 +17,37 @@
                 <div class="card-body p-4">
 
                     <h1 class="page-heading">
-                        Create Course
+                        Edit Course
                     </h1>
 
                     <p class="page-subheading">
-                        Enter the course information and upload an optional cover image.
+                        Update the course details and cover image.
                     </p>
+
+
+                    {% if course.image %}
+
+                        <div class="mb-4">
+
+                            <p class="fw-semibold mb-2">
+                                Current cover image
+                            </p>
+
+                            <img
+                                src="{{ course.image.url }}"
+                                alt="{{ course.title }}"
+                                class="img-fluid rounded"
+                                style="
+                                    width: 100%;
+                                    max-height: 300px;
+                                    object-fit: cover;
+                                "
+                            >
+
+                        </div>
+
+                    {% endif %}
+
 
                     <form
                         method="post"
@@ -35,11 +62,11 @@
                             type="submit"
                             class="btn btn-primary"
                         >
-                            Create Course
+                            Save Changes
                         </button>
 
                         <a
-                            href="{% url 'teacher_courses' %}"
+                            href="{% url 'course_detail' course.id %}"
                             class="btn btn-outline-secondary"
                         >
                             Cancel

@@ -5,6 +5,12 @@ from . import views
 urlpatterns = [
 
     path(
+        "",
+        views.home_redirect,
+        name="home",
+    ),
+
+    path(
         "register/",
         views.register,
         name="register"
@@ -32,6 +38,12 @@ urlpatterns = [
         "teacher/dashboard/",
         views.teacher_dashboard,
         name="teacher_dashboard"
+    ),
+
+    path(
+        "profile/edit/",
+        views.edit_profile,
+        name="edit_profile",
     ),
 
     path(

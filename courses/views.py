@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Course, Enrolment, Feedback, CourseBlock, CourseMaterial
 from .forms import CourseForm, FeedbackForm, CourseMaterialForm
 from accounts.models import CustomUser
@@ -7,57 +7,48 @@ from notifications.models import Notification
 
 @login_required
 def create_course(request):
-
-    # Only teachers can create courses
     if request.user.role != "teacher":
         return redirect("student_dashboard")
 
     if request.method == "POST":
-
-        form = CourseForm(request.POST)
+        form = CourseForm(
+            request.POST,
+            request.FILES,
+        )
 
         if form.is_valid():
-
-            course = form.save(
-                commit=False
-            )
-
-            # Automatically assign logged-in teacher
+            course = form.save(commit=False)
             course.teacher = request.user
-
             course.save()
 
-            return redirect(
-                "teacher_courses"
-            )
+            return redirect("teacher_courses")
 
     else:
-
         form = CourseForm()
 
     return render(
         request,
         "courses/create_course.html",
         {
-            "form": form
-        }
+            "form": form,
+        },
     )
 
 @login_required
 def teacher_courses(request):
-
-    # Only teachers can access this page
     if request.user.role != "teacher":
         return redirect("student_dashboard")
 
-    courses = request.user.courses_created.all()
+    courses = Course.objects.filter(
+        teacher=request.user
+    ).order_by("-created_at")
 
     return render(
         request,
         "courses/teacher_courses.html",
         {
-            "courses": courses
-        }
+            "courses": courses,
+        },
     )
 
 @login_required
@@ -387,4 +378,46 @@ def upload_material(request, course_id):
             "form": form,
             "course": course,
         }
+    )
+
+@login_required
+def edit_course(request, course_id):
+    course = get_object_or_404(
+        Course,
+        id=course_id,
+    )
+
+    if request.user.role != "teacher":
+        return redirect("student_dashboard")
+
+    if course.teacher != request.user:
+        return redirect("teacher_courses")
+
+    if request.method == "POST":
+        form = CourseForm(
+            request.POST,
+            request.FILES,
+            instance=course,
+        )
+
+        if form.is_valid():
+            form.save()
+
+            return redirect(
+                "course_detail",
+                course_id=course.id,
+            )
+
+    else:
+        form = CourseForm(
+            instance=course,
+        )
+
+    return render(
+        request,
+        "courses/edit_course.html",
+        {
+            "form": form,
+            "course": course,
+        },
     )

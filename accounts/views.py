@@ -1,9 +1,19 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import CustomUser
-from .forms import CustomUserCreationForm, StatusUpdateForm
+from .models import CustomUser, StatusUpdate
+from .forms import CustomUserCreationForm, StatusUpdateForm, EditProfileForm
+from courses.models import Course, Enrolment
 
+def home_redirect(request):
+    if request.user.is_authenticated:
+        if request.user.role == "teacher":
+            return redirect("teacher_dashboard")
+
+        return redirect("student_dashboard")
+
+    return redirect("login")
 
 def register(request):
     if request.method == "POST":
@@ -92,24 +102,38 @@ def teacher_dashboard(request):
         "accounts/teacher_dashboard.html"
     )
 
+@login_required
 def profile(request, username):
-
-    from .models import CustomUser
-
-    user_profile = get_object_or_404(
+    profile_user = get_object_or_404(
         CustomUser,
-        username=username
+        username=username,
     )
 
-    statuses = user_profile.status_updates.all()
+    status_updates = StatusUpdate.objects.filter(
+        user=profile_user,
+    ).order_by("-created_at")
+
+    courses_created_count = 0
+    courses_enrolled_count = 0
+
+    if profile_user.role == "teacher":
+        courses_created_count = profile_user.courses_taught.count()
+
+    if profile_user.role == "student":
+        courses_enrolled_count = Enrolment.objects.filter(
+            student=profile_user,
+        ).count()
 
     return render(
         request,
         "accounts/profile.html",
         {
-            "user_profile": user_profile,
-            "statuses": statuses,
-        }
+            "profile_user": profile_user,
+            "status_updates": status_updates,
+            "courses_created_count": courses_created_count,
+            "courses_enrolled_count": courses_enrolled_count,
+            "status_count": status_updates.count(),
+        },
     )
 
 @login_required
@@ -182,4 +206,39 @@ def teacher_dashboard(request):
     return render(
         request,
         "accounts/teacher_dashboard.html"
+    )
+
+@login_required
+def edit_profile(request):
+    if request.method == "POST":
+        form = EditProfileForm(
+            request.POST,
+            request.FILES,
+            instance=request.user,
+        )
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "Your profile has been updated successfully.",
+            )
+
+            return redirect(
+                "profile",
+                username=request.user.username,
+            )
+
+    else:
+        form = EditProfileForm(
+            instance=request.user,
+        )
+
+    return render(
+        request,
+        "accounts/edit_profile.html",
+        {
+            "form": form,
+        },
     )

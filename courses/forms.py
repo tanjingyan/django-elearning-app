@@ -11,6 +11,7 @@ class CourseForm(forms.ModelForm):
         fields = (
             "title",
             "description",
+            "image",
         )
 
         widgets = {
