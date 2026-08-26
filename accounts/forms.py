@@ -19,6 +19,7 @@ class CustomUserCreationForm(UserCreationForm):
             "bio",
         )
 
+
 class StatusUpdateForm(forms.ModelForm):
 
     class Meta:
@@ -37,7 +38,27 @@ class StatusUpdateForm(forms.ModelForm):
             )
         }
 
+    def clean_content(self):
+        content = self.cleaned_data.get(
+            "content",
+            "",
+        ).strip()
+
+        if not content:
+            raise forms.ValidationError(
+                "Status update cannot be empty."
+            )
+
+        if len(content) > 500:
+            raise forms.ValidationError(
+                "Status update cannot exceed 500 characters."
+            )
+
+        return content
+
+
 class EditProfileForm(forms.ModelForm):
+
     class Meta:
         model = CustomUser
 
@@ -86,3 +107,35 @@ class EditProfileForm(forms.ModelForm):
                 }
             ),
         }
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+
+        if (
+            email
+            and CustomUser.objects.filter(
+                email=email
+            )
+            .exclude(
+                pk=self.instance.pk
+            )
+            .exists()
+        ):
+            raise forms.ValidationError(
+                "This email address is already being used."
+            )
+
+        return email
+
+    def clean_bio(self):
+        bio = self.cleaned_data.get(
+            "bio",
+            "",
+        ).strip()
+
+        if len(bio) > 500:
+            raise forms.ValidationError(
+                "Bio cannot exceed 500 characters."
+            )
+
+        return bio
