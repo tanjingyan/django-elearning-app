@@ -117,7 +117,7 @@ def profile(request, username):
     courses_enrolled_count = 0
 
     if profile_user.role == "teacher":
-        courses_created_count = profile_user.courses_taught.count()
+        courses_created_count = profile_user.courses_created.count()
 
     if profile_user.role == "student":
         courses_enrolled_count = Enrolment.objects.filter(

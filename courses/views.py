@@ -273,7 +273,7 @@ def block_student(request, course_id, student_id):
     if request.method != "POST":
         return redirect(
             "course_students",
-            course_id=course_id
+            course_id=course_id,
         )
 
     course = Course.objects.get(
@@ -288,32 +288,35 @@ def block_student(request, course_id, student_id):
     )
 
     CourseBlock.objects.get_or_create(
-        teacher=request.user,
         student=student,
-        course=course
+        course=course,
     )
 
     Enrolment.objects.filter(
         course=course,
-        student=student
+        student=student,
     ).delete()
 
     return redirect(
         "course_students",
-        course_id=course.id
+        course_id=course.id,
     )
+
 
 @login_required
 def upload_material(request, course_id):
 
+    # Only teachers can upload materials
     if request.user.role != "teacher":
         return redirect("student_dashboard")
 
-    course = Course.objects.get(
-        id=course_id
+    course = get_object_or_404(
+        Course,
+        id=course_id,
     )
 
-    # Make sure the logged-in teacher owns this course
+    # Only the teacher who owns the course
+    # can upload material to it
     if course.teacher != request.user:
         return redirect("teacher_courses")
 
@@ -321,55 +324,49 @@ def upload_material(request, course_id):
 
         form = CourseMaterialForm(
             request.POST,
-            request.FILES
+            request.FILES,
         )
 
         if form.is_valid():
 
-            # Save the uploaded material
             material = form.save(
                 commit=False
             )
 
+            # The teacher is already known through:
+            # material.course.teacher
             material.course = course
-            material.teacher = request.user
 
             material.save()
-
 
             # Find all students enrolled in this course
             enrolments = Enrolment.objects.filter(
                 course=course
+            ).select_related(
+                "student"
             )
 
-
-            # Create a notification for each enrolled student
+            # Notify every enrolled student
             for enrolment in enrolments:
 
                 Notification.objects.create(
-
                     recipient=enrolment.student,
-
                     course=course,
-
+                    notification_type=Notification.MATERIAL,
                     message=(
                         f'New material "{material.title}" '
                         f'has been added to '
                         f'"{course.title}".'
-                    )
-
+                    ),
                 )
-
 
             return redirect(
                 "course_detail",
-                course_id=course.id
+                course_id=course.id,
             )
 
     else:
-
         form = CourseMaterialForm()
-
 
     return render(
         request,
@@ -377,7 +374,7 @@ def upload_material(request, course_id):
         {
             "form": form,
             "course": course,
-        }
+        },
     )
 
 @login_required
