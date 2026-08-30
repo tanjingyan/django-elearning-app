@@ -30,21 +30,24 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-class StatusUpdate(models.Model):
 
+class StatusUpdate(models.Model):
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="status_updates"
+        related_name="status_updates",
     )
 
     content = models.TextField(
-        max_length=500
+        max_length=500,
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
+
+    class Meta:
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.user.username}: {self.content[:30]}"

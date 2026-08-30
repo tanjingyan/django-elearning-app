@@ -242,3 +242,20 @@ def edit_profile(request):
             "form": form,
         },
     )
+
+@login_required
+def api_docs(request):
+    if request.user.role != "teacher":
+        messages.error(
+            request,
+            "API documentation is available to teachers only.",
+        )
+
+        return redirect(
+            "student_dashboard"
+        )
+
+    return render(
+        request,
+        "api_docs.html",
+    )

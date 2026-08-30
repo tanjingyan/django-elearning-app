@@ -5,6 +5,14 @@ from rest_framework.test import APITestCase
 
 from accounts.models import CustomUser
 
+from courses.models import (
+    Course,
+    CourseMaterial,
+    Enrolment,
+    Feedback,
+)
+
+from notifications.models import Notification
 
 class UserAPITests(APITestCase):
 
@@ -269,4 +277,528 @@ class UserAPITests(APITestCase):
         self.assertEqual(
             self.student1.role,
             "student",
+        )
+
+class ExtendedAPITests(APITestCase):
+
+    def setUp(self):
+        self.teacher = CustomUser.objects.create_user(
+            username="teacher_api",
+            password="testpass123",
+            role="teacher",
+            email="teacher_api@example.com",
+        )
+
+        self.other_teacher = CustomUser.objects.create_user(
+            username="teacher_other",
+            password="testpass123",
+            role="teacher",
+            email="teacher_other@example.com",
+        )
+
+        self.student = CustomUser.objects.create_user(
+            username="student_api",
+            password="testpass123",
+            role="student",
+            email="student_api@example.com",
+        )
+
+        self.other_student = CustomUser.objects.create_user(
+            username="student_other",
+            password="testpass123",
+            role="student",
+            email="student_other@example.com",
+        )
+
+        self.course = Course.objects.create(
+            teacher=self.teacher,
+            title="API Testing Course",
+            description="Course used for REST API testing.",
+        )
+
+        self.material = CourseMaterial.objects.create(
+            course=self.course,
+            title="Week 1 Notes",
+            description="Testing material.",
+            file="course_materials/week1.pdf",
+        )
+
+        self.enrolment = Enrolment.objects.create(
+            student=self.student,
+            course=self.course,
+        )
+
+        self.notification = Notification.objects.create(
+            recipient=self.student,
+            course=self.course,
+            notification_type="material",
+            message="New course material available.",
+        )
+
+    # -----------------------------------------
+    # Course list
+    # -----------------------------------------
+
+    def test_authenticated_user_can_view_course_list(self):
+        self.client.force_authenticate(
+            user=self.student
+        )
+
+        url = reverse("api_course_list")
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+
+        self.assertEqual(
+            response.data[0]["title"],
+            "API Testing Course",
+        )
+
+    def test_unauthenticated_user_cannot_view_course_list(self):
+        url = reverse("api_course_list")
+
+        response = self.client.get(url)
+
+        self.assertIn(
+            response.status_code,
+            [
+                status.HTTP_401_UNAUTHORIZED,
+                status.HTTP_403_FORBIDDEN,
+            ],
+        )
+
+    # -----------------------------------------
+    # Enrolments
+    # -----------------------------------------
+
+    def test_student_can_view_own_enrolments(self):
+        self.client.force_authenticate(
+            user=self.student
+        )
+
+        url = reverse(
+            "api_current_user_enrolments"
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+
+        self.assertEqual(
+            len(response.data),
+            1,
+        )
+
+        self.assertEqual(
+            response.data[0]["course"]["title"],
+            "API Testing Course",
+        )
+
+    def test_student_can_enrol_in_course(self):
+        second_course = Course.objects.create(
+            teacher=self.teacher,
+            title="Second API Course",
+            description="Second course.",
+        )
+
+        self.client.force_authenticate(
+            user=self.other_student
+        )
+
+        url = reverse(
+            "api_course_enrol",
+            kwargs={
+                "pk": second_course.id,
+            },
+        )
+
+        response = self.client.post(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED,
+        )
+
+        self.assertTrue(
+            Enrolment.objects.filter(
+                student=self.other_student,
+                course=second_course,
+            ).exists()
+        )
+
+    def test_duplicate_enrolment_is_rejected(self):
+        self.client.force_authenticate(
+            user=self.student
+        )
+
+        url = reverse(
+            "api_course_enrol",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        response = self.client.post(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    def test_teacher_cannot_enrol_in_course(self):
+        self.client.force_authenticate(
+            user=self.teacher
+        )
+
+        url = reverse(
+            "api_course_enrol",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        response = self.client.post(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+    # -----------------------------------------
+    # Course materials
+    # -----------------------------------------
+
+    def test_enrolled_student_can_view_course_materials(self):
+        self.client.force_authenticate(
+            user=self.student
+        )
+
+        url = reverse(
+            "api_course_materials",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+
+        self.assertEqual(
+            response.data[0]["title"],
+            "Week 1 Notes",
+        )
+
+    def test_non_enrolled_student_cannot_view_course_materials(self):
+        self.client.force_authenticate(
+            user=self.other_student
+        )
+
+        url = reverse(
+            "api_course_materials",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+    # -----------------------------------------
+    # Course students
+    # -----------------------------------------
+
+    def test_course_teacher_can_view_enrolled_students(self):
+        self.client.force_authenticate(
+            user=self.teacher
+        )
+
+        url = reverse(
+            "api_course_students",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+
+        self.assertEqual(
+            response.data[0]["username"],
+            "student_api",
+        )
+
+    def test_other_teacher_cannot_view_course_students(self):
+        self.client.force_authenticate(
+            user=self.other_teacher
+        )
+
+        url = reverse(
+            "api_course_students",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+    def test_student_cannot_view_course_student_list(self):
+        self.client.force_authenticate(
+            user=self.student
+        )
+
+        url = reverse(
+            "api_course_students",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+    # -----------------------------------------
+    # Feedback
+    # -----------------------------------------
+
+    def test_enrolled_student_can_submit_feedback(self):
+        self.client.force_authenticate(
+            user=self.student
+        )
+
+        url = reverse(
+            "api_course_feedback",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        data = {
+            "rating": 5,
+            "comment": "Excellent course.",
+        }
+
+        response = self.client.post(
+            url,
+            data,
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED,
+        )
+
+        self.assertTrue(
+            Feedback.objects.filter(
+                student=self.student,
+                course=self.course,
+            ).exists()
+        )
+
+    def test_non_enrolled_student_cannot_submit_feedback(self):
+        self.client.force_authenticate(
+            user=self.other_student
+        )
+
+        url = reverse(
+            "api_course_feedback",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        data = {
+            "rating": 4,
+            "comment": "Test feedback.",
+        }
+
+        response = self.client.post(
+            url,
+            data,
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+    def test_duplicate_feedback_is_rejected(self):
+        Feedback.objects.create(
+            student=self.student,
+            course=self.course,
+            rating=5,
+            comment="First feedback.",
+        )
+
+        self.client.force_authenticate(
+            user=self.student
+        )
+
+        url = reverse(
+            "api_course_feedback",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        data = {
+            "rating": 4,
+            "comment": "Second feedback.",
+        }
+
+        response = self.client.post(
+            url,
+            data,
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    def test_invalid_feedback_rating_is_rejected(self):
+        self.client.force_authenticate(
+            user=self.student
+        )
+
+        url = reverse(
+            "api_course_feedback",
+            kwargs={
+                "pk": self.course.id,
+            },
+        )
+
+        data = {
+            "rating": 6,
+            "comment": "Invalid rating.",
+        }
+
+        response = self.client.post(
+            url,
+            data,
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    # -----------------------------------------
+    # Notifications
+    # -----------------------------------------
+
+    def test_student_only_sees_own_notifications(self):
+        Notification.objects.create(
+            recipient=self.other_student,
+            course=self.course,
+            notification_type="material",
+            message="Other student's notification.",
+        )
+
+        self.client.force_authenticate(
+            user=self.student
+        )
+
+        url = reverse(
+            "api_current_user_notifications"
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+
+        self.assertEqual(
+            len(response.data),
+            1,
+        )
+
+        self.assertEqual(
+            response.data[0]["message"],
+            "New course material available.",
+        )
+
+    def test_notification_owner_can_mark_notification_read(self):
+        self.client.force_authenticate(
+            user=self.student
+        )
+
+        url = reverse(
+            "api_notification_read",
+            kwargs={
+                "pk": self.notification.id,
+            },
+        )
+
+        response = self.client.patch(
+            url,
+            {},
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+
+        self.notification.refresh_from_db()
+
+        self.assertTrue(
+            self.notification.is_read
+        )
+
+    def test_other_user_cannot_mark_notification_read(self):
+        self.client.force_authenticate(
+            user=self.other_student
+        )
+
+        url = reverse(
+            "api_notification_read",
+            kwargs={
+                "pk": self.notification.id,
+            },
+        )
+
+        response = self.client.patch(
+            url,
+            {},
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_404_NOT_FOUND,
         )

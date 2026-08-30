@@ -1,10 +1,16 @@
 from django.contrib import admin
-from .models import Course, Enrolment, Feedback, CourseBlock, CourseMaterial
+
+from .models import (
+    Course,
+    CourseBlock,
+    CourseMaterial,
+    Enrolment,
+    Feedback,
+)
 
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-
     list_display = (
         "title",
         "teacher",
@@ -12,18 +18,17 @@ class CourseAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
-        "teacher",
+        "created_at",
     )
 
     search_fields = (
         "title",
-        "description",
+        "teacher__username",
     )
 
 
 @admin.register(Enrolment)
 class EnrolmentAdmin(admin.ModelAdmin):
-
     list_display = (
         "student",
         "course",
@@ -31,6 +36,7 @@ class EnrolmentAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
+        "enrolled_at",
         "course",
     )
 
@@ -39,9 +45,9 @@ class EnrolmentAdmin(admin.ModelAdmin):
         "course__title",
     )
 
+
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
-
     list_display = (
         "student",
         "course",
@@ -51,6 +57,7 @@ class FeedbackAdmin(admin.ModelAdmin):
 
     list_filter = (
         "rating",
+        "created_at",
         "course",
     )
 
@@ -60,43 +67,56 @@ class FeedbackAdmin(admin.ModelAdmin):
         "comment",
     )
 
+
 @admin.register(CourseBlock)
 class CourseBlockAdmin(admin.ModelAdmin):
-
     list_display = (
-        "teacher",
         "student",
         "course",
+        "course_teacher",
         "blocked_at",
     )
 
     list_filter = (
         "course",
+        "blocked_at",
     )
 
     search_fields = (
-        "teacher__username",
         "student__username",
         "course__title",
+        "course__teacher__username",
     )
+
+    @admin.display(
+        description="Teacher"
+    )
+    def course_teacher(self, obj):
+        return obj.course.teacher
+
 
 @admin.register(CourseMaterial)
 class CourseMaterialAdmin(admin.ModelAdmin):
-
     list_display = (
         "title",
         "course",
-        "teacher",
+        "course_teacher",
         "uploaded_at",
     )
 
     list_filter = (
         "course",
-        "teacher",
+        "uploaded_at",
     )
 
     search_fields = (
         "title",
         "course__title",
-        "teacher__username",
+        "course__teacher__username",
     )
+
+    @admin.display(
+        description="Teacher"
+    )
+    def course_teacher(self, obj):
+        return obj.course.teacher

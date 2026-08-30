@@ -31,5 +31,6 @@ class ChatMessage(models.Model):
     def __str__(self):
         return (
             f"{self.sender.username} in "
-            f"{self.course.title}: {self.message[:30]}"
+            f"{self.course.title}: "
+            f"{self.message[:30]}"
         )

@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third Party Apps
+    "django_extensions",
     'rest_framework',
+    "drf_spectacular",
 
     "channels",
 
@@ -163,6 +165,8 @@ CHANNEL_LAYERS = {
 }
 
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
@@ -170,4 +174,14 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "LearnSpace API",
+    "DESCRIPTION": (
+        "REST API documentation for the LearnSpace "
+        "eLearning platform."
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }

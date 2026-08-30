@@ -1,17 +1,21 @@
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+)
 from django.db import models
+
 from accounts.models import CustomUser
 
 
 class Course(models.Model):
-
     teacher = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="courses_created"
+        related_name="courses_created",
     )
 
     title = models.CharField(
-        max_length=200
+        max_length=200,
     )
 
     description = models.TextField()
@@ -23,101 +27,123 @@ class Course(models.Model):
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
+
+    class Meta:
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.title
 
-class Enrolment(models.Model):
 
+class Enrolment(models.Model):
     student = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="enrolments"
+        related_name="enrolments",
     )
 
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
-        related_name="enrolments"
+        related_name="enrolments",
     )
 
     enrolled_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
 
     class Meta:
-        unique_together = (
-            "student",
-            "course",
-        )
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "course"],
+                name="unique_student_enrolment",
+            ),
+        ]
+
+        ordering = ["-enrolled_at"]
 
     def __str__(self):
         return f"{self.student.username} - {self.course.title}"
 
-class Feedback(models.Model):
 
+class Feedback(models.Model):
     student = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="feedback_given"
+        related_name="feedback_given",
     )
 
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
-        related_name="feedback"
+        related_name="feedback",
     )
 
-    rating = models.PositiveIntegerField()
+    rating = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5),
+        ],
+    )
 
     comment = models.TextField(
-        max_length=1000
+        max_length=1000,
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
 
     class Meta:
-        unique_together = (
-            "student",
-            "course",
-        )
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "course"],
+                name="unique_student_course_feedback",
+            ),
+
+            models.CheckConstraint(
+                condition=models.Q(
+                    rating__gte=1,
+                    rating__lte=5,
+                ),
+                name="feedback_rating_between_1_and_5",
+            ),
+        ]
+
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.student.username} - {self.course.title}"
 
+
 class CourseBlock(models.Model):
-
-    teacher = models.ForeignKey(
-        CustomUser,
-        on_delete=models.CASCADE,
-        related_name="course_blocks_created"
-    )
-
     student = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="course_blocks_received"
+        related_name="course_blocks_received",
     )
 
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
-        related_name="blocked_students"
+        related_name="blocked_students",
     )
 
     blocked_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
 
     class Meta:
-        unique_together = (
-            "student",
-            "course",
-        )
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "course"],
+                name="unique_course_block",
+            ),
+        ]
+
+        ordering = ["-blocked_at"]
 
     def __str__(self):
         return (
@@ -125,35 +151,32 @@ class CourseBlock(models.Model):
             f"blocked from {self.course.title}"
         )
 
-class CourseMaterial(models.Model):
 
+class CourseMaterial(models.Model):
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
-        related_name="materials"
-    )
-
-    teacher = models.ForeignKey(
-        CustomUser,
-        on_delete=models.CASCADE,
-        related_name="uploaded_materials"
+        related_name="materials",
     )
 
     title = models.CharField(
-        max_length=200
+        max_length=200,
     )
 
     description = models.TextField(
-        blank=True
+        blank=True,
     )
 
     file = models.FileField(
-        upload_to="course_materials/"
+        upload_to="course_materials/",
     )
 
     uploaded_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
+
+    class Meta:
+        ordering = ["-uploaded_at"]
 
     def __str__(self):
         return self.title

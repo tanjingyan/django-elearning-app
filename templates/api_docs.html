@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}
+    API Documentation
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-9">
+
+        <div class="mb-4">
+            <h1 class="page-heading">
+                API Documentation
+            </h1>
+
+            <p class="page-subheading">
+                Explore the LearnSpace REST API documentation
+                and OpenAPI specification.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+
+                <div class="card content-card h-100">
+
+                    <div class="card-body p-4">
+
+                        <h4 class="card-title">
+                            Swagger UI
+                        </h4>
+
+                        <p class="text-muted">
+                            Interactive API documentation for viewing
+                            and testing LearnSpace REST endpoints.
+                        </p>
+
+                        <a
+                            href="{% url 'swagger-ui' %}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-primary"
+                        >
+                            Open Swagger
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card content-card h-100">
+
+                    <div class="card-body p-4">
+
+                        <h4 class="card-title">
+                            ReDoc
+                        </h4>
+
+                        <p class="text-muted">
+                            Structured reference documentation generated
+                            from the LearnSpace OpenAPI schema.
+                        </p>
+
+                        <a
+                            href="{% url 'redoc' %}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-outline-primary"
+                        >
+                            Open ReDoc
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card content-card h-100">
+
+                    <div class="card-body p-4">
+
+                        <h4 class="card-title">
+                            OpenAPI Schema
+                        </h4>
+
+                        <p class="text-muted">
+                            View the raw machine-readable OpenAPI
+                            specification used by Swagger and ReDoc.
+                        </p>
+
+                        <a
+                            href="{% url 'schema' %}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-outline-secondary"
+                        >
+                            View Schema
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
