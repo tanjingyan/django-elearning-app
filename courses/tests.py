@@ -16,6 +16,10 @@ from courses.models import (
 )
 from notifications.models import Notification
 
+@override_settings(
+    CELERY_TASK_ALWAYS_EAGER=True,
+    CELERY_TASK_EAGER_PROPAGATES=True,
+)
 
 class CourseTests(TestCase):
 

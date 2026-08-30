@@ -25,65 +25,7 @@
 
             {% for notification in notifications %}
 
-                <div class="col-12">
-
-                    <div class="card content-card">
-
-                        <div class="card-body">
-
-                            <div class="d-flex gap-3">
-
-                                <div
-                                    class="
-                                        rounded-circle
-                                        bg-primary-subtle
-                                        text-primary
-                                        d-flex
-                                        align-items-center
-                                        justify-content-center
-                                        flex-shrink-0
-                                    "
-                                    style="
-                                        width: 52px;
-                                        height: 52px;
-                                        font-size: 1.3rem;
-                                    "
-                                >
-                                    🔔
-                                </div>
-
-
-                                <div class="flex-grow-1">
-
-                                    <p class="fw-semibold mb-1">
-                                        {{ notification.message }}
-                                    </p>
-
-                                    <p class="text-muted small mb-3">
-                                        {{ notification.created_at|date:"d M Y, g:i A" }}
-                                    </p>
-
-
-                                    {% if notification.course %}
-
-                                        <a
-                                            href="{% url 'course_detail' notification.course.id %}"
-                                            class="btn btn-outline-primary btn-sm"
-                                        >
-                                            View Course
-                                        </a>
-
-                                    {% endif %}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
+                {% include "notifications/partials/notification_item.html" %}
 
             {% endfor %}
 

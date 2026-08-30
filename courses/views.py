@@ -3,7 +3,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Course, Enrolment, Feedback, CourseBlock, CourseMaterial
 from .forms import CourseForm, FeedbackForm, CourseMaterialForm
 from accounts.models import CustomUser
-from notifications.models import Notification
+from notifications.tasks import (
+    create_enrolment_notification,
+    create_material_notifications,
+)
 
 @login_required
 def create_course(request):
@@ -124,13 +127,8 @@ def enrol_course(request, course_id):
     )
 
     if created:
-        Notification.objects.create(
-            recipient=course.teacher,
-            course=course,
-            message=(
-                f'{request.user.username} enrolled in '
-                f'"{course.title}".'
-            )
+        create_enrolment_notification.delay(
+            enrolment.id
         )
 
     return redirect(
@@ -333,32 +331,14 @@ def upload_material(request, course_id):
                 commit=False
             )
 
-            # The teacher is already known through:
-            # material.course.teacher
             material.course = course
-
             material.save()
 
-            # Find all students enrolled in this course
-            enrolments = Enrolment.objects.filter(
-                course=course
-            ).select_related(
-                "student"
+            # Create student notifications
+            # asynchronously using Celery
+            create_material_notifications.delay(
+                material.id
             )
-
-            # Notify every enrolled student
-            for enrolment in enrolments:
-
-                Notification.objects.create(
-                    recipient=enrolment.student,
-                    course=course,
-                    notification_type=Notification.MATERIAL,
-                    message=(
-                        f'New material "{material.title}" '
-                        f'has been added to '
-                        f'"{course.title}".'
-                    ),
-                )
 
             return redirect(
                 "course_detail",
