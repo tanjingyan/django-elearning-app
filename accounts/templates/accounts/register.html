@@ -1,47 +1,421 @@
 {% extends "base.html" %}
 
-{% block title %}Register{% endblock %}
+
+{% block title %}
+    Register
+{% endblock %}
+
 
 {% block content %}
 
-<div class="col-md-7 mx-auto">
+    <div class="row justify-content-center">
 
-    <div class="card shadow">
+        <div class="col-lg-7 col-xl-6">
 
-        <div class="card-header">
-            <h3>Create Account</h3>
-        </div>
+            <div class="card content-card">
 
-        <div class="card-body">
+                <div class="card-body p-4 p-md-5">
 
-            <form method="POST" enctype="multipart/form-data">
+                    <!-- =========================================
+                         HEADER
+                         ========================================= -->
 
-                {% csrf_token %}
+                    <div class="mb-4">
 
-                {{ form.as_p }}
+                        <h1 class="h3 fw-bold mb-2">
+                            Create Account
+                        </h1>
 
-                <button class="btn btn-success w-100">
-                    Register
-                </button>
+                        <p class="text-muted mb-0">
+                            Create your LearnSpace student account.
+                        </p>
 
-            </form>
+                    </div>
 
-        </div>
 
-        <div class="text-center mt-3">
+                    <!-- =========================================
+                         REGISTRATION FORM
+                         ========================================= -->
 
-            <span class="text-muted">
-                Already have an account?
-            </span>
+                    <form
+                        method="POST"
+                        enctype="multipart/form-data"
+                    >
 
-            <a href="{% url 'login' %}" class="text-decoration-none fw-semibold">
-                Login
-            </a>
+                        {% csrf_token %}
+
+
+                        <!-- Non-field errors -->
+
+                        {% if form.non_field_errors %}
+
+                            <div class="alert alert-danger">
+
+                                {% for error in form.non_field_errors %}
+
+                                    <div>
+                                        {{ error }}
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- =====================================
+                             USERNAME
+                             ===================================== -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="{{ form.username.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Username
+                            </label>
+
+                            <input
+                                type="text"
+                                name="{{ form.username.html_name }}"
+                                id="{{ form.username.id_for_label }}"
+                                value="{{ form.username.value|default:'' }}"
+                                class="form-control"
+                                required
+                            >
+
+                            {% if form.username.help_text %}
+
+                                <div class="form-text">
+                                    {{ form.username.help_text }}
+                                </div>
+
+                            {% endif %}
+
+
+                            {% for error in form.username.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- =====================================
+                             FIRST / LAST NAME
+                             ===================================== -->
+
+                        <div class="row">
+
+                            <div class="col-md-6">
+
+                                <div class="mb-3">
+
+                                    <label
+                                        for="{{ form.first_name.id_for_label }}"
+                                        class="form-label fw-semibold"
+                                    >
+                                        First Name
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="{{ form.first_name.html_name }}"
+                                        id="{{ form.first_name.id_for_label }}"
+                                        value="{{ form.first_name.value|default:'' }}"
+                                        class="form-control"
+                                    >
+
+                                    {% for error in form.first_name.errors %}
+
+                                        <div class="text-danger small mt-1">
+                                            {{ error }}
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <div class="mb-3">
+
+                                    <label
+                                        for="{{ form.last_name.id_for_label }}"
+                                        class="form-label fw-semibold"
+                                    >
+                                        Last Name
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="{{ form.last_name.html_name }}"
+                                        id="{{ form.last_name.id_for_label }}"
+                                        value="{{ form.last_name.value|default:'' }}"
+                                        class="form-control"
+                                    >
+
+                                    {% for error in form.last_name.errors %}
+
+                                        <div class="text-danger small mt-1">
+                                            {{ error }}
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =====================================
+                             EMAIL
+                             ===================================== -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="{{ form.email.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                name="{{ form.email.html_name }}"
+                                id="{{ form.email.id_for_label }}"
+                                value="{{ form.email.value|default:'' }}"
+                                class="form-control"
+                            >
+
+                            {% for error in form.email.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- =====================================
+                             PROFILE PICTURE
+                             ===================================== -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="{{ form.profile_picture.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Profile Picture
+                            </label>
+
+                            <input
+                                type="file"
+                                name="{{ form.profile_picture.html_name }}"
+                                id="{{ form.profile_picture.id_for_label }}"
+                                class="form-control"
+                                accept="image/*"
+                            >
+
+                            {% for error in form.profile_picture.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- =====================================
+                             BIO
+                             ===================================== -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="{{ form.bio.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Bio
+                            </label>
+
+                            <textarea
+                                name="{{ form.bio.html_name }}"
+                                id="{{ form.bio.id_for_label }}"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Tell us a little about yourself..."
+                            >{{ form.bio.value|default:'' }}</textarea>
+
+                            {% for error in form.bio.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- =====================================
+                             PASSWORD
+                             ===================================== -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="{{ form.password1.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Password
+                            </label>
+
+                            <input
+                                type="password"
+                                name="{{ form.password1.html_name }}"
+                                id="{{ form.password1.id_for_label }}"
+                                class="form-control"
+                                required
+                            >
+
+                            {% if form.password1.help_text %}
+
+                                <div class="form-text">
+                                    {{ form.password1.help_text|safe }}
+                                </div>
+
+                            {% endif %}
+
+
+                            {% for error in form.password1.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- =====================================
+                             PASSWORD CONFIRMATION
+                             ===================================== -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="{{ form.password2.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Confirm Password
+                            </label>
+
+                            <input
+                                type="password"
+                                name="{{ form.password2.html_name }}"
+                                id="{{ form.password2.id_for_label }}"
+                                class="form-control"
+                                required
+                            >
+
+                            {% if form.password2.help_text %}
+
+                                <div class="form-text">
+                                    {{ form.password2.help_text }}
+                                </div>
+
+                            {% endif %}
+
+
+                            {% for error in form.password2.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- =====================================
+                             ACCOUNT TYPE INFORMATION
+                             ===================================== -->
+
+                        <div class="alert alert-light border mb-4">
+
+                            <small class="text-muted">
+
+                                New accounts are registered as
+                                <strong>Student</strong> accounts.
+
+                            </small>
+
+                        </div>
+
+
+                        <!-- =====================================
+                             REGISTER
+                             ===================================== -->
+
+                        <div class="d-grid">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                            >
+                                Create Account
+                            </button>
+
+                        </div>
+
+                    </form>
+
+
+                    <hr class="my-4">
+
+
+                    <!-- =========================================
+                         LOGIN
+                         ========================================= -->
+
+                    <p class="text-center text-muted mb-0">
+
+                        Already have an account?
+
+                        <a
+                            href="{% url 'login' %}"
+                            class="text-decoration-none fw-semibold"
+                        >
+                            Login
+                        </a>
+
+                    </p>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
-
-</div>
 
 {% endblock %}

@@ -9,210 +9,713 @@
 {% block content %}
 
     <!-- =========================================================
-         COURSE HEADER
+         COURSE ACCESS
          ========================================================= -->
 
-    <div class="card content-card overflow-hidden mb-4">
+    <div
+        class="
+            course-access-bar
+            d-flex
+            align-items-center
+            gap-3
+            mb-4
+            {% if is_blocked %}
+                course-access-blocked
+            {% endif %}
+        "
+    >
 
-        {% if course.image %}
+        <!-- =====================================================
+             TEACHER ACCESS
+             ===================================================== -->
 
-            <img
-                src="{{ course.image.url }}"
-                alt="{{ course.title }}"
-                style="
-                    width: 100%;
-                    height: 320px;
-                    object-fit: cover;
-                "
-            >
+        {% if request.user == course.teacher %}
 
-        {% else %}
+            <div class="course-access-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <span class="fw-semibold">
+                    Teacher Access
+                </span>
+
+                <span class="course-access-description ms-2">
+                    You are managing this course.
+                </span>
+
+            </div>
+
+
+        <!-- =====================================================
+             BLOCKED STUDENT
+             ===================================================== -->
+
+        {% elif is_blocked %}
 
             <div
                 class="
-                    bg-primary-subtle
-                    text-primary
-                    d-flex
-                    align-items-center
-                    justify-content-center
+                    course-access-icon
+                    course-access-icon-blocked
                 "
-                style="height: 260px;"
             >
-                <span class="display-1">
-                    📚
+                !
+            </div>
+
+            <div>
+
+                <span class="fw-semibold text-danger">
+                    Course Access
                 </span>
+
+                <span class="course-access-description ms-2">
+                    You have been blocked from this course.
+                </span>
+
+            </div>
+
+
+        <!-- =====================================================
+             ENROLLED STUDENT
+             ===================================================== -->
+
+        {% elif is_enrolled %}
+
+            <div
+                class="
+                    course-access-icon
+                    course-access-icon-success
+                "
+            >
+                ✓
+            </div>
+
+            <div>
+
+                <span class="fw-semibold">
+                    Course Access
+                </span>
+
+                <span class="course-access-description ms-2">
+                    You are enrolled in this course.
+                </span>
+
+            </div>
+
+
+        <!-- =====================================================
+             NOT ENROLLED
+             ===================================================== -->
+
+        {% else %}
+
+            <div class="course-access-icon">
+                🔒
+            </div>
+
+            <div>
+
+                <span class="fw-semibold">
+                    Course Access
+                </span>
+
+                <span class="course-access-description ms-2">
+                    Enrol to access materials and live discussion.
+                </span>
+
             </div>
 
         {% endif %}
 
-
-        <div class="card-body p-4">
-
-            <div
-                class="
-                    d-flex
-                    flex-column
-                    flex-lg-row
-                    justify-content-between
-                    align-items-lg-start
-                    gap-3
-                "
-            >
-
-                <!-- Course information -->
-
-                <div>
-
-                    <span class="badge text-bg-primary mb-2">
-                        Course
-                    </span>
-
-                    <h1 class="page-heading mb-2">
-                        {{ course.title }}
-                    </h1>
-
-                    <p class="text-muted mb-3">
-                        {{ course.description }}
-                    </p>
+    </div>
 
 
-                    <!-- Teacher profile link -->
 
-                    <p class="mb-0">
+    <!-- =========================================================
+         COURSE INFORMATION + STUDENT MANAGEMENT
+         ========================================================= -->
 
-                        <strong>
-                            Teacher:
-                        </strong>
-
-                        <a
-                            href="{% url 'profile' course.teacher.username %}"
-                            class="text-decoration-none fw-semibold"
-                        >
-                            {{ course.teacher.username }}
-                        </a>
-
-                    </p>
-
-                </div>
+    <div class="row g-4 mb-4 align-items-start">
 
 
-                <!-- =================================================
-                     TEACHER COURSE MANAGEMENT
-                     Only the owner of the course can see these.
-                     ================================================= -->
+        <!-- =====================================================
+             COURSE INFORMATION
+             ===================================================== -->
 
+        <div
+            class="
                 {% if request.user == course.teacher %}
+                    col-lg-8
+                {% else %}
+                    col-12
+                {% endif %}
+            "
+        >
 
-                    <div class="d-flex flex-wrap gap-2">
+            <div class="card content-card">
 
-                        <!-- Edit course -->
+                <div class="card-body p-4">
 
-                        <a
-                            href="{% url 'edit_course' course.id %}"
-                            class="btn btn-outline-primary"
-                        >
-                            Edit Course
-                        </a>
-
-
-                        <!-- View enrolled students -->
-
-                        <a
-                            href="{% url 'course_students' course.id %}"
-                            class="btn btn-outline-dark"
-                        >
-                            View Students
-                        </a>
+                    <div
+                        class="
+                            d-flex
+                            flex-column
+                            flex-md-row
+                            align-items-md-start
+                            gap-4
+                        "
+                    >
 
 
-                        <!-- Upload course material -->
+                        <!-- =====================================
+                             COURSE IMAGE
+                             ===================================== -->
 
-                        <a
-                            href="{% url 'upload_material' course.id %}"
-                            class="btn btn-outline-success"
-                        >
-                            Upload Material
-                        </a>
+                        <div class="course-thumbnail flex-shrink-0">
+
+                            {% if course.image %}
+
+                                <img
+                                    src="{{ course.image.url }}"
+                                    alt="{{ course.title }}"
+                                    class="course-thumbnail-image"
+                                >
+
+                            {% else %}
+
+                                <div
+                                    class="
+                                        course-thumbnail-placeholder
+                                        d-flex
+                                        align-items-center
+                                        justify-content-center
+                                        bg-primary-subtle
+                                        text-primary
+                                    "
+                                >
+
+                                    <span class="display-5">
+                                        📚
+                                    </span>
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+
+                        <!-- =====================================
+                             COURSE DETAILS
+                             ===================================== -->
+
+                        <div class="flex-grow-1">
+
+                            <span
+                                class="
+                                    badge
+                                    bg-primary-subtle
+                                    text-primary
+                                    border
+                                    border-primary-subtle
+                                    mb-2
+                                "
+                            >
+                                Course
+                            </span>
+
+
+                            <h1 class="page-heading mb-2">
+                                {{ course.title }}
+                            </h1>
+
+
+                            {% if course.description %}
+
+                                <p class="text-muted mb-4">
+                                    {{ course.description }}
+                                </p>
+
+                            {% else %}
+
+                                <p class="text-muted mb-4">
+                                    No description available.
+                                </p>
+
+                            {% endif %}
+
+
+
+                            <!-- =================================
+                                 COURSE METADATA
+                                 ================================= -->
+
+                            <div
+                                class="
+                                    d-flex
+                                    flex-wrap
+                                    gap-4
+                                    border-top
+                                    pt-3
+                                "
+                            >
+
+
+                                <!-- Teacher -->
+
+                                <div>
+
+                                    <small class="text-muted d-block">
+                                        Teacher
+                                    </small>
+
+                                    <a
+                                        href="{% url 'profile' course.teacher.username %}"
+                                        class="
+                                            text-decoration-none
+                                            fw-semibold
+                                        "
+                                    >
+                                        {{ course.teacher.username }}
+                                    </a>
+
+                                </div>
+
+
+
+                                <!-- Created -->
+
+                                <div>
+
+                                    <small class="text-muted d-block">
+                                        Created
+                                    </small>
+
+                                    <span class="fw-semibold">
+                                        {{ course.created_at|date:"d M Y" }}
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Student count - teacher only -->
+
+                                {% if request.user == course.teacher %}
+
+                                    <div>
+
+                                        <small class="text-muted d-block">
+                                            Students
+                                        </small>
+
+                                        <span class="fw-semibold">
+                                            {{ student_count }}
+                                        </span>
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- =====================================
+                             COURSE ACTIONS
+                             ===================================== -->
+
+                        {% if request.user == course.teacher %}
+
+
+                            <!-- Teacher controls -->
+
+                            <div
+                                class="
+                                    d-flex
+                                    flex-md-column
+                                    gap-2
+                                    flex-shrink-0
+                                "
+                            >
+
+                                <a
+                                    href="{% url 'edit_course' course.id %}"
+                                    class="
+                                        btn
+                                        btn-outline-primary
+                                        btn-sm
+                                    "
+                                >
+                                    Edit Course
+                                </a>
+
+
+                                <a
+                                    href="{% url 'upload_material' course.id %}"
+                                    class="
+                                        btn
+                                        btn-outline-success
+                                        btn-sm
+                                    "
+                                >
+                                    Upload Material
+                                </a>
+
+                            </div>
+
+
+
+                        {% elif request.user.role == "student" and is_blocked %}
+
+
+                            <!-- =================================
+                                 BLOCKED STUDENT
+                                 ================================= -->
+
+                            <div
+                                class="
+                                    d-flex
+                                    flex-column
+                                    align-items-end
+                                    flex-shrink-0
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        btn
+                                        btn-outline-danger
+                                        disabled
+                                    "
+                                    style="min-width: 165px;"
+                                >
+                                    Blocked
+                                </span>
+
+                            </div>
+
+
+
+                        {% elif request.user.role == "student" and is_enrolled %}
+
+
+                            <!-- =================================
+                                 ENROLLED STUDENT
+                                 ================================= -->
+
+                            <div
+                                class="
+                                    d-flex
+                                    flex-column
+                                    align-items-end
+                                    flex-shrink-0
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        btn
+                                        btn-success
+                                        disabled
+                                    "
+                                    style="min-width: 165px;"
+                                >
+                                    ✓ Enrolled
+                                </span>
+
+                            </div>
+
+
+
+                        {% elif request.user.role == "student" %}
+
+
+                            <!-- =================================
+                                 STUDENT NOT ENROLLED
+                                 ================================= -->
+
+                            <div
+                                class="
+                                    d-flex
+                                    flex-column
+                                    align-items-end
+                                    flex-shrink-0
+                                "
+                            >
+
+                                <a
+                                    href="{% url 'enrol_course' course.id %}"
+                                    class="btn btn-primary"
+                                    style="min-width: 165px;"
+                                >
+                                    Enrol on this Course
+                                </a>
+
+                            </div>
+
+                        {% endif %}
 
                     </div>
 
-                {% endif %}
+                </div>
 
             </div>
 
         </div>
 
+
+
+        <!-- =====================================================
+             MANAGE STUDENTS
+             Teacher only
+             ===================================================== -->
+
+        {% if request.user == course.teacher %}
+
+            <div class="col-lg-4">
+
+                <div class="card content-card">
+
+                    <div class="card-body p-4">
+
+
+                        <!-- Header -->
+
+                        <div
+                            class="
+                                d-flex
+                                justify-content-between
+                                align-items-start
+                                gap-3
+                                mb-3
+                            "
+                        >
+
+                            <div>
+
+                                <h2 class="h5 fw-bold mb-1">
+                                    Manage Students
+                                </h2>
+
+                                <p class="text-muted small mb-0">
+                                    Students enrolled in this course.
+                                </p>
+
+                            </div>
+
+
+                            <span
+                                class="
+                                    badge
+                                    bg-primary-subtle
+                                    text-primary
+                                    border
+                                    border-primary-subtle
+                                "
+                            >
+                                {{ student_count }}
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- =====================================
+                             STUDENT PREVIEW
+                             ===================================== -->
+
+                        {% if student_preview %}
+
+                            <div class="d-grid gap-3 mb-4">
+
+                                {% for enrolment in student_preview %}
+
+                                    <div
+                                        class="
+                                            d-flex
+                                            align-items-center
+                                            gap-3
+                                        "
+                                    >
+
+
+                                        <!-- Profile picture -->
+
+                                        {% if enrolment.student.profile_picture %}
+
+                                            <img
+                                                src="{{ enrolment.student.profile_picture.url }}"
+                                                alt="{{ enrolment.student.username }}"
+                                                class="rounded-circle"
+                                                style="
+                                                    width: 44px;
+                                                    height: 44px;
+                                                    object-fit: cover;
+                                                "
+                                            >
+
+                                        {% else %}
+
+                                            <div
+                                                class="
+                                                    rounded-circle
+                                                    bg-primary-subtle
+                                                    text-primary
+                                                    d-flex
+                                                    align-items-center
+                                                    justify-content-center
+                                                    flex-shrink-0
+                                                "
+                                                style="
+                                                    width: 44px;
+                                                    height: 44px;
+                                                "
+                                            >
+                                                👤
+                                            </div>
+
+                                        {% endif %}
+
+
+
+                                        <!-- Student -->
+
+                                        <div class="flex-grow-1">
+
+                                            <a
+                                                href="{% url 'profile' enrolment.student.username %}"
+                                                class="
+                                                    fw-semibold
+                                                    text-dark
+                                                    text-decoration-none
+                                                "
+                                            >
+
+                                                {% if enrolment.student.first_name or enrolment.student.last_name %}
+
+                                                    {{ enrolment.student.first_name }}
+                                                    {{ enrolment.student.last_name }}
+
+                                                {% else %}
+
+                                                    {{ enrolment.student.username }}
+
+                                                {% endif %}
+
+                                            </a>
+
+
+                                            <div class="text-muted small">
+                                                @{{ enrolment.student.username }}
+                                            </div>
+
+                                        </div>
+
+
+
+                                        <!-- Profile -->
+
+                                        <a
+                                            href="{% url 'profile' enrolment.student.username %}"
+                                            class="
+                                                btn
+                                                btn-sm
+                                                btn-outline-secondary
+                                            "
+                                        >
+                                            Profile
+                                        </a>
+
+                                    </div>
+
+
+                                    {% if not forloop.last %}
+
+                                        <hr class="my-0">
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </div>
+
+
+
+                        {% else %}
+
+                            <!-- =================================
+                                 NO STUDENTS
+                                 ================================= -->
+
+                            <div class="text-center py-4">
+
+                                <div class="fs-2 mb-2">
+                                    👥
+                                </div>
+
+
+                                <h6 class="fw-semibold">
+                                    No students enrolled
+                                </h6>
+
+
+                                <p class="text-muted small mb-0">
+
+                                    Students who enrol in this course
+                                    will appear here.
+
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- =====================================
+                             VIEW STUDENTS
+                             ===================================== -->
+
+                        <div class="d-grid">
+
+                            <a
+                                href="{% url 'course_students' course.id %}"
+                                class="btn btn-primary"
+                            >
+
+                                {% if student_count > 3 %}
+
+                                    View All {{ student_count }} Students
+
+                                {% else %}
+
+                                    View Students
+
+                                {% endif %}
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
     </div>
 
 
 
     <!-- =========================================================
-         COURSE ACCESS / ENROLMENT
-         ========================================================= -->
-
-    <div class="card content-card mb-4">
-
-        <div class="card-body">
-
-            <h2 class="h4 mb-3">
-                Course Access
-            </h2>
-
-
-            <!-- Teacher owns course -->
-
-            {% if request.user == course.teacher %}
-
-                <div class="alert alert-primary mb-0">
-
-                    You are the teacher of this course.
-
-                </div>
-
-
-            <!-- Student already enrolled -->
-
-            {% elif is_enrolled %}
-
-                <div class="alert alert-success mb-0">
-
-                    You are enrolled in this course.
-
-                </div>
-
-
-            <!-- User not enrolled -->
-
-            {% else %}
-
-                <div class="alert alert-warning">
-
-                    You are not enrolled in this course.
-
-                </div>
-
-
-                {% if request.user.role == "student" %}
-
-                    <a
-                        href="{% url 'enrol_course' course.id %}"
-                        class="btn btn-primary"
-                    >
-                        Enrol on this Course
-                    </a>
-
-                {% endif %}
-
-            {% endif %}
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =========================================================
-         COURSE CONTENT ROW
+         COURSE CONTENT
          ========================================================= -->
 
     <div class="row g-4">
@@ -222,49 +725,69 @@
              COURSE MATERIALS
              ===================================================== -->
 
-        <div class="col-lg-7">
+        <div class="col-lg-8">
 
             <div class="card content-card h-100">
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <div
-                        class="
-                            d-flex
-                            justify-content-between
-                            align-items-center
-                            mb-3
-                        "
-                    >
 
-                        <h2 class="h4 mb-0">
+                    <!-- Header -->
+
+                    <div class="mb-4">
+
+                        <h2 class="h4 fw-bold mb-1">
                             Course Materials
                         </h2>
 
-
-                        <!-- Teacher upload shortcut -->
-
-                        {% if request.user == course.teacher %}
-
-                            <a
-                                href="{% url 'upload_material' course.id %}"
-                                class="btn btn-sm btn-outline-success"
-                            >
-                                Upload Material
-                            </a>
-
-                        {% endif %}
+                        <p class="text-muted small mb-0">
+                            Files and teaching resources for this course.
+                        </p>
 
                     </div>
 
 
-                    {% if materials %}
+
+                    <!-- =================================================
+                         BLOCKED
+                         ================================================= -->
+
+                    {% if is_blocked %}
+
+                        <div class="text-center py-5">
+
+                            <div class="display-5 mb-3">
+                                🔒
+                            </div>
+
+
+                            <h5 class="fw-semibold">
+                                Materials Unavailable
+                            </h5>
+
+
+                            <p class="text-muted mb-0">
+
+                                You have been blocked from accessing
+                                materials for this course.
+
+                            </p>
+
+                        </div>
+
+
+
+                    <!-- =================================================
+                         MATERIAL LIST
+                         ================================================= -->
+
+                    {% elif materials %}
 
                         <div class="list-group list-group-flush">
 
                             {% for material in materials %}
 
-                                <div class="list-group-item px-0">
+                                <div class="list-group-item px-0 py-3">
 
                                     <div
                                         class="
@@ -275,7 +798,8 @@
                                         "
                                     >
 
-                                        <div>
+                                        <div class="flex-grow-1">
+
 
                                             <h5 class="mb-1">
                                                 📄 {{ material.title }}
@@ -290,11 +814,6 @@
 
                                             {% endif %}
 
-
-                                            <!--
-                                                Teacher is obtained through
-                                                the course relationship.
-                                            -->
 
                                             <small class="text-muted d-block">
 
@@ -322,7 +841,11 @@
                                         <a
                                             href="{{ material.file.url }}"
                                             target="_blank"
-                                            class="btn btn-outline-primary btn-sm"
+                                            class="
+                                                btn
+                                                btn-outline-primary
+                                                btn-sm
+                                            "
                                         >
                                             View
                                         </a>
@@ -336,6 +859,40 @@
                         </div>
 
 
+
+                    <!-- =================================================
+                         NOT ENROLLED STUDENT
+                         ================================================= -->
+
+                    {% elif request.user.role == "student" and not is_enrolled %}
+
+                        <div class="text-center py-5">
+
+                            <div class="display-5 mb-3">
+                                🔒
+                            </div>
+
+
+                            <h5 class="fw-semibold">
+                                Enrol to Access Materials
+                            </h5>
+
+
+                            <p class="text-muted mb-0">
+
+                                Course materials are available
+                                to enrolled students.
+
+                            </p>
+
+                        </div>
+
+
+
+                    <!-- =================================================
+                         NO MATERIALS
+                         ================================================= -->
+
                     {% else %}
 
                         <div class="text-center py-5">
@@ -344,13 +901,41 @@
                                 📂
                             </div>
 
-                            <h5>
+
+                            <h5 class="fw-semibold">
                                 No materials yet
                             </h5>
 
-                            <p class="text-muted mb-0">
-                                Teaching materials will appear here.
-                            </p>
+
+                            {% if request.user == course.teacher %}
+
+                                <p class="text-muted mb-3">
+
+                                    Upload teaching materials
+                                    for your students.
+
+                                </p>
+
+
+                                <a
+                                    href="{% url 'upload_material' course.id %}"
+                                    class="
+                                        btn
+                                        btn-outline-success
+                                        btn-sm
+                                    "
+                                >
+                                    Upload First Material
+                                </a>
+
+
+                            {% else %}
+
+                                <p class="text-muted mb-0">
+                                    Teaching materials will appear here.
+                                </p>
+
+                            {% endif %}
 
                         </div>
 
@@ -368,19 +953,45 @@
              LIVE DISCUSSION
              ===================================================== -->
 
-        <div class="col-lg-5">
+        <div class="col-lg-4">
 
             <div class="card content-card h-100">
 
-                <div class="card-body d-flex flex-column">
+                <div
+                    class="
+                        card-body
+                        d-flex
+                        flex-column
+                        p-4
+                    "
+                >
 
-                    <div class="display-5 mb-3">
+
+                    <!-- Icon -->
+
+                    <div
+                        class="
+                            rounded-circle
+                            bg-primary-subtle
+                            d-flex
+                            align-items-center
+                            justify-content-center
+                            mb-3
+                        "
+                        style="
+                            width: 52px;
+                            height: 52px;
+                            font-size: 1.4rem;
+                        "
+                    >
                         💬
                     </div>
 
-                    <h2 class="h4">
+
+                    <h2 class="h4 fw-bold">
                         Live Discussion
                     </h2>
+
 
                     <p class="text-muted flex-grow-1">
 
@@ -390,15 +1001,44 @@
                     </p>
 
 
-                    {% if request.user == course.teacher or is_enrolled %}
 
-                        <a
-                            href="{% url 'course_chat' course.id %}"
-                            class="btn btn-primary"
-                        >
-                            Open Live Discussion
-                        </a>
+                    <!-- =========================================
+                         BLOCKED STUDENT
+                         ========================================= -->
 
+                    {% if is_blocked %}
+
+                        <div class="alert alert-danger mb-0">
+
+                            You have been blocked from
+                            this course discussion.
+
+                        </div>
+
+
+
+                    <!-- =========================================
+                         ACCESS ALLOWED
+                         ========================================= -->
+
+                    {% elif request.user == course.teacher or is_enrolled %}
+
+                        <div class="d-grid">
+
+                            <a
+                                href="{% url 'course_chat' course.id %}"
+                                class="btn btn-primary"
+                            >
+                                Open Live Discussion
+                            </a>
+
+                        </div>
+
+
+
+                    <!-- =========================================
+                         NOT ENROLLED
+                         ========================================= -->
 
                     {% else %}
 
@@ -422,12 +1062,12 @@
 
 
     <!-- =========================================================
-         COURSE FEEDBACK
+         COURSE / STUDENT FEEDBACK
          ========================================================= -->
 
     <div class="card content-card mt-4">
 
-        <div class="card-body">
+        <div class="card-body p-4">
 
             <div
                 class="
@@ -442,20 +1082,46 @@
 
                 <div>
 
-                    <h2 class="h4 mb-1">
-                        Course Feedback
-                    </h2>
 
-                    <p class="text-muted mb-0">
-                        Read what students think about this course.
-                    </p>
+                    <!-- Teacher wording -->
+
+                    {% if request.user == course.teacher %}
+
+                        <h2 class="h4 fw-bold mb-1">
+                            Student Feedback
+                        </h2>
+
+                        <p class="text-muted mb-0">
+
+                            Reviews submitted by students
+                            enrolled in this course.
+
+                        </p>
+
+
+                    <!-- Student wording -->
+
+                    {% else %}
+
+                        <h2 class="h4 fw-bold mb-1">
+                            Course Feedback
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            Read what students think about this course.
+                        </p>
+
+                    {% endif %}
 
                 </div>
 
 
-                <!-- Enrolled student who has not reviewed yet -->
 
-                {% if is_enrolled and not has_feedback %}
+                <!-- =============================================
+                     LEAVE FEEDBACK
+                     ============================================= -->
+
+                {% if is_enrolled and not has_feedback and not is_blocked %}
 
                     <a
                         href="{% url 'create_feedback' course.id %}"
@@ -470,6 +1136,10 @@
 
 
 
+            <!-- =================================================
+                 FEEDBACK LIST
+                 ================================================= -->
+
             {% if feedback_list %}
 
                 <div class="row g-3">
@@ -478,36 +1148,48 @@
 
                         <div class="col-md-6">
 
-                            <div class="border rounded p-3 h-100">
+                            <div
+                                class="
+                                    border
+                                    rounded-3
+                                    p-3
+                                    h-100
+                                "
+                            >
 
                                 <div
                                     class="
                                         d-flex
                                         justify-content-between
                                         align-items-start
+                                        gap-2
                                         mb-2
                                     "
                                 >
 
-                                    <!--
-                                        Student name links to
-                                        student's home/profile page.
-                                    -->
-
-                                    <strong>
+                                    <div>
 
                                         <a
                                             href="{% url 'profile' feedback.student.username %}"
-                                            class="text-decoration-none text-dark"
+                                            class="
+                                                fw-semibold
+                                                text-decoration-none
+                                                text-dark
+                                            "
                                         >
                                             {{ feedback.student.username }}
                                         </a>
 
-                                    </strong>
+                                    </div>
 
 
-                                    <span class="badge text-bg-warning">
-                                        {{ feedback.rating }}/5
+                                    <span
+                                        class="
+                                            badge
+                                            text-bg-warning
+                                        "
+                                    >
+                                        ⭐ {{ feedback.rating }}/5
                                     </span>
 
                                 </div>
@@ -533,6 +1215,11 @@
                 </div>
 
 
+
+            <!-- =================================================
+                 NO FEEDBACK
+                 ================================================= -->
+
             {% else %}
 
                 <div class="text-center py-5">
@@ -541,13 +1228,28 @@
                         ⭐
                     </div>
 
-                    <h5>
+
+                    <h5 class="fw-semibold">
                         No feedback yet
                     </h5>
 
-                    <p class="text-muted mb-0">
-                        Student reviews will appear here.
-                    </p>
+
+                    {% if request.user == course.teacher %}
+
+                        <p class="text-muted mb-0">
+
+                            Student reviews will appear here
+                            once they submit feedback.
+
+                        </p>
+
+                    {% else %}
+
+                        <p class="text-muted mb-0">
+                            Student reviews will appear here.
+                        </p>
+
+                    {% endif %}
 
                 </div>
 
@@ -555,9 +1257,9 @@
 
 
 
-            <!-- Student already submitted feedback -->
+            <!-- Already submitted -->
 
-            {% if is_enrolled and has_feedback %}
+            {% if is_enrolled and has_feedback and not is_blocked %}
 
                 <div class="alert alert-info mt-4 mb-0">
 
@@ -575,7 +1277,7 @@
 
 
     <!-- =========================================================
-         BACK BUTTON
+         BACK NAVIGATION
          ========================================================= -->
 
     <div class="mt-4">
@@ -586,8 +1288,19 @@
                 href="{% url 'teacher_courses' %}"
                 class="btn btn-outline-secondary"
             >
-                Back to My Courses
+                ← Back to My Courses
             </a>
+
+
+        {% elif request.user.role == "student" and is_enrolled %}
+
+            <a
+                href="{% url 'student_courses' %}"
+                class="btn btn-outline-secondary"
+            >
+                ← Back to My Courses
+            </a>
+
 
         {% else %}
 
@@ -595,11 +1308,180 @@
                 href="{% url 'course_list' %}"
                 class="btn btn-outline-secondary"
             >
-                Back to Courses
+                ← Back to Browse Courses
             </a>
 
         {% endif %}
 
     </div>
+
+
+
+    <!-- =========================================================
+         PAGE-SPECIFIC STYLING
+         ========================================================= -->
+
+    <style>
+
+        /* =====================================================
+           COURSE ACCESS BAR
+           ===================================================== */
+
+        .course-access-bar {
+
+            width: 100%;
+
+            padding: 10px 16px;
+
+            background-color: #e7f1ff;
+
+            border: 1px solid #cfe2ff;
+
+            border-radius: 10px;
+        }
+
+
+        .course-access-description {
+
+            color: #5f6f82;
+
+            font-size: 0.9rem;
+        }
+
+
+
+        /* Access icon */
+
+        .course-access-icon {
+
+            width: 28px;
+            height: 28px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background-color: #0d6efd;
+
+            color: #ffffff;
+
+            font-size: 0.8rem;
+
+            font-weight: 700;
+        }
+
+
+
+        /* Enrolled */
+
+        .course-access-icon-success {
+
+            background-color: #198754;
+        }
+
+
+
+        /* =====================================================
+           BLOCKED ACCESS
+           ===================================================== */
+
+        .course-access-blocked {
+
+            background-color: #fff1f2;
+
+            border-color: #fecdd3;
+        }
+
+
+        .course-access-icon-blocked {
+
+            background-color: #dc3545;
+        }
+
+
+
+        /* =====================================================
+           COURSE SQUARE THUMBNAIL
+           ===================================================== */
+
+        .course-thumbnail {
+
+            width: 170px;
+            height: 170px;
+
+            border-radius: 14px;
+
+            overflow: hidden;
+
+            border: 1px solid #dee2e6;
+
+            background: #f8f9fa;
+        }
+
+
+        .course-thumbnail-image {
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+
+        .course-thumbnail-placeholder {
+
+            width: 100%;
+            height: 100%;
+        }
+
+
+
+        /* =====================================================
+           CARDS
+           ===================================================== */
+
+        .content-card {
+
+            border: 0;
+        }
+
+
+
+        /* =====================================================
+           MOBILE
+           ===================================================== */
+
+        @media (max-width: 767.98px) {
+
+            .course-thumbnail {
+
+                width: 130px;
+                height: 130px;
+            }
+
+
+            .course-access-bar {
+
+                padding: 10px 12px;
+            }
+
+
+            .course-access-description {
+
+                display: block;
+
+                margin-left: 0 !important;
+
+                margin-top: 2px;
+            }
+
+        }
+
+    </style>
+
 
 {% endblock %}

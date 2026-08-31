@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
+
 {% block title %}
     {{ profile_user.username }} - Profile
 {% endblock %}
 
 
 {% block content %}
-
 
     <!-- =========================================================
          PROFILE HEADER
@@ -25,20 +25,16 @@
                 "
             >
 
-
-                <!-- =============================================
+                <!-- =================================================
                      PROFILE PICTURE
-                     ============================================= -->
+                     ================================================= -->
 
                 {% if profile_user.profile_picture %}
 
                     <img
                         src="{{ profile_user.profile_picture.url }}"
                         alt="{{ profile_user.username }}"
-                        class="
-                            rounded-circle
-                            border
-                        "
+                        class="rounded-circle border"
                         style="
                             width: 110px;
                             height: 110px;
@@ -69,9 +65,9 @@
                 {% endif %}
 
 
-                <!-- =============================================
-                     PROFILE DETAILS
-                     ============================================= -->
+                <!-- =================================================
+                     PROFILE INFORMATION
+                     ================================================= -->
 
                 <div class="flex-grow-1">
 
@@ -86,11 +82,11 @@
                     >
 
                         <h1 class="h3 fw-bold mb-0">
-
                             {{ profile_user.username }}
-
                         </h1>
 
+
+                        <!-- User role -->
 
                         {% if profile_user.role == "teacher" %}
 
@@ -125,6 +121,8 @@
                     </div>
 
 
+                    <!-- Real name -->
+
                     {% if profile_user.first_name or profile_user.last_name %}
 
                         <p class="mb-2">
@@ -137,75 +135,50 @@
                     {% endif %}
 
 
+                    <!-- Bio -->
+
                     {% if profile_user.bio %}
 
                         <p class="text-muted mb-3">
-
                             {{ profile_user.bio }}
-
                         </p>
 
                     {% else %}
 
                         <p class="text-muted mb-3">
-
                             No bio added yet.
-
                         </p>
 
                     {% endif %}
 
 
-                    <!-- =========================================
+                    <!-- =================================================
                          PROFILE ACTIONS
-                         ========================================= -->
+                         Only visible to profile owner
+                         ================================================= -->
 
-                    <div
-                        class="
-                            d-flex
-                            gap-2
-                            flex-wrap
-                        "
-                    >
+                    {% if request.user == profile_user %}
 
-                        {% if request.user == profile_user %}
+                        <div class="d-flex gap-2 flex-wrap">
 
                             <a
                                 href="{% url 'edit_profile' %}"
-                                class="
-                                    btn
-                                    btn-outline-primary
-                                    btn-sm
-                                "
+                                class="btn btn-outline-primary btn-sm"
                             >
                                 Edit Profile
                             </a>
 
-                        {% endif %}
-
-
-                        <!--
-                            Coursework requirement:
-                            students can post status updates
-                            to their own home page.
-                        -->
-
-                        {% if request.user == profile_user and profile_user.role == "student" %}
 
                             <a
                                 href="{% url 'create_status' %}"
-                                class="
-                                    btn
-                                    btn-primary
-                                    btn-sm
-                                "
+                                class="btn btn-primary btn-sm"
                             >
                                 Post Status
                             </a>
 
-                        {% endif %}
+                        </div>
 
-                    </div>
+                    {% endif %}
 
                 </div>
 
@@ -223,6 +196,8 @@
 
     <div class="row g-3 mb-4">
 
+
+        <!-- Student statistics -->
 
         {% if profile_user.role == "student" %}
 
@@ -245,6 +220,9 @@
                 </div>
 
             </div>
+
+
+        <!-- Teacher statistics -->
 
         {% else %}
 
@@ -270,6 +248,8 @@
 
         {% endif %}
 
+
+        <!-- Status count -->
 
         <div class="col-md-6">
 
@@ -310,8 +290,11 @@
                 </h2>
 
                 <p class="text-muted mb-0">
-                    Courses that {{ profile_user.username }}
+
+                    Courses that
+                    {{ profile_user.username }}
                     is currently enrolled in.
+
                 </p>
 
             </div>
@@ -334,6 +317,7 @@
                                 "
                             >
 
+                                <!-- Course image -->
 
                                 {% if enrolment.course.image %}
 
@@ -391,9 +375,7 @@
 
 
                                     <h5 class="fw-semibold">
-
                                         {{ enrolment.course.title }}
-
                                     </h5>
 
 
@@ -404,9 +386,13 @@
                                             flex-grow-1
                                         "
                                     >
+
                                         {{ enrolment.course.description|truncatechars:90 }}
+
                                     </p>
 
+
+                                    <!-- Teacher profile -->
 
                                     <p class="small text-muted">
 
@@ -451,20 +437,21 @@
 
                 <div class="card content-card">
 
-                    <div
-                        class="
-                            card-body
-                            text-center
-                            py-4
-                        "
-                    >
+                    <div class="card-body text-center py-5">
 
-                        <div class="fs-2 mb-2">
+                        <div class="display-6 mb-3">
                             📚
                         </div>
 
+                        <h5 class="fw-semibold">
+                            No enrolled courses
+                        </h5>
+
                         <p class="text-muted mb-0">
-                            No enrolled courses yet.
+
+                            {{ profile_user.username }}
+                            is not enrolled in any courses yet.
+
                         </p>
 
                     </div>
@@ -494,8 +481,10 @@
                 </h2>
 
                 <p class="text-muted mb-0">
+
                     Courses created by
                     {{ profile_user.username }}.
+
                 </p>
 
             </div>
@@ -518,6 +507,7 @@
                                 "
                             >
 
+                                <!-- Course image -->
 
                                 {% if course.image %}
 
@@ -575,9 +565,7 @@
 
 
                                     <h5 class="fw-semibold">
-
                                         {{ course.title }}
-
                                     </h5>
 
 
@@ -588,7 +576,9 @@
                                             flex-grow-1
                                         "
                                     >
+
                                         {{ course.description|truncatechars:90 }}
+
                                     </p>
 
 
@@ -618,20 +608,21 @@
 
                 <div class="card content-card">
 
-                    <div
-                        class="
-                            card-body
-                            text-center
-                            py-4
-                        "
-                    >
+                    <div class="card-body text-center py-5">
 
-                        <div class="fs-2 mb-2">
+                        <div class="display-6 mb-3">
                             📚
                         </div>
 
+                        <h5 class="fw-semibold">
+                            No courses created
+                        </h5>
+
                         <p class="text-muted mb-0">
-                            No courses created yet.
+
+                            {{ profile_user.username }}
+                            has not created any courses yet.
+
                         </p>
 
                     </div>
@@ -658,7 +649,7 @@
                 justify-content-between
                 align-items-center
                 flex-wrap
-                gap-2
+                gap-3
                 mb-3
             "
         >
@@ -670,14 +661,21 @@
                 </h2>
 
                 <p class="text-muted mb-0">
+
                     Recent updates from
                     {{ profile_user.username }}.
+
                 </p>
 
             </div>
 
 
-            {% if request.user == profile_user and profile_user.role == "student" %}
+            <!--
+                Both Students and Teachers may post
+                status updates to THEIR OWN profile.
+            -->
+
+            {% if request.user == profile_user %}
 
                 <a
                     href="{% url 'create_status' %}"
@@ -690,6 +688,11 @@
 
         </div>
 
+
+
+        <!-- =====================================================
+             STATUS LIST
+             ===================================================== -->
 
         {% if status_updates %}
 
@@ -709,29 +712,99 @@
                                 "
                             >
 
-                                <div
-                                    class="
-                                        rounded-circle
-                                        bg-primary-subtle
-                                        d-flex
-                                        align-items-center
-                                        justify-content-center
-                                        flex-shrink-0
-                                    "
-                                    style="
-                                        width: 44px;
-                                        height: 44px;
-                                    "
-                                >
-                                    💬
-                                </div>
+                                <!-- Status user image -->
+
+                                {% if profile_user.profile_picture %}
+
+                                    <img
+                                        src="{{ profile_user.profile_picture.url }}"
+                                        alt="{{ profile_user.username }}"
+                                        class="
+                                            rounded-circle
+                                            flex-shrink-0
+                                        "
+                                        style="
+                                            width: 48px;
+                                            height: 48px;
+                                            object-fit: cover;
+                                        "
+                                    >
+
+                                {% else %}
+
+                                    <div
+                                        class="
+                                            rounded-circle
+                                            bg-primary-subtle
+                                            text-primary
+                                            d-flex
+                                            align-items-center
+                                            justify-content-center
+                                            flex-shrink-0
+                                        "
+                                        style="
+                                            width: 48px;
+                                            height: 48px;
+                                        "
+                                    >
+                                        👤
+                                    </div>
+
+                                {% endif %}
 
 
-                                <div>
+                                <!-- Status content -->
+
+                                <div class="flex-grow-1">
+
+                                    <div
+                                        class="
+                                            d-flex
+                                            align-items-center
+                                            gap-2
+                                            flex-wrap
+                                            mb-2
+                                        "
+                                    >
+
+                                        <strong>
+                                            {{ profile_user.username }}
+                                        </strong>
+
+
+                                        {% if profile_user.role == "teacher" %}
+
+                                            <span
+                                                class="
+                                                    badge
+                                                    bg-primary-subtle
+                                                    text-primary
+                                                "
+                                            >
+                                                Teacher
+                                            </span>
+
+                                        {% else %}
+
+                                            <span
+                                                class="
+                                                    badge
+                                                    bg-success-subtle
+                                                    text-success
+                                                "
+                                            >
+                                                Student
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
 
                                     <p class="mb-2">
                                         {{ status.content }}
                                     </p>
+
 
                                     <small class="text-muted">
 
@@ -752,29 +825,49 @@
             </div>
 
 
+        <!-- =====================================================
+             NO STATUS UPDATES
+             ===================================================== -->
+
         {% else %}
 
             <div class="card content-card">
 
-                <div
-                    class="
-                        card-body
-                        text-center
-                        py-5
-                    "
-                >
+                <div class="card-body text-center py-5">
 
                     <div class="display-6 mb-3">
                         💬
                     </div>
 
-                    <h5>
+
+                    <h5 class="fw-semibold">
                         No status updates yet
                     </h5>
 
-                    <p class="text-muted mb-0">
-                        Status updates will appear here.
-                    </p>
+
+                    {% if request.user == profile_user %}
+
+                        <p class="text-muted mb-3">
+                            Share your first update with other LearnSpace users.
+                        </p>
+
+                        <a
+                            href="{% url 'create_status' %}"
+                            class="btn btn-primary"
+                        >
+                            Post Your First Status
+                        </a>
+
+                    {% else %}
+
+                        <p class="text-muted mb-0">
+
+                            {{ profile_user.username }}
+                            has not posted any status updates yet.
+
+                        </p>
+
+                    {% endif %}
 
                 </div>
 
@@ -783,6 +876,5 @@
         {% endif %}
 
     </section>
-
 
 {% endblock %}

@@ -8,29 +8,60 @@
 
 {% block content %}
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- =========================================================
+         PAGE HEADER
+         ========================================================= -->
+
+    <div
+        class="
+            d-flex
+            justify-content-between
+            align-items-center
+            flex-wrap
+            gap-3
+            mb-4
+        "
+    >
 
         <div>
 
-            <h1 class="page-heading">
+            <p
+                class="
+                    text-primary
+                    fw-semibold
+                    small
+                    text-uppercase
+                    mb-1
+                "
+            >
+                Course Management
+            </p>
+
+            <h1 class="page-heading mb-1">
                 My Courses
             </h1>
 
             <p class="page-subheading mb-0">
-                Manage your courses, students, materials and live discussions.
+                View and manage the courses you teach.
             </p>
 
         </div>
+
 
         <a
             href="{% url 'create_course' %}"
             class="btn btn-primary"
         >
-            Create New Course
+            + Create New Course
         </a>
 
     </div>
 
+
+
+    <!-- =========================================================
+         COURSE LIST
+         ========================================================= -->
 
     {% if courses %}
 
@@ -40,7 +71,19 @@
 
                 <div class="col-md-6 col-xl-4">
 
-                    <div class="card content-card h-100 overflow-hidden">
+                    <div
+                        class="
+                            card
+                            content-card
+                            h-100
+                            overflow-hidden
+                        "
+                    >
+
+
+                        <!-- =================================================
+                             COURSE IMAGE
+                             ================================================= -->
 
                         {% if course.image %}
 
@@ -64,111 +107,149 @@
                                     bg-primary-subtle
                                     text-primary
                                 "
-                                style="height: 190px;"
+                                style="
+                                    height: 190px;
+                                "
                             >
+
                                 <span class="display-4">
                                     📚
                                 </span>
+
                             </div>
 
                         {% endif %}
 
 
-                        <div class="card-body d-flex flex-column">
 
-                            <div class="mb-3">
+                        <!-- =================================================
+                             COURSE INFORMATION
+                             ================================================= -->
 
-                                <span class="badge text-bg-primary">
+                        <div class="card-body d-flex flex-column p-4">
+
+
+                            <!-- Course badge -->
+
+                            <div class="mb-2">
+
+                                <span
+                                    class="
+                                        badge
+                                        bg-primary-subtle
+                                        text-primary
+                                        border
+                                        border-primary-subtle
+                                    "
+                                >
                                     Your Course
                                 </span>
 
                             </div>
 
 
-                            <h4 class="card-title">
+
+                            <!-- Course title -->
+
+                            <h4 class="card-title fw-bold mb-2">
+
                                 {{ course.title }}
+
                             </h4>
 
 
-                            <p class="card-text text-muted flex-grow-1">
+
+                            <!-- Description -->
+
+                            <p
+                                class="
+                                    card-text
+                                    text-muted
+                                    flex-grow-1
+                                    mb-3
+                                "
+                            >
 
                                 {% if course.description %}
 
-                                    {{ course.description|truncatewords:25 }}
+                                    {{ course.description|truncatechars:100 }}
 
                                 {% else %}
 
-                                    No description is available for this course.
+                                    No description available.
 
                                 {% endif %}
 
                             </p>
 
 
-                            <div class="mb-3">
 
-                                <small class="text-muted d-block">
+                            <!-- =================================================
+                                 COURSE INFORMATION
+                                 ================================================= -->
 
-                                    Course ID:
+                            <div
+                                class="
+                                    border-top
+                                    border-bottom
+                                    py-3
+                                    mb-3
+                                "
+                            >
 
-                                    <strong>
-                                        {{ course.id }}
-                                    </strong>
+                                <div
+                                    class="
+                                        d-flex
+                                        justify-content-between
+                                        mb-2
+                                    "
+                                >
 
-                                </small>
+                                    <span class="text-muted small">
+                                        Course ID
+                                    </span>
 
-                                <small class="text-muted">
+                                    <span class="small fw-semibold">
+                                        #{{ course.id }}
+                                    </span>
 
-                                    Created:
+                                </div>
 
-                                    <strong>
+
+                                <div
+                                    class="
+                                        d-flex
+                                        justify-content-between
+                                    "
+                                >
+
+                                    <span class="text-muted small">
+                                        Created
+                                    </span>
+
+                                    <span class="small fw-semibold">
+
                                         {{ course.created_at|date:"d M Y" }}
-                                    </strong>
 
-                                </small>
+                                    </span>
+
+                                </div>
 
                             </div>
 
 
-                            <div class="d-grid gap-2">
 
-                                <!-- View course -->
+                            <!-- =================================================
+                                 PRIMARY ACTION
+                                 ================================================= -->
+
+                            <div class="d-grid">
 
                                 <a
                                     href="{% url 'course_detail' course.id %}"
-                                    class="btn btn-outline-primary"
+                                    class="btn btn-primary"
                                 >
-                                    View Course
-                                </a>
-
-
-                                <!-- Edit course -->
-
-                                <a
-                                    href="{% url 'edit_course' course.id %}"
-                                    class="btn btn-outline-secondary"
-                                >
-                                    Edit Course
-                                </a>
-
-                                
-                                <!-- Upload teaching material -->
-
-                                <a
-                                    href="{% url 'upload_material' course.id %}"
-                                    class="btn btn-outline-success"
-                                >
-                                    Upload Material
-                                </a>
-
-
-                                <!-- Open real-time discussion -->
-
-                                <a
-                                    href="{% url 'course_chat' course.id %}"
-                                    class="btn btn-outline-info"
-                                >
-                                    Open Live Discussion
+                                    Manage Course
                                 </a>
 
                             </div>
@@ -184,6 +265,11 @@
         </div>
 
 
+
+    <!-- =========================================================
+         EMPTY STATE
+         ========================================================= -->
+
     {% else %}
 
         <div class="card content-card">
@@ -194,14 +280,19 @@
                     📚
                 </div>
 
-                <h4>
-                    You have not created any courses
+
+                <h4 class="fw-bold">
+                    No courses created yet
                 </h4>
 
-                <p class="text-muted">
-                    Create your first course to start adding students
-                    and teaching materials.
+
+                <p class="text-muted mb-4">
+
+                    Create your first course to start
+                    adding teaching materials and enrolling students.
+
                 </p>
+
 
                 <a
                     href="{% url 'create_course' %}"
@@ -215,5 +306,6 @@
         </div>
 
     {% endif %}
+
 
 {% endblock %}

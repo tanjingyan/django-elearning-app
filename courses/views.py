@@ -70,36 +70,105 @@ def course_list(request):
 @login_required
 def course_detail(request, course_id):
 
-    course = Course.objects.get(
-        id=course_id
+    course = get_object_or_404(
+        Course.objects.select_related("teacher"),
+        id=course_id,
     )
 
-    is_enrolled = Enrolment.objects.filter(
-        student=request.user,
-        course=course
-    ).exists()
+    is_enrolled = False
+    is_blocked = False
+    has_feedback = False
 
-    feedback_list = course.feedback.all()
 
-    has_feedback = Feedback.objects.filter(
-        student=request.user,
-        course=course
-    ).exists()
+    # ---------------------------------------------------------
+    # STUDENT ACCESS
+    # ---------------------------------------------------------
 
-    materials = course.materials.all().order_by(
-        "-uploaded_at"
+    if request.user.role == "student":
+
+        is_blocked = CourseBlock.objects.filter(
+            student=request.user,
+            course=course,
+        ).exists()
+
+        is_enrolled = Enrolment.objects.filter(
+            student=request.user,
+            course=course,
+        ).exists()
+
+        has_feedback = Feedback.objects.filter(
+            student=request.user,
+            course=course,
+        ).exists()
+
+
+    # ---------------------------------------------------------
+    # MATERIALS
+    # ---------------------------------------------------------
+
+    materials = CourseMaterial.objects.none()
+
+    if request.user == course.teacher or (
+        is_enrolled and not is_blocked
+    ):
+
+        materials = (
+            CourseMaterial.objects
+            .filter(course=course)
+            .order_by("-uploaded_at")
+        )
+
+
+    # ---------------------------------------------------------
+    # FEEDBACK
+    # ---------------------------------------------------------
+
+    feedback_list = (
+        Feedback.objects
+        .filter(course=course)
+        .select_related("student")
+        .order_by("-created_at")
     )
+
+
+    # ---------------------------------------------------------
+    # TEACHER STUDENT PREVIEW
+    # ---------------------------------------------------------
+
+    student_preview = []
+    student_count = 0
+
+    if request.user == course.teacher:
+
+        course_enrolments = (
+            Enrolment.objects
+            .filter(course=course)
+            .select_related("student")
+            .order_by("-enrolled_at")
+        )
+
+        student_count = course_enrolments.count()
+
+        student_preview = course_enrolments[:3]
+
 
     return render(
         request,
         "courses/course_detail.html",
         {
             "course": course,
+
             "is_enrolled": is_enrolled,
+            "is_blocked": is_blocked,
+
+            "materials": materials,
+
             "feedback_list": feedback_list,
             "has_feedback": has_feedback,
-            "materials": materials,
-        }
+
+            "student_preview": student_preview,
+            "student_count": student_count,
+        },
     )
 
 @login_required

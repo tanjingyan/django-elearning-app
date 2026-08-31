@@ -16,30 +16,40 @@ def home_redirect(request):
     return redirect("login")
 
 def register(request):
+
+    if request.user.is_authenticated:
+
+        if request.user.role == "teacher":
+            return redirect("teacher_dashboard")
+
+        return redirect("student_dashboard")
+
+
     if request.method == "POST":
-        form = CustomUserCreationForm(request.POST, request.FILES)
+
+        form = CustomUserCreationForm(
+            request.POST,
+            request.FILES,
+        )
 
         if form.is_valid():
-            user = form.save()
 
-            # Log the new user in automatically
-            login(request, user)
+            form.save()
 
-            # Redirect based on role
-            if user.role == "teacher":
-                return redirect("teacher_dashboard")
-            else:
-                return redirect("student_dashboard")
+            return redirect("login")
 
     else:
+
         form = CustomUserCreationForm()
+
 
     return render(
         request,
         "accounts/register.html",
-        {"form": form}
+        {
+            "form": form,
+        },
     )
-
 
 def login_view(request):
     if request.method == "POST":
@@ -119,9 +129,82 @@ def student_dashboard(request):
 @login_required
 def teacher_dashboard(request):
 
+    # Only teachers may access this dashboard
+    if request.user.role != "teacher":
+        return redirect("student_dashboard")
+
+    # ---------------------------------------------------------
+    # COURSES CREATED BY THIS TEACHER
+    # ---------------------------------------------------------
+
+    courses = (
+        Course.objects
+        .filter(teacher=request.user)
+        .order_by("-created_at")
+    )
+
+    course_count = courses.count()
+
+
+    # ---------------------------------------------------------
+    # ENROLMENTS ACROSS THE TEACHER'S COURSES
+    # ---------------------------------------------------------
+
+    teacher_enrolments = (
+        Enrolment.objects
+        .filter(course__teacher=request.user)
+        .select_related(
+            "student",
+            "course",
+        )
+    )
+
+
+    # Total enrolment records
+    total_enrolments = teacher_enrolments.count()
+
+
+    # Unique students
+    #
+    # Example:
+    # Student A enrolled in Course 1 + Course 2
+    # = 1 unique student
+    # = 2 total enrolments
+    #
+    total_students = (
+        teacher_enrolments
+        .values("student_id")
+        .distinct()
+        .count()
+    )
+
+
+    # ---------------------------------------------------------
+    # RECENT DATA
+    # ---------------------------------------------------------
+
+    recent_courses = courses[:3]
+
+    recent_enrolments = (
+        teacher_enrolments
+        .order_by("-enrolled_at")[:5]
+    )
+
+
+    # ---------------------------------------------------------
+    # TEMPLATE
+    # ---------------------------------------------------------
+
     return render(
         request,
-        "accounts/teacher_dashboard.html"
+        "accounts/teacher_dashboard.html",
+        {
+            "course_count": course_count,
+            "total_students": total_students,
+            "total_enrolments": total_enrolments,
+            "recent_courses": recent_courses,
+            "recent_enrolments": recent_enrolments,
+        },
     )
 
 @login_required
@@ -253,17 +336,6 @@ def search_users(request):
             "users": users,
             "query": query,
         }
-    )
-
-@login_required
-def teacher_dashboard(request):
-
-    if request.user.role != "teacher":
-        return redirect("student_dashboard")
-
-    return render(
-        request,
-        "accounts/teacher_dashboard.html"
     )
 
 @login_required

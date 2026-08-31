@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 
 from .models import CustomUser, StatusUpdate
 
-
 class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
@@ -14,11 +13,22 @@ class CustomUserCreationForm(UserCreationForm):
             "first_name",
             "last_name",
             "email",
-            "role",
             "profile_picture",
             "bio",
         )
 
+    def save(self, commit=True):
+
+        user = super().save(commit=False)
+
+        # All users who register publicly are Students.
+        # Teacher accounts must be created/assigned by an administrator.
+        user.role = "student"
+
+        if commit:
+            user.save()
+
+        return user
 
 class StatusUpdateForm(forms.ModelForm):
 
