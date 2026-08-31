@@ -398,3 +398,30 @@ def edit_course(request, course_id):
             "course": course,
         },
     )
+
+@login_required
+def student_courses(request):
+
+    if request.user.role != "student":
+        return redirect("teacher_dashboard")
+
+    enrolments = (
+        Enrolment.objects.filter(
+            student=request.user
+        )
+        .select_related(
+            "course",
+            "course__teacher",
+        )
+        .order_by(
+            "-enrolled_at"
+        )
+    )
+
+    return render(
+        request,
+        "courses/student_courses.html",
+        {
+            "enrolments": enrolments,
+        },
+    )

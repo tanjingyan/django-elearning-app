@@ -1,41 +1,516 @@
 {% extends "base.html" %}
 
-
 {% block title %}
     Student Dashboard
 {% endblock %}
 
 
+{% block extra_css %}
+
+<style>
+
+    .learning-hero {
+        border: 0;
+        border-radius: 20px;
+        overflow: hidden;
+        background-color: #e7f0ff;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    }
+
+
+    .learning-hero-content {
+        min-height: 310px;
+    }
+
+
+    .learning-hero-image {
+        width: 100%;
+        height: 100%;
+        min-height: 310px;
+        object-fit: cover;
+    }
+
+
+    .learning-placeholder {
+        min-height: 310px;
+        background-color: #cfe2ff;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 5rem;
+    }
+
+
+    .course-mini-card-image {
+        height: 150px;
+        object-fit: cover;
+    }
+
+
+    .course-placeholder {
+        height: 150px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background-color: #cfe2ff;
+        font-size: 2.5rem;
+    }
+
+
+    @media (max-width: 767.98px) {
+
+        .learning-hero-content {
+            min-height: auto;
+        }
+
+
+        .learning-hero-image,
+        .learning-placeholder {
+            min-height: 220px;
+            height: 220px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
 {% block content %}
+
+
+    <!-- =========================================================
+         WELCOME
+         ========================================================= -->
 
     <div class="mb-4">
 
         <h1 class="page-heading">
-            Welcome back, {{ request.user.first_name|default:request.user.username }}
+            Welcome back, {{ request.user.username }}
         </h1>
 
-        <p class="page-subheading">
-            Browse courses, review notifications and continue your learning.
+        <p class="page-subheading mb-0">
+            Continue learning and explore your enrolled courses.
         </p>
 
     </div>
 
 
-    <div class="row g-4">
 
-        <div class="col-md-6">
+    <!-- =========================================================
+         CONTINUE LEARNING
+         ========================================================= -->
 
-            <div class="card content-card h-100">
+    {% if featured_enrolment %}
 
-                <div class="card-body">
+        <section class="mb-5">
 
-                    <h5 class="card-title">
-                        Available Courses
-                    </h5>
+            <div class="mb-3">
 
-                    <p class="card-text text-muted">
-                        Browse courses and enrol in the ones you are interested in.
+                <h2 class="h4 fw-bold mb-1">
+                    Continue Learning
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Pick up from one of your current courses.
+                </p>
+
+            </div>
+
+
+            <div class="card learning-hero">
+
+                <div class="row g-0">
+
+
+                    <!-- =========================================
+                         COURSE INFORMATION
+                         ========================================= -->
+
+                    <div class="col-md-6">
+
+                        <div
+                            class="
+                                learning-hero-content
+                                p-4
+                                p-lg-5
+                                d-flex
+                                flex-column
+                                justify-content-between
+                            "
+                        >
+
+                            <div>
+
+                                <span
+                                    class="
+                                        badge
+                                        bg-primary
+                                        mb-3
+                                    "
+                                >
+                                    Enrolled Course
+                                </span>
+
+
+                                <h2 class="fw-bold mb-2">
+
+                                    {{ featured_enrolment.course.title }}
+
+                                </h2>
+
+
+                                <p class="text-muted mb-4">
+
+                                    {{ featured_enrolment.course.description|truncatechars:180 }}
+
+                                </p>
+
+
+                                <div class="small mb-2">
+
+                                    <strong>
+                                        Teacher:
+                                    </strong>
+
+                                    {{ featured_enrolment.course.teacher.username }}
+
+                                </div>
+
+
+                                <div class="small text-muted">
+
+                                    Enrolled on
+                                    {{ featured_enrolment.enrolled_at|date:"d M Y" }}
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="mt-4">
+
+                                <a
+                                    href="{% url 'course_detail' featured_enrolment.course.id %}"
+                                    class="btn btn-primary px-4"
+                                >
+                                    Resume Learning
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================================
+                         COURSE IMAGE
+                         ========================================= -->
+
+                    <div class="col-md-6">
+
+                        {% if featured_enrolment.course.image %}
+
+                            <img
+                                src="{{ featured_enrolment.course.image.url }}"
+                                alt="{{ featured_enrolment.course.title }}"
+                                class="learning-hero-image"
+                            >
+
+                        {% else %}
+
+                            <div class="learning-placeholder">
+
+                                📚
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    {% else %}
+
+
+        <!-- =====================================================
+             NO COURSE EMPTY STATE
+             ===================================================== -->
+
+        <section class="mb-5">
+
+            <div class="card content-card">
+
+                <div class="card-body text-center py-5">
+
+                    <div class="display-4 mb-3">
+                        📚
+                    </div>
+
+
+                    <h3 class="fw-semibold">
+                        Start learning today
+                    </h3>
+
+
+                    <p class="text-muted mb-4">
+                        You are not enrolled in any courses yet.
+                        Browse the available courses to get started.
                     </p>
+
+
+                    <a
+                        href="{% url 'course_list' %}"
+                        class="btn btn-primary"
+                    >
+                        Browse Courses
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+
+    <!-- =========================================================
+         MY COURSES SUMMARY
+         ========================================================= -->
+
+    <section>
+
+        <div
+            class="
+                d-flex
+                justify-content-between
+                align-items-end
+                flex-wrap
+                gap-2
+                mb-3
+            "
+        >
+
+            <div>
+
+                <h2 class="h4 fw-bold mb-1">
+                    My Courses
+                </h2>
+
+                <p class="text-muted mb-0">
+
+                    You are currently enrolled in
+                    {{ enrolled_course_count }}
+                    course{{ enrolled_course_count|pluralize }}.
+
+                </p>
+
+            </div>
+
+
+            {% if enrolments %}
+
+                <a
+                    href="{% url 'student_courses' %}"
+                    class="btn btn-outline-primary btn-sm"
+                >
+                    View All Courses
+                </a>
+
+            {% endif %}
+
+        </div>
+
+
+        {% if enrolments %}
+
+            <div class="row g-4">
+
+                {% for enrolment in enrolments|slice:":3" %}
+
+                    <div class="col-md-6 col-lg-4">
+
+                        <div
+                            class="
+                                card
+                                content-card
+                                h-100
+                                overflow-hidden
+                            "
+                        >
+
+
+                            <!-- =============================
+                                 COURSE IMAGE
+                                 ============================= -->
+
+                            {% if enrolment.course.image %}
+
+                                <img
+                                    src="{{ enrolment.course.image.url }}"
+                                    alt="{{ enrolment.course.title }}"
+                                    class="
+                                        card-img-top
+                                        course-mini-card-image
+                                    "
+                                >
+
+                            {% else %}
+
+                                <div class="course-placeholder">
+                                    📚
+                                </div>
+
+                            {% endif %}
+
+
+
+                            <!-- =============================
+                                 COURSE CONTENT
+                                 ============================= -->
+
+                            <div
+                                class="
+                                    card-body
+                                    d-flex
+                                    flex-column
+                                "
+                            >
+
+                                <div class="mb-2">
+
+                                    <span
+                                        class="
+                                            badge
+                                            bg-success-subtle
+                                            text-success
+                                            border
+                                            border-success-subtle
+                                        "
+                                    >
+                                        Enrolled
+                                    </span>
+
+                                </div>
+
+
+                                <h5 class="fw-semibold">
+
+                                    {{ enrolment.course.title }}
+
+                                </h5>
+
+
+                                <p
+                                    class="
+                                        text-muted
+                                        small
+                                        flex-grow-1
+                                    "
+                                >
+
+                                    {{ enrolment.course.description|truncatechars:90 }}
+
+                                </p>
+
+                                
+                                <p class="small text-muted mb-3">
+                                    <strong>
+                                        Teacher:
+                                    </strong>
+
+                                    <a
+                                        href="{% url 'profile' enrolment.course.teacher.username %}"
+                                        class="text-decoration-none fw-semibold"
+                                    >
+                                        {{ enrolment.course.teacher.username }}
+                                    </a>
+                                </p>
+
+
+                                <div class="d-grid">
+
+                                    <a
+                                        href="{% url 'course_detail' enrolment.course.id %}"
+                                        class="btn btn-outline-primary"
+                                    >
+                                        View Course
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- =========================================================
+         BROWSE MORE
+         ========================================================= -->
+
+    <section class="mt-5">
+
+        <div
+            class="
+                card
+                content-card
+                bg-primary-subtle
+            "
+        >
+
+            <div class="card-body p-4">
+
+                <div
+                    class="
+                        d-flex
+                        justify-content-between
+                        align-items-center
+                        flex-wrap
+                        gap-3
+                    "
+                >
+
+                    <div>
+
+                        <h4 class="fw-semibold mb-1">
+                            Discover more courses
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Explore available courses and continue
+                            building your skills.
+                        </p>
+
+                    </div>
+
 
                     <a
                         href="{% url 'course_list' %}"
@@ -50,34 +525,7 @@
 
         </div>
 
+    </section>
 
-        <div class="col-md-6">
-
-            <div class="card content-card h-100">
-
-                <div class="card-body">
-
-                    <h5 class="card-title">
-                        My Notifications
-                    </h5>
-
-                    <p class="card-text text-muted">
-                        Check for new course materials and other updates.
-                    </p>
-
-                    <a
-                        href="{% url 'notification_list' %}"
-                        class="btn btn-primary"
-                    >
-                        View Notifications
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
 
 {% endblock %}

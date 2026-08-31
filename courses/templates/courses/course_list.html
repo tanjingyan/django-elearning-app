@@ -119,6 +119,13 @@
                                         {{ course.teacher.username }}
                                     </strong>
 
+                                    <a
+                                        href="{% url 'profile' course.teacher.username %}"
+                                        class="text-decoration-none fw-semibold"
+                                    >
+                                        {{ course.teacher.username }}
+                                    </a>
+
                                 </small>
 
                             </div>

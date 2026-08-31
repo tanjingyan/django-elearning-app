@@ -88,11 +88,33 @@ def logout_view(request):
 @login_required
 def student_dashboard(request):
 
-    return render(
-        request,
-        "accounts/student_dashboard.html"
+    if request.user.role != "student":
+        return redirect("teacher_dashboard")
+
+    enrolments = (
+        Enrolment.objects.filter(
+            student=request.user
+        )
+        .select_related(
+            "course",
+            "course__teacher",
+        )
+        .order_by(
+            "-enrolled_at"
+        )
     )
 
+    featured_enrolment = enrolments.first()
+
+    return render(
+        request,
+        "accounts/student_dashboard.html",
+        {
+            "enrolments": enrolments,
+            "featured_enrolment": featured_enrolment,
+            "enrolled_course_count": enrolments.count(),
+        },
+    )
 
 @login_required
 def teacher_dashboard(request):
@@ -104,25 +126,51 @@ def teacher_dashboard(request):
 
 @login_required
 def profile(request, username):
+
     profile_user = get_object_or_404(
         CustomUser,
         username=username,
     )
 
+    # Status updates belonging to this user
     status_updates = StatusUpdate.objects.filter(
         user=profile_user,
-    ).order_by("-created_at")
+    ).order_by(
+        "-created_at"
+    )
 
-    courses_created_count = 0
-    courses_enrolled_count = 0
+    courses_created = []
+    enrolments = []
 
+    # Teacher home page:
+    # show courses created by the teacher
     if profile_user.role == "teacher":
-        courses_created_count = profile_user.courses_created.count()
 
-    if profile_user.role == "student":
-        courses_enrolled_count = Enrolment.objects.filter(
-            student=profile_user,
-        ).count()
+        courses_created = (
+            Course.objects.filter(
+                teacher=profile_user
+            )
+            .order_by(
+                "-created_at"
+            )
+        )
+
+    # Student home page:
+    # show courses the student is enrolled in
+    elif profile_user.role == "student":
+
+        enrolments = (
+            Enrolment.objects.filter(
+                student=profile_user
+            )
+            .select_related(
+                "course",
+                "course__teacher",
+            )
+            .order_by(
+                "-enrolled_at"
+            )
+        )
 
     return render(
         request,
@@ -130,8 +178,18 @@ def profile(request, username):
         {
             "profile_user": profile_user,
             "status_updates": status_updates,
-            "courses_created_count": courses_created_count,
-            "courses_enrolled_count": courses_enrolled_count,
+
+            "courses_created": courses_created,
+            "enrolments": enrolments,
+
+            "courses_created_count": len(
+                courses_created
+            ),
+
+            "courses_enrolled_count": len(
+                enrolments
+            ),
+
             "status_count": status_updates.count(),
         },
     )

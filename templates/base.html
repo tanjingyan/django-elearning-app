@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -11,69 +12,183 @@
 
     <title>
         {% block title %}
-            eLearning Platform
+            LearnSpace
         {% endblock %}
     </title>
 
+
+    <!-- Bootstrap -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
 
+
     <style>
+
         body {
             background-color: #f5f7fb;
             min-height: 100vh;
         }
+
+
+        /* =========================================
+           NAVBAR
+           ========================================= */
 
         .navbar-brand {
             font-weight: 700;
             letter-spacing: 0.3px;
         }
 
-        .page-container {
-            padding-top: 32px;
-            padding-bottom: 48px;
-        }
-
-        .content-card {
-            border: 0;
-            border-radius: 16px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-        }
-
-        .page-heading {
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .page-subheading {
-            color: #6c757d;
-            margin-bottom: 24px;
-        }
 
         .profile-link {
             color: #ffffff;
             text-decoration: none;
             font-weight: 600;
             transition: opacity 0.2s ease;
+            white-space: nowrap;
         }
+
 
         .profile-link:hover {
             color: #ffffff;
             opacity: 0.8;
         }
+
+
+        /* Notification icon */
+
+        .notification-link {
+            position: relative;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+
+            width: 36px;
+            height: 36px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            transition:
+                background-color 0.2s ease,
+                color 0.2s ease;
+        }
+
+
+        .notification-link:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+
+        .notification-badge {
+            position: absolute;
+
+            top: -3px;
+            right: -5px;
+
+            min-width: 18px;
+            height: 18px;
+
+            padding: 0 5px;
+
+            border-radius: 999px;
+
+            background-color: #dc3545;
+            color: #ffffff;
+
+            font-size: 0.65rem;
+            font-weight: 700;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 2px solid #0d6efd;
+        }
+
+
+        /* =========================================
+           PAGE LAYOUT
+           ========================================= */
+
+        .page-container {
+            padding-top: 32px;
+            padding-bottom: 48px;
+        }
+
+
+        .content-card {
+            border: 0;
+            border-radius: 16px;
+
+            box-shadow:
+                0 4px 18px
+                rgba(0, 0, 0, 0.08);
+        }
+
+
+        .page-heading {
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+
+        .page-subheading {
+            color: #6c757d;
+            margin-bottom: 24px;
+        }
+
+
+        /* =========================================
+           MOBILE
+           ========================================= */
+
+        @media (max-width: 991.98px) {
+
+            .navbar-user-area {
+                margin-top: 16px;
+                padding-top: 16px;
+
+                border-top:
+                    1px solid
+                    rgba(255, 255, 255, 0.2);
+            }
+
+        }
+
     </style>
+
 
     {% block extra_css %}
     {% endblock %}
+
 </head>
+
 
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+
+    <!-- =============================================================
+         NAVBAR
+         ============================================================= -->
+
+    <nav
+        class="
+            navbar
+            navbar-expand-lg
+            navbar-dark
+            bg-primary
+            shadow-sm
+        "
+    >
 
         <div class="container">
+
 
             <!-- =====================================================
                  BRAND
@@ -81,7 +196,19 @@
 
             <a
                 class="navbar-brand"
-                href="{% if request.user.is_authenticated %}{% if request.user.role == 'teacher' %}{% url 'teacher_dashboard' %}{% else %}{% url 'student_dashboard' %}{% endif %}{% else %}{% url 'login' %}{% endif %}"
+                href="
+                    {% if request.user.is_authenticated %}
+
+                        {% if request.user.role == 'teacher' %}
+                            {% url 'teacher_dashboard' %}
+                        {% else %}
+                            {% url 'student_dashboard' %}
+                        {% endif %}
+
+                    {% else %}
+                        {% url 'login' %}
+                    {% endif %}
+                "
             >
                 LearnSpace
             </a>
@@ -102,7 +229,9 @@
                     aria-expanded="false"
                     aria-label="Toggle navigation"
                 >
-                    <span class="navbar-toggler-icon"></span>
+                    <span
+                        class="navbar-toggler-icon"
+                    ></span>
                 </button>
 
             {% endif %}
@@ -119,7 +248,19 @@
 
                 {% if request.user.is_authenticated %}
 
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    <!-- =============================================
+                         LEFT NAVIGATION
+                         ============================================= -->
+
+                    <ul
+                        class="
+                            navbar-nav
+                            me-auto
+                            mb-2
+                            mb-lg-0
+                        "
+                    >
 
 
                         <!-- =========================================
@@ -127,6 +268,7 @@
                              ========================================= -->
 
                         {% if request.user.role == "teacher" %}
+
 
                             <li class="nav-item">
 
@@ -180,9 +322,9 @@
                                 API documentation is intentionally
                                 displayed in the teacher interface.
 
-                                The Swagger interface documents the REST
-                                API, while individual API endpoints still
-                                enforce their own DRF permissions.
+                                Swagger and ReDoc document the REST
+                                API while individual endpoints still
+                                enforce their DRF permissions.
                             -->
 
                             <li class="nav-item">
@@ -204,6 +346,7 @@
 
                         {% else %}
 
+
                             <li class="nav-item">
 
                                 <a
@@ -220,39 +363,108 @@
 
                                 <a
                                     class="nav-link"
-                                    href="{% url 'course_list' %}"
+                                    href="{% url 'student_courses' %}"
                                 >
-                                    Courses
+                                    My Courses
                                 </a>
 
                             </li>
 
+
+                            <li class="nav-item">
+
+                                <a
+                                    class="nav-link"
+                                    href="{% url 'course_list' %}"
+                                >
+                                    Browse Courses
+                                </a>
+
+                            </li>
+
+
                         {% endif %}
 
-
-                        <!-- =========================================
-                             SHARED NAVIGATION
-                             ========================================= -->
-
-                        <li class="nav-item">
-
-                            <a
-                                class="nav-link"
-                                href="{% url 'notification_list' %}"
-                            >
-                                Notifications
-                            </a>
-
-                        </li>
 
                     </ul>
 
 
                     <!-- =============================================
-                         USER / PROFILE NAVIGATION
+                         RIGHT NAVIGATION
                          ============================================= -->
 
-                    <div class="d-flex align-items-center gap-3">
+                    <div
+                        class="
+                            d-flex
+                            align-items-center
+                            gap-3
+                            navbar-user-area
+                        "
+                    >
+
+
+                        <!-- =========================================
+                             NOTIFICATIONS
+                             ========================================= -->
+
+                        <a
+                            href="{% url 'notification_list' %}"
+                            class="notification-link"
+                            title="Notifications"
+                            aria-label="Notifications"
+                        >
+
+                            <!-- Bell icon -->
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                fill="currentColor"
+                                viewBox="0 0 16 16"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="
+                                        M8 16a2 2 0 0 0 2-2H6
+                                        a2 2 0 0 0 2 2zm.995-14.901
+                                        a1 1 0 1 0-1.99 0
+                                        A5.002 5.002 0 0 0 3 6
+                                        c0 1.098-.5 6-2 7h14
+                                        c-1.5-1-2-5.902-2-7
+                                        0-2.42-1.72-4.44-4.005-4.901z
+                                    "
+                                ></path>
+                            </svg>
+
+
+                            <!-- Unread notification count -->
+
+                            {% if unread_notification_count > 0 %}
+
+                                <span
+                                    class="notification-badge"
+                                >
+
+                                    {% if unread_notification_count > 99 %}
+
+                                        99+
+
+                                    {% else %}
+
+                                        {{ unread_notification_count }}
+
+                                    {% endif %}
+
+                                </span>
+
+                            {% endif %}
+
+                        </a>
+
+
+                        <!-- =========================================
+                             PROFILE
+                             ========================================= -->
 
                         <a
                             href="{% url 'profile' request.user.username %}"
@@ -262,12 +474,18 @@
                             👤 {{ request.user.username }}
                         </a>
 
+
+                        <!-- =========================================
+                             LOGOUT
+                             ========================================= -->
+
                         <a
                             class="btn btn-light btn-sm"
                             href="{% url 'logout' %}"
                         >
                             Logout
                         </a>
+
 
                     </div>
 
@@ -281,6 +499,7 @@
 
                 {% endif %}
 
+
             </div>
 
         </div>
@@ -292,7 +511,12 @@
          MAIN PAGE CONTENT
          ============================================================= -->
 
-    <main class="container page-container">
+    <main
+        class="
+            container
+            page-container
+        "
+    >
 
 
         <!-- =========================================================
@@ -322,6 +546,7 @@
 
                     {{ message }}
 
+
                     <button
                         type="button"
                         class="btn-close"
@@ -343,6 +568,7 @@
         {% block content %}
         {% endblock %}
 
+
     </main>
 
 
@@ -351,16 +577,24 @@
          ============================================================= -->
 
     <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        src="
+            https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js
+        "
+    ></script>
+
+
+    <!-- =============================================================
+         HTMX
+         ============================================================= -->
+
+    <script
+        src="https://unpkg.com/htmx.org@2.0.8/dist/htmx.min.js"
     ></script>
 
 
     {% block extra_js %}
     {% endblock %}
 
-    <script
-        src="https://unpkg.com/htmx.org@2.0.8/dist/htmx.min.js"
-    ></script>    
 
 </body>
 

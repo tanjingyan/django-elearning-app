@@ -132,12 +132,17 @@
 
                             <div class="d-grid gap-2">
 
+                                <!-- View course -->
+
                                 <a
                                     href="{% url 'course_detail' course.id %}"
                                     class="btn btn-outline-primary"
                                 >
                                     View Course
                                 </a>
+
+
+                                <!-- Edit course -->
 
                                 <a
                                     href="{% url 'edit_course' course.id %}"
@@ -146,12 +151,18 @@
                                     Edit Course
                                 </a>
 
+                                
+                                <!-- Upload teaching material -->
+
                                 <a
                                     href="{% url 'upload_material' course.id %}"
                                     class="btn btn-outline-success"
                                 >
                                     Upload Material
                                 </a>
+
+
+                                <!-- Open real-time discussion -->
 
                                 <a
                                     href="{% url 'course_chat' course.id %}"
@@ -172,6 +183,7 @@
 
         </div>
 
+
     {% else %}
 
         <div class="card content-card">
@@ -187,7 +199,8 @@
                 </h4>
 
                 <p class="text-muted">
-                    Create your first course to start adding students and teaching materials.
+                    Create your first course to start adding students
+                    and teaching materials.
                 </p>
 
                 <a

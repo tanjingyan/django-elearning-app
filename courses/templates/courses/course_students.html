@@ -1,108 +1,405 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-
-    <title>
-        Students - {{ course.title }}
-    </title>
-
-</head>
-
-<body>
-
-    <h1>
-        Students Enrolled in {{ course.title }}
-    </h1>
+{% block title %}
+    Students - {{ course.title }}
+{% endblock %}
 
 
-    {% if enrolments %}
+{% block content %}
 
-        {% for enrolment in enrolments %}
+    <!-- =========================================================
+         PAGE HEADER
+         ========================================================= -->
 
-            <div>
+    <div
+        class="
+            d-flex
+            justify-content-between
+            align-items-center
+            flex-wrap
+            gap-3
+            mb-4
+        "
+    >
 
-                <h3>
-                    {{ enrolment.student.first_name }}
-                    {{ enrolment.student.last_name }}
-                </h3>
+        <div>
 
-                <p>
-                    Username:
-                    {{ enrolment.student.username }}
-                </p>
+            <h1 class="page-heading">
+                Enrolled Students
+            </h1>
 
-                <p>
-                    Email:
-                    {{ enrolment.student.email }}
-                </p>
+            <p class="page-subheading mb-0">
+                Manage students enrolled in
+                <strong>{{ course.title }}</strong>.
+            </p>
 
-                <p>
-                    Enrolled:
-                    {{ enrolment.enrolled_at }}
-                </p>
+        </div>
 
 
-                <!-- Remove Student -->
+        <a
+            href="{% url 'teacher_courses' %}"
+            class="btn btn-outline-secondary"
+        >
+            Back to My Courses
+        </a>
 
-                <form
-                    method="POST"
-                    action="{% url 'remove_student' course.id enrolment.student.id %}"
-                    style="display: inline;"
-                    onsubmit="return confirm(
-                        'Are you sure you want to remove {{ enrolment.student.username }} from this course?'
-                    );"
+    </div>
+
+
+    <!-- =========================================================
+         STUDENT COUNT
+         ========================================================= -->
+
+    <div class="card content-card mb-4">
+
+        <div class="card-body">
+
+            <div
+                class="
+                    d-flex
+                    align-items-center
+                    gap-3
+                "
+            >
+
+                <div
+                    class="
+                        rounded-circle
+                        bg-primary-subtle
+                        text-primary
+                        d-flex
+                        align-items-center
+                        justify-content-center
+                    "
+                    style="
+                        width: 52px;
+                        height: 52px;
+                        font-size: 1.4rem;
+                    "
                 >
-
-                    {% csrf_token %}
-
-                    <button type="submit">
-                        Remove Student
-                    </button>
-
-                </form>
+                    👥
+                </div>
 
 
-                <!-- Block Student -->
+                <div>
 
-                <form
-                    method="POST"
-                    action="{% url 'block_student' course.id enrolment.student.id %}"
-                    style="display: inline;"
-                    onsubmit="return confirm(
-                        'Are you sure you want to block {{ enrolment.student.username }} from this course? They will also be removed from the course.'
-                    );"
-                >
+                    <p class="text-muted small mb-1">
+                        Total Enrolled Students
+                    </p>
 
-                    {% csrf_token %}
+                    <h3 class="fw-bold mb-0">
+                        {{ enrolments|length }}
+                    </h3>
 
-                    <button type="submit">
-                        Block Student
-                    </button>
-
-                </form>
+                </div>
 
             </div>
 
-            <hr>
+        </div>
 
-        {% endfor %}
+    </div>
+
+
+    <!-- =========================================================
+         STUDENTS
+         ========================================================= -->
+
+    {% if enrolments %}
+
+        <div class="row g-4">
+
+            {% for enrolment in enrolments %}
+
+                <div class="col-lg-6">
+
+                    <div class="card content-card h-100">
+
+                        <div class="card-body p-4">
+
+
+                            <!-- =================================
+                                 STUDENT INFORMATION
+                                 ================================= -->
+
+                            <div
+                                class="
+                                    d-flex
+                                    align-items-start
+                                    gap-3
+                                    mb-4
+                                "
+                            >
+
+
+                                <!-- Profile picture -->
+
+                                {% if enrolment.student.profile_picture %}
+
+                                    <img
+                                        src="{{ enrolment.student.profile_picture.url }}"
+                                        alt="{{ enrolment.student.username }}"
+                                        class="rounded-circle"
+                                        style="
+                                            width: 64px;
+                                            height: 64px;
+                                            object-fit: cover;
+                                        "
+                                    >
+
+                                {% else %}
+
+                                    <div
+                                        class="
+                                            rounded-circle
+                                            bg-primary-subtle
+                                            text-primary
+                                            d-flex
+                                            align-items-center
+                                            justify-content-center
+                                            flex-shrink-0
+                                        "
+                                        style="
+                                            width: 64px;
+                                            height: 64px;
+                                            font-size: 1.6rem;
+                                        "
+                                    >
+                                        👤
+                                    </div>
+
+                                {% endif %}
+
+
+                                <div class="flex-grow-1">
+
+
+                                    <!-- Student name -->
+
+                                    <h5 class="fw-semibold mb-1">
+
+                                        <a
+                                            href="{% url 'profile' enrolment.student.username %}"
+                                            class="
+                                                text-dark
+                                                text-decoration-none
+                                            "
+                                        >
+
+                                            {% if enrolment.student.first_name or enrolment.student.last_name %}
+
+                                                {{ enrolment.student.first_name }}
+                                                {{ enrolment.student.last_name }}
+
+                                            {% else %}
+
+                                                {{ enrolment.student.username }}
+
+                                            {% endif %}
+
+                                        </a>
+
+                                    </h5>
+
+
+                                    <!-- Username -->
+
+                                    <p class="mb-1">
+
+                                        <span class="text-muted">
+                                            Username:
+                                        </span>
+
+                                        <a
+                                            href="{% url 'profile' enrolment.student.username %}"
+                                            class="
+                                                text-decoration-none
+                                                fw-semibold
+                                            "
+                                        >
+                                            {{ enrolment.student.username }}
+                                        </a>
+
+                                    </p>
+
+
+                                    <!-- Email -->
+
+                                    <p class="text-muted small mb-1">
+
+                                        {{ enrolment.student.email }}
+
+                                    </p>
+
+
+                                    <!-- Enrolled date -->
+
+                                    <p class="text-muted small mb-0">
+
+                                        Enrolled:
+                                        {{ enrolment.enrolled_at|date:"d M Y, g:i A" }}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 PROFILE BUTTON
+                                 ================================= -->
+
+                            <div class="mb-3">
+
+                                <a
+                                    href="{% url 'profile' enrolment.student.username %}"
+                                    class="
+                                        btn
+                                        btn-outline-primary
+                                        btn-sm
+                                    "
+                                >
+                                    View Profile
+                                </a>
+
+                            </div>
+
+
+                            <hr>
+
+
+                            <!-- =================================
+                                 STUDENT MANAGEMENT
+                                 ================================= -->
+
+                            <div>
+
+                                <p
+                                    class="
+                                        text-muted
+                                        small
+                                        fw-semibold
+                                        mb-2
+                                    "
+                                >
+                                    Student Management
+                                </p>
+
+
+                                <div
+                                    class="
+                                        d-flex
+                                        gap-2
+                                        flex-wrap
+                                    "
+                                >
+
+
+                                    <!-- Remove student -->
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'remove_student' course.id enrolment.student.id %}"
+                                        onsubmit="
+                                            return confirm(
+                                                'Are you sure you want to remove {{ enrolment.student.username }} from this course?'
+                                            );
+                                        "
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="
+                                                btn
+                                                btn-outline-danger
+                                                btn-sm
+                                            "
+                                        >
+                                            Remove Student
+                                        </button>
+
+                                    </form>
+
+
+                                    <!-- Block student -->
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'block_student' course.id enrolment.student.id %}"
+                                        onsubmit="
+                                            return confirm(
+                                                'Are you sure you want to block {{ enrolment.student.username }}? The student will also be removed from this course.'
+                                            );
+                                        "
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="
+                                                btn
+                                                btn-danger
+                                                btn-sm
+                                            "
+                                        >
+                                            Block Student
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    <!-- =========================================================
+         EMPTY STATE
+         ========================================================= -->
 
     {% else %}
 
-        <p>
-            There are no students enrolled in this course.
-        </p>
+        <div class="card content-card">
+
+            <div
+                class="
+                    card-body
+                    text-center
+                    py-5
+                "
+            >
+
+                <div class="display-5 mb-3">
+                    👥
+                </div>
+
+
+                <h4 class="fw-semibold">
+                    No students enrolled
+                </h4>
+
+
+                <p class="text-muted mb-0">
+                    Students who enrol in this course
+                    will appear here.
+                </p>
+
+            </div>
+
+        </div>
 
     {% endif %}
 
-
-    <br>
-
-    <a href="{% url 'teacher_courses' %}">
-        Back to My Courses
-    </a>
-
-</body>
-
-</html>
+{% endblock %}
