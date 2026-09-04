@@ -7,33 +7,186 @@
 
 {% block content %}
 
-    <div class="row justify-content-center">
+<div class="login-page">
 
-        <div class="col-md-7 col-lg-5">
+    <div class="login-wrapper">
 
-            <div class="card content-card">
+        <div class="login-layout">
 
-                <div class="card-body p-4 p-md-5">
 
-                    <!-- =================================================
-                         HEADER
-                         ================================================= -->
+            <!-- =========================================================
+                 LEFT SIDE - LEARNSPACE INTRODUCTION
+                 ========================================================= -->
 
-                    <div class="text-center mb-4">
+            <section class="login-hero">
 
-                        <div class="display-5 mb-3">
-                            🎓
+                <!-- Decorative background shapes -->
+                <div class="hero-decoration hero-decoration-one"></div>
+                <div class="hero-decoration hero-decoration-two"></div>
+
+
+                <div class="hero-content">
+
+                    
+                    <p class="hero-eyebrow">
+                        WELCOME TO LEARNSPACE
+                    </p>
+
+
+                    <h1 class="hero-title">
+                        Learn. Connect.<br>
+                        <span>Grow.</span>
+                    </h1>
+
+
+                    <p class="hero-description">
+                        Your central learning space for courses,
+                        teaching materials and real-time discussions.
+                        LearnSpace brings students and teachers together
+                        in one convenient platform.
+                    </p>
+
+
+                    <!-- Feature List -->
+
+                    <div class="feature-list">
+
+                        <div class="feature-item">
+
+                            <div class="feature-icon">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="3"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+
+                            <div>
+                                <strong>Access course materials</strong>
+                                <span>
+                                    Keep your learning resources in one place.
+                                </span>
+                            </div>
+
                         </div>
 
-                        <h1 class="page-heading">
-                            Welcome Back
-                        </h1>
 
-                        <p class="page-subheading mb-0">
+                        <div class="feature-item">
+
+                            <div class="feature-icon">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="3"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+
+                            <div>
+                                <strong>Join real-time discussions</strong>
+                                <span>
+                                    Connect with teachers and other students.
+                                </span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="feature-item">
+
+                            <div class="feature-icon">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="3"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+
+                            <div>
+                                <strong>Manage your courses</strong>
+                                <span>
+                                    Easily access and keep track of your courses.
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =========================================================
+                 RIGHT SIDE - LOGIN FORM
+                 ========================================================= -->
+
+            <section class="login-form-section">
+
+                <div class="login-card">
+
+
+                    <!-- Header -->
+
+                    <div class="login-card-header">
+
+                        <div class="login-card-icon">
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="29"
+                                height="29"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="M22 10v6"></path>
+                                <path d="M2 10l10-5 10 5-10 5z"></path>
+                                <path d="M6 12v5c3 2 9 2 12 0v-5"></path>
+                            </svg>
+
+                        </div>
+
+
+                        <h2>
+                            Welcome Back
+                        </h2>
+
+                        <p>
                             Log in to continue to LearnSpace.
                         </p>
 
                     </div>
+
 
 
                     <!-- =================================================
@@ -42,11 +195,20 @@
 
                     {% if error %}
 
-                        <div class="alert alert-danger">
-                            {{ error }}
+                        <div class="login-error" role="alert">
+
+                            <div class="login-error-icon">
+                                !
+                            </div>
+
+                            <div>
+                                {{ error }}
+                            </div>
+
                         </div>
 
                     {% endif %}
+
 
 
                     <!-- =================================================
@@ -58,11 +220,20 @@
                         {% csrf_token %}
 
 
-                        <!-- =============================================
-                             USERNAME
-                             ============================================= -->
+                        {% if next %}
 
-                        <div class="mb-3">
+                            <input
+                                type="hidden"
+                                name="next"
+                                value="{{ next }}"
+                            >
+
+                        {% endif %}
+
+
+                        <!-- Username -->
+
+                        <div class="login-form-group">
 
                             <label
                                 for="username"
@@ -71,24 +242,50 @@
                                 Username
                             </label>
 
-                            <input
-                                id="username"
-                                name="username"
-                                type="text"
-                                class="form-control"
-                                placeholder="Enter your username"
-                                autocomplete="username"
-                                required
-                            >
+
+                            <div class="login-input-wrapper">
+
+                                <span class="login-input-icon">
+
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M20 21a8 8 0 0 0-16 0"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+
+                                </span>
+
+
+                                <input
+                                    id="username"
+                                    name="username"
+                                    type="text"
+                                    class="form-control login-input"
+                                    placeholder="Enter your username"
+                                    autocomplete="username"
+                                    required
+                                    autofocus
+                                >
+
+                            </div>
 
                         </div>
 
 
-                        <!-- =============================================
-                             PASSWORD
-                             ============================================= -->
 
-                        <div class="mb-4">
+                        <!-- Password -->
+
+                        <div class="login-form-group">
 
                             <label
                                 for="password"
@@ -98,13 +295,43 @@
                             </label>
 
 
-                            <div class="input-group">
+                            <div class="password-wrapper">
+
+                                <span class="login-input-icon">
+
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="11"
+                                            width="18"
+                                            height="10"
+                                            rx="2"
+                                        ></rect>
+
+                                        <path
+                                            d="M7 11V7a5 5 0 0 1 10 0v4"
+                                        ></path>
+                                    </svg>
+
+                                </span>
+
 
                                 <input
                                     id="password"
                                     name="password"
                                     type="password"
-                                    class="form-control"
+                                    class="form-control login-input password-input"
                                     placeholder="Enter your password"
                                     autocomplete="current-password"
                                     required
@@ -116,7 +343,7 @@
                                 <button
                                     type="button"
                                     id="togglePassword"
-                                    class="btn btn-outline-secondary password-toggle"
+                                    class="password-toggle"
                                     aria-label="Show password"
                                     title="Show password"
                                 >
@@ -124,29 +351,29 @@
                                     <svg
                                         id="eyeIcon"
                                         xmlns="http://www.w3.org/2000/svg"
-                                        width="18"
-                                        height="18"
+                                        width="19"
+                                        height="19"
                                         viewBox="0 0 24 24"
                                         fill="none"
                                         stroke="currentColor"
                                         stroke-width="2"
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
+                                        aria-hidden="true"
                                     >
+
                                         <path
                                             d="M2 12s3.5-7 10-7
                                                10 7 10 7
                                                -3.5 7-10 7
                                                S2 12 2 12"
-                                        >
-                                        </path>
+                                        ></path>
 
                                         <circle
                                             cx="12"
                                             cy="12"
                                             r="3"
-                                        >
-                                        </circle>
+                                        ></circle>
 
                                     </svg>
 
@@ -157,212 +384,972 @@
                         </div>
 
 
-                        <!-- =============================================
-                             LOGIN BUTTON
-                             ============================================= -->
+
+                        <!-- Login Button -->
 
                         <button
                             type="submit"
-                            class="btn btn-primary w-100"
+                            class="login-button"
                         >
-                            Login
+
+                            <span>
+                                Login
+                            </span>
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <line
+                                    x1="5"
+                                    y1="12"
+                                    x2="19"
+                                    y2="12"
+                                ></line>
+
+                                <polyline
+                                    points="12 5 19 12 12 19"
+                                ></polyline>
+                            </svg>
+
                         </button>
 
                     </form>
+
 
 
                     <!-- =================================================
                          REGISTER LINK
                          ================================================= -->
 
-                    <p class="text-center text-muted mt-4 mb-0">
+                    <div class="register-section">
 
-                        Do not have an account?
+                        <span>
+                            New to LearnSpace?
+                        </span>
 
-                        <a
-                            href="{% url 'register' %}"
-                            class="text-decoration-none fw-semibold"
-                        >
-                            Register
+                        <a href="{% url 'register' %}">
+                            Create an account
                         </a>
 
-                    </p>
+                    </div>
+
 
                 </div>
 
-            </div>
+            </section>
+
 
         </div>
 
     </div>
 
-
-
-    <!-- =========================================================
-         PAGE STYLING
-         ========================================================= -->
-
-    <style>
-
-        .password-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            min-width: 48px;
-
-            color: #6c757d;
-
-            background-color: #ffffff;
-
-            border-color: #ced4da;
-        }
-
-
-        .password-toggle:hover {
-            color: #0d6efd;
-
-            background-color: #f8f9fa;
-
-            border-color: #86b7fe;
-        }
-
-
-        .password-toggle:focus {
-            box-shadow:
-                0 0 0 0.25rem
-                rgba(13, 110, 253, 0.25);
-        }
-
-
-        .password-toggle svg {
-            pointer-events: none;
-        }
-
-    </style>
+</div>
 
 
 
-    <!-- =========================================================
-         PASSWORD VISIBILITY SCRIPT
-         ========================================================= -->
+<!-- =========================================================
+     PAGE STYLING
+     ========================================================= -->
 
-    <script>
+<style>
 
-        const passwordInput =
-            document.getElementById("password");
+    /* =========================================================
+       PAGE
+       ========================================================= */
 
-        const togglePasswordButton =
-            document.getElementById("togglePassword");
+    .login-page {
+        width: 100%;
+        min-height: calc(100vh - 100px);
 
-        const eyeIcon =
-            document.getElementById("eyeIcon");
+        display: flex;
+        align-items: center;
 
+        padding: 3rem 1.5rem;
 
-        togglePasswordButton.addEventListener(
-            "click",
-            function () {
-
-                const passwordIsHidden =
-                    passwordInput.type === "password";
-
-
-                if (passwordIsHidden) {
-
-                    /* Show password */
-
-                    passwordInput.type = "text";
-
-                    togglePasswordButton.setAttribute(
-                        "aria-label",
-                        "Hide password"
-                    );
-
-                    togglePasswordButton.setAttribute(
-                        "title",
-                        "Hide password"
-                    );
+        background:
+            linear-gradient(
+                135deg,
+                #f8faff 0%,
+                #eef4ff 55%,
+                #f7f9fc 100%
+            );
+    }
 
 
-                    /* Eye-off icon */
+    .login-wrapper {
+        width: 100%;
+        max-width: 1180px;
 
-                    eyeIcon.innerHTML = `
-                        <path d="M3 3l18 18"></path>
-
-                        <path
-                            d="M10.6 10.6
-                               a2 2 0 0 0
-                               2.8 2.8"
-                        ></path>
-
-                        <path
-                            d="M9.9 4.2
-                               A10.8 10.8 0 0 1
-                               12 4
-                               c6.5 0
-                               10 8
-                               10 8
-                               a18.6 18.6 0 0 1
-                               -2.2 3.2"
-                        ></path>
-
-                        <path
-                            d="M6.6 6.6
-                               C3.6 8.6
-                               2 12
-                               2 12
-                               s3.5 8
-                               10 8
-                               c1.5 0
-                               2.8-.4
-                               4-.9"
-                        ></path>
-                    `;
-
-                } else {
-
-                    /* Hide password */
-
-                    passwordInput.type = "password";
-
-                    togglePasswordButton.setAttribute(
-                        "aria-label",
-                        "Show password"
-                    );
-
-                    togglePasswordButton.setAttribute(
-                        "title",
-                        "Show password"
-                    );
+        margin: 0 auto;
+    }
 
 
-                    /* Normal eye icon */
+    .login-layout {
+        display: grid;
 
-                    eyeIcon.innerHTML = `
-                        <path
-                            d="M2 12
-                               s3.5-7
-                               10-7
-                               10 7
-                               10 7
-                               -3.5 7
-                               -10 7
-                               S2 12
-                               2 12"
-                        ></path>
+        grid-template-columns:
+            minmax(0, 1.08fr)
+            minmax(380px, 0.92fr);
 
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="3"
-                        ></circle>
-                    `;
+        gap: 5rem;
 
-                }
+        align-items: start;
+    }
 
-            }
+
+
+    /* =========================================================
+       HERO SECTION
+       ========================================================= */
+
+    .login-hero {
+        position: relative;
+
+        padding: 2rem 2rem 3rem;
+
+        overflow: hidden;
+    }
+
+
+    .hero-content {
+        position: relative;
+
+        z-index: 2;
+
+        max-width: 570px;
+    }
+
+
+    .hero-icon {
+        width: 64px;
+        height: 64px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 1.75rem;
+
+        border-radius: 18px;
+
+        color: #0d6efd;
+
+        background:
+            linear-gradient(
+                135deg,
+                #dbeafe,
+                #eaf2ff
+            );
+
+        box-shadow:
+            0 8px 20px
+            rgba(13, 110, 253, 0.10);
+    }
+
+
+    .hero-eyebrow {
+        margin-bottom: 0.8rem;
+
+        color: #0d6efd;
+
+        font-size: 0.78rem;
+        font-weight: 700;
+
+        letter-spacing: 0.11em;
+    }
+
+
+    .hero-title {
+        margin-bottom: 1.4rem;
+
+        color: #1c2733;
+
+        font-size: clamp(
+            2.7rem,
+            5vw,
+            4.15rem
         );
 
-    </script>
+        font-weight: 750;
+
+        line-height: 1.05;
+
+        letter-spacing: -0.045em;
+    }
+
+
+    .hero-title span {
+        color: #0d6efd;
+    }
+
+
+    .hero-description {
+        max-width: 530px;
+
+        margin-bottom: 2.2rem;
+
+        color: #687386;
+
+        font-size: 1.08rem;
+
+        line-height: 1.75;
+    }
+
+
+
+    /* =========================================================
+       FEATURE LIST
+       ========================================================= */
+
+    .feature-list {
+        display: flex;
+        flex-direction: column;
+
+        gap: 1.25rem;
+    }
+
+
+    .feature-item {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 0.9rem;
+    }
+
+
+    .feature-icon {
+        width: 31px;
+        height: 31px;
+
+        min-width: 31px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-top: 2px;
+
+        color: #0d6efd;
+
+        border-radius: 50%;
+
+        background: #dbeafe;
+    }
+
+
+    .feature-item strong {
+        display: block;
+
+        margin-bottom: 0.15rem;
+
+        color: #2a3441;
+
+        font-size: 0.97rem;
+
+        font-weight: 650;
+    }
+
+
+    .feature-item span {
+        display: block;
+
+        color: #7b8492;
+
+        font-size: 0.88rem;
+
+        line-height: 1.5;
+    }
+
+
+
+    /* Decorative Shapes */
+
+    .hero-decoration {
+        position: absolute;
+
+        z-index: 1;
+
+        border-radius: 50%;
+
+        pointer-events: none;
+    }
+
+
+    .hero-decoration-one {
+        width: 220px;
+        height: 220px;
+
+        top: -70px;
+        right: 5px;
+
+        background:
+            rgba(13, 110, 253, 0.035);
+    }
+
+
+    .hero-decoration-two {
+        width: 130px;
+        height: 130px;
+
+        bottom: -30px;
+        left: -25px;
+
+        background:
+            rgba(13, 110, 253, 0.035);
+    }
+
+
+
+    /* =========================================================
+       LOGIN CARD
+       ========================================================= */
+
+    .login-form-section {
+        width: 100%;
+    }
+
+
+    .login-card {
+        width: 100%;
+
+        padding: 2.75rem;
+
+        border:
+            1px solid
+            rgba(218, 224, 232, 0.9);
+
+        border-radius: 20px;
+
+        background: #ffffff;
+
+        box-shadow:
+            0 18px 50px
+            rgba(28, 39, 51, 0.09);
+    }
+
+
+
+    /* =========================================================
+       CARD HEADER
+       ========================================================= */
+
+    .login-card-header {
+        margin-bottom: 2rem;
+
+        text-align: center;
+    }
+
+
+    .login-card-icon {
+        width: 57px;
+        height: 57px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin:
+            0 auto
+            1rem;
+
+        color: #0d6efd;
+
+        border-radius: 16px;
+
+        background: #edf4ff;
+    }
+
+
+    .login-card-header h2 {
+        margin-bottom: 0.4rem;
+
+        color: #202932;
+
+        font-size: 2rem;
+
+        font-weight: 700;
+
+        letter-spacing: -0.025em;
+    }
+
+
+    .login-card-header p {
+        margin: 0;
+
+        color: #7b8492;
+
+        font-size: 0.96rem;
+    }
+
+
+
+    /* =========================================================
+       FORM
+       ========================================================= */
+
+    .login-form-group {
+        margin-bottom: 1.4rem;
+    }
+
+
+    .login-form-group .form-label {
+        margin-bottom: 0.5rem;
+
+        color: #374151;
+
+        font-size: 0.91rem;
+
+        font-weight: 600;
+    }
+
+
+    .login-input-wrapper,
+    .password-wrapper {
+        position: relative;
+    }
+
+
+    .login-input-icon {
+        position: absolute;
+
+        z-index: 5;
+
+        top: 50%;
+        left: 15px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #8993a1;
+
+        transform: translateY(-50%);
+
+        pointer-events: none;
+    }
+
+
+    .login-input {
+        height: 50px;
+
+        padding-left: 44px;
+
+        color: #2b3440;
+
+        border: 1px solid #d5dce5;
+
+        border-radius: 9px;
+
+        background: #ffffff;
+
+        font-size: 0.94rem;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+
+    .login-input::placeholder {
+        color: #a0a7b2;
+    }
+
+
+    .login-input:focus {
+        border-color: #86b7fe;
+
+        box-shadow:
+            0 0 0
+            0.2rem
+            rgba(13, 110, 253, 0.12);
+    }
+
+
+    .password-input {
+        padding-right: 52px;
+    }
+
+
+
+    /* =========================================================
+       PASSWORD TOGGLE
+       ========================================================= */
+
+    .password-toggle {
+        position: absolute;
+
+        z-index: 6;
+
+        top: 1px;
+        right: 1px;
+
+        width: 49px;
+        height: 48px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #788391;
+
+        border: none;
+        border-left: 1px solid #d5dce5;
+
+        border-radius:
+            0
+            8px
+            8px
+            0;
+
+        background: #ffffff;
+
+        cursor: pointer;
+
+        transition:
+            color 0.2s ease,
+            background-color 0.2s ease;
+    }
+
+
+    .password-toggle:hover {
+        color: #0d6efd;
+
+        background-color: #f8faff;
+    }
+
+
+    .password-toggle:focus {
+        outline: none;
+
+        box-shadow:
+            0 0 0
+            0.2rem
+            rgba(13, 110, 253, 0.15);
+    }
+
+
+    .password-toggle svg {
+        pointer-events: none;
+    }
+
+
+
+    /* =========================================================
+       LOGIN BUTTON
+       ========================================================= */
+
+    .login-button {
+        width: 100%;
+        height: 50px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 0.55rem;
+
+        margin-top: 1.8rem;
+
+        color: #ffffff;
+
+        border: none;
+
+        border-radius: 9px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #0d6efd,
+                #1769e8
+            );
+
+        box-shadow:
+            0 7px 18px
+            rgba(13, 110, 253, 0.18);
+
+        font-weight: 600;
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+
+    .login-button:hover {
+        color: #ffffff;
+
+        background:
+            linear-gradient(
+                135deg,
+                #0b5ed7,
+                #0d63df
+            );
+
+        box-shadow:
+            0 9px 22px
+            rgba(13, 110, 253, 0.24);
+
+        transform: translateY(-1px);
+    }
+
+
+    .login-button:active {
+        transform: translateY(0);
+    }
+
+
+
+    /* =========================================================
+       REGISTER
+       ========================================================= */
+
+    .register-section {
+        display: flex;
+
+        justify-content: center;
+
+        gap: 0.35rem;
+
+        margin-top: 1.55rem;
+
+        color: #7b8492;
+
+        font-size: 0.92rem;
+    }
+
+
+    .register-section a {
+        color: #0d6efd;
+
+        font-weight: 650;
+
+        text-decoration: none;
+    }
+
+
+    .register-section a:hover {
+        text-decoration: underline;
+    }
+
+
+
+    /* =========================================================
+       LOGIN ERROR
+       ========================================================= */
+
+    .login-error {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.75rem;
+
+        margin-bottom: 1.5rem;
+
+        padding: 0.85rem 1rem;
+
+        color: #b42335;
+
+        border: 1px solid #f1bec5;
+
+        border-radius: 9px;
+
+        background: #fff5f6;
+
+        font-size: 0.9rem;
+    }
+
+
+    .login-error-icon {
+        width: 24px;
+        height: 24px;
+
+        min-width: 24px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #ffffff;
+
+        border-radius: 50%;
+
+        background: #dc3545;
+
+        font-size: 0.8rem;
+
+        font-weight: 700;
+    }
+
+
+
+    /* =========================================================
+       TABLET
+       ========================================================= */
+
+    @media (max-width: 992px) {
+
+        .login-page {
+            padding:
+                2.5rem
+                1.25rem;
+        }
+
+
+        .login-layout {
+            grid-template-columns: 1fr;
+
+            gap: 2rem;
+        }
+
+
+        .login-hero {
+            padding:
+                1rem
+                1rem
+                0;
+
+            text-align: center;
+        }
+
+
+        .hero-content {
+            max-width: 650px;
+
+            margin: 0 auto;
+        }
+
+
+        .hero-icon {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+        .hero-description {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+        .feature-list {
+            max-width: 430px;
+
+            margin: 0 auto;
+
+            text-align: left;
+        }
+
+
+        .login-form-section {
+            max-width: 540px;
+
+            margin: 0 auto;
+        }
+
+    }
+
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 576px) {
+
+        .login-page {
+            min-height: auto;
+
+            padding:
+                2rem
+                0.5rem;
+        }
+
+
+        .login-hero {
+            padding:
+                0.5rem
+                0.5rem
+                1rem;
+        }
+
+
+        .hero-title {
+            font-size: 2.35rem;
+        }
+
+
+        .hero-description {
+            font-size: 0.98rem;
+        }
+
+
+        .feature-list {
+            display: none;
+        }
+
+
+        .login-card {
+            padding:
+                2rem
+                1.4rem;
+
+            border-radius: 16px;
+        }
+
+
+        .login-card-header h2 {
+            font-size: 1.75rem;
+        }
+
+
+        .register-section {
+            flex-wrap: wrap;
+        }
+
+    }
+
+</style>
+
+
+
+<!-- =========================================================
+     PASSWORD VISIBILITY SCRIPT
+     ========================================================= -->
+
+<script>
+
+    const passwordInput =
+        document.getElementById("password");
+
+    const togglePasswordButton =
+        document.getElementById("togglePassword");
+
+    const eyeIcon =
+        document.getElementById("eyeIcon");
+
+
+    togglePasswordButton.addEventListener(
+        "click",
+        function () {
+
+            const passwordIsHidden =
+                passwordInput.type === "password";
+
+
+            if (passwordIsHidden) {
+
+                /* Show password */
+
+                passwordInput.type = "text";
+
+
+                togglePasswordButton.setAttribute(
+                    "aria-label",
+                    "Hide password"
+                );
+
+                togglePasswordButton.setAttribute(
+                    "title",
+                    "Hide password"
+                );
+
+
+                /* Eye-off icon */
+
+                eyeIcon.innerHTML = `
+                    <path d="M3 3l18 18"></path>
+
+                    <path
+                        d="M10.6 10.6
+                           a2 2 0 0 0
+                           2.8 2.8"
+                    ></path>
+
+                    <path
+                        d="M9.9 4.2
+                           A10.8 10.8 0 0 1
+                           12 4
+                           c6.5 0
+                           10 8
+                           10 8
+                           a18.6 18.6 0 0 1
+                           -2.2 3.2"
+                    ></path>
+
+                    <path
+                        d="M6.6 6.6
+                           C3.6 8.6
+                           2 12
+                           2 12
+                           s3.5 8
+                           10 8
+                           c1.5 0
+                           2.8-.4
+                           4-.9"
+                    ></path>
+                `;
+
+            } else {
+
+                /* Hide password */
+
+                passwordInput.type = "password";
+
+
+                togglePasswordButton.setAttribute(
+                    "aria-label",
+                    "Show password"
+                );
+
+                togglePasswordButton.setAttribute(
+                    "title",
+                    "Show password"
+                );
+
+
+                /* Normal eye icon */
+
+                eyeIcon.innerHTML = `
+                    <path
+                        d="M2 12
+                           s3.5-7
+                           10-7
+                           10 7
+                           10 7
+                           -3.5 7
+                           -10 7
+                           S2 12
+                           2 12"
+                    ></path>
+
+                    <circle
+                        cx="12"
+                        cy="12"
+                        r="3"
+                    ></circle>
+                `;
+
+            }
+
+        }
+    );
+
+</script>
 
 {% endblock %}
