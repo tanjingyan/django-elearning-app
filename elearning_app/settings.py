@@ -89,7 +89,6 @@ INSTALLED_APPS = [
     # Local Apps
     'accounts',
     'courses',
-    'feedback',
     'notifications',
     'chat',
     'api',

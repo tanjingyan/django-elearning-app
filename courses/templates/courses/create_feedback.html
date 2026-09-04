@@ -1,44 +1,1023 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-
-    <title>
-        Leave Feedback - {{ course.title }}
-    </title>
-
-</head>
-
-<body>
-
-    <h1>
-        Leave Feedback
-    </h1>
-
-    <h2>
-        {{ course.title }}
-    </h2>
+{% extends "base.html" %}
 
 
-    <form method="POST">
-
-        {% csrf_token %}
-
-        {{ form.as_p }}
-
-        <button type="submit">
-            Submit Feedback
-        </button>
-
-    </form>
+{% block title %}
+    Leave Feedback - {{ course.title }}
+{% endblock %}
 
 
-    <br>
+{% block content %}
 
-    <a href="{% url 'course_detail' course.id %}">
-        Back to Course
-    </a>
 
-</body>
+<div class="row justify-content-center">
 
-</html>
+    <div class="col-lg-8 col-xl-7">
+
+        <div class="card content-card feedback-card">
+
+            <div class="card-body p-4 p-md-5">
+
+
+                <!-- =====================================================
+                     HEADER
+                     ===================================================== -->
+
+                <div class="feedback-header mb-4">
+
+                    <div class="feedback-header-icon">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="26"
+                            height="26"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <polygon
+                                points="
+                                    12 2
+                                    15.09 8.26
+                                    22 9.27
+                                    17 14.14
+                                    18.18 21.02
+                                    12 17.77
+                                    5.82 21.02
+                                    7 14.14
+                                    2 9.27
+                                    8.91 8.26
+                                    12 2
+                                "
+                            ></polygon>
+                        </svg>
+
+                    </div>
+
+
+                    <div>
+
+                        <h1 class="feedback-title">
+                            Leave Feedback
+                        </h1>
+
+                        <p class="feedback-subtitle">
+                            Share your experience with this course.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =====================================================
+                     COURSE INFORMATION
+                     ===================================================== -->
+
+                <div class="course-summary mb-4">
+
+                    {% if course.image %}
+
+                        <img
+                            src="{{ course.image.url }}"
+                            alt="{{ course.title }}"
+                            class="course-summary-image"
+                        >
+
+                    {% else %}
+
+                        <div class="course-summary-placeholder">
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="34"
+                                height="34"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path
+                                    d="
+                                        M4 19.5
+                                        A2.5 2.5 0 0 1
+                                        6.5 17
+                                        H20
+                                    "
+                                ></path>
+
+                                <path
+                                    d="
+                                        M6.5 2
+                                        H20
+                                        v20
+                                        H6.5
+                                        A2.5 2.5 0 0 1
+                                        4 19.5
+                                        v-15
+                                        A2.5 2.5 0 0 1
+                                        6.5 2z
+                                    "
+                                ></path>
+                            </svg>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="course-summary-content">
+
+                        <span class="course-summary-label">
+                            Course
+                        </span>
+
+                        <h2>
+                            {{ course.title }}
+                        </h2>
+
+
+                        {% if course.description %}
+
+                            <p>
+                                {{ course.description|truncatechars:140 }}
+                            </p>
+
+                        {% endif %}
+
+
+                        <div class="course-summary-teacher">
+
+                            Teacher:
+
+                            <span>
+                                {{ course.teacher.username }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =====================================================
+                     FORM
+                     ===================================================== -->
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+
+
+                    <!-- =================================================
+                         NON FIELD ERRORS
+                         ================================================= -->
+
+                    {% if form.non_field_errors %}
+
+                        <div class="alert alert-danger">
+
+                            {% for error in form.non_field_errors %}
+
+                                <div>
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- =================================================
+                         STAR RATING
+                         ================================================= -->
+
+                    <div class="feedback-field mb-4">
+
+                        <label class="feedback-label">
+                            How would you rate this course?
+                        </label>
+
+
+                        <div
+                            class="star-rating"
+                            role="radiogroup"
+                            aria-label="Course rating"
+                        >
+
+
+                            <!-- 5 Stars -->
+
+                            <input
+                                type="radio"
+                                name="rating"
+                                id="rating-5"
+                                value="5"
+
+                                {% if form.rating.value|stringformat:"s" == "5" %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <label
+                                for="rating-5"
+                                title="Excellent"
+                                aria-label="5 stars"
+                            >
+                                ★
+                            </label>
+
+
+
+                            <!-- 4 Stars -->
+
+                            <input
+                                type="radio"
+                                name="rating"
+                                id="rating-4"
+                                value="4"
+
+                                {% if form.rating.value|stringformat:"s" == "4" %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <label
+                                for="rating-4"
+                                title="Very good"
+                                aria-label="4 stars"
+                            >
+                                ★
+                            </label>
+
+
+
+                            <!-- 3 Stars -->
+
+                            <input
+                                type="radio"
+                                name="rating"
+                                id="rating-3"
+                                value="3"
+
+                                {% if form.rating.value|stringformat:"s" == "3" %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <label
+                                for="rating-3"
+                                title="Good"
+                                aria-label="3 stars"
+                            >
+                                ★
+                            </label>
+
+
+
+                            <!-- 2 Stars -->
+
+                            <input
+                                type="radio"
+                                name="rating"
+                                id="rating-2"
+                                value="2"
+
+                                {% if form.rating.value|stringformat:"s" == "2" %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <label
+                                for="rating-2"
+                                title="Fair"
+                                aria-label="2 stars"
+                            >
+                                ★
+                            </label>
+
+
+
+                            <!-- 1 Star -->
+
+                            <input
+                                type="radio"
+                                name="rating"
+                                id="rating-1"
+                                value="1"
+
+                                {% if form.rating.value|stringformat:"s" == "1" %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <label
+                                for="rating-1"
+                                title="Poor"
+                                aria-label="1 star"
+                            >
+                                ★
+                            </label>
+
+                        </div>
+
+
+                        <p
+                            id="rating-message"
+                            class="rating-message"
+                        >
+                            Select a rating from 1 to 5 stars.
+                        </p>
+
+
+                        {% for error in form.rating.errors %}
+
+                            <div class="feedback-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         COMMENT
+                         ================================================= -->
+
+                    <div class="feedback-field mb-4">
+
+                        <label
+                            for="{{ form.comment.id_for_label }}"
+                            class="feedback-label"
+                        >
+                            Your feedback
+                        </label>
+
+
+                        <textarea
+                            name="comment"
+                            id="{{ form.comment.id_for_label }}"
+                            class="form-control feedback-textarea"
+                            rows="6"
+                            placeholder="Tell us what you liked or what could be improved..."
+                        >{{ form.comment.value|default_if_none:"" }}</textarea>
+
+
+                        <div class="feedback-help">
+                            Share your experience with the course.
+                        </div>
+
+
+                        {% for error in form.comment.errors %}
+
+                            <div class="feedback-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         ACTIONS
+                         ================================================= -->
+
+                    <div class="feedback-actions">
+
+                        <a
+                            href="{% url 'course_detail' course.id %}"
+                            class="feedback-cancel-btn"
+                        >
+                            Cancel
+                        </a>
+
+
+                        <button
+                            type="submit"
+                            class="feedback-submit-btn"
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="17"
+                                height="17"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M22 2 11 13"></path>
+                                <path d="m22 2-7 20-4-9-9-4Z"></path>
+                            </svg>
+
+                            Submit Feedback
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =============================================================
+     PAGE CSS
+     ============================================================= -->
+
+<style>
+
+    /* =========================================================
+       MAIN CARD
+       ========================================================= */
+
+    .feedback-card {
+        overflow: hidden;
+
+        border:
+            1px solid
+            #e2e8f0;
+
+        border-radius: 18px;
+
+        box-shadow:
+            0 10px 30px
+            rgba(31, 41, 55, 0.07);
+    }
+
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .feedback-header {
+        display: flex;
+
+        align-items: center;
+
+        gap: 1rem;
+
+        padding-bottom: 1.5rem;
+
+        border-bottom:
+            1px solid
+            #edf0f4;
+    }
+
+
+    .feedback-header-icon {
+        width: 50px;
+        height: 50px;
+
+        min-width: 50px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #0d6efd;
+
+        background: #eaf2ff;
+
+        border-radius: 13px;
+    }
+
+
+    .feedback-title {
+        margin:
+            0
+            0
+            0.25rem;
+
+        color: #202932;
+
+        font-size: 2rem;
+        font-weight: 700;
+
+        letter-spacing: -0.025em;
+    }
+
+
+    .feedback-subtitle {
+        margin: 0;
+
+        color: #7d8794;
+
+        font-size: 0.92rem;
+    }
+
+
+
+    /* =========================================================
+       COURSE SUMMARY
+       ========================================================= */
+
+    .course-summary {
+        display: flex;
+
+        align-items: center;
+
+        gap: 1rem;
+
+        padding: 1rem;
+
+        background: #f8faff;
+
+        border:
+            1px solid
+            #e1e8f0;
+
+        border-radius: 13px;
+    }
+
+
+    .course-summary-image,
+    .course-summary-placeholder {
+        width: 100px;
+        height: 86px;
+
+        min-width: 100px;
+
+        border-radius: 10px;
+    }
+
+
+    .course-summary-image {
+        object-fit: cover;
+    }
+
+
+    .course-summary-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #0d6efd;
+
+        background:
+            linear-gradient(
+                135deg,
+                #dbeafe,
+                #edf4ff
+            );
+    }
+
+
+    .course-summary-content {
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .course-summary-label {
+        display: inline-block;
+
+        margin-bottom: 0.3rem;
+
+        padding:
+            0.2rem
+            0.45rem;
+
+        color: #0d6efd;
+
+        background: #e7f0ff;
+
+        border-radius: 5px;
+
+        font-size: 0.67rem;
+        font-weight: 600;
+    }
+
+
+    .course-summary h2 {
+        margin-bottom: 0.3rem;
+
+        color: #202932;
+
+        font-size: 1.15rem;
+        font-weight: 700;
+    }
+
+
+    .course-summary p {
+        margin-bottom: 0.35rem;
+
+        color: #718096;
+
+        font-size: 0.84rem;
+    }
+
+
+    .course-summary-teacher {
+        color: #8a94a3;
+
+        font-size: 0.78rem;
+    }
+
+
+    .course-summary-teacher span {
+        color: #374151;
+
+        font-weight: 600;
+    }
+
+
+
+    /* =========================================================
+       FORM FIELD
+       ========================================================= */
+
+    .feedback-label {
+        display: block;
+
+        margin-bottom: 0.6rem;
+
+        color: #303947;
+
+        font-size: 0.92rem;
+        font-weight: 600;
+    }
+
+
+
+    /* =========================================================
+       STAR RATING
+       ========================================================= */
+
+    .star-rating {
+        display: inline-flex;
+
+        flex-direction: row-reverse;
+
+        justify-content: flex-end;
+
+        gap: 0.3rem;
+    }
+
+
+    .star-rating input {
+        position: absolute;
+
+        opacity: 0;
+
+        pointer-events: none;
+    }
+
+
+    .star-rating label {
+        margin: 0;
+
+        color: #d2d8df;
+
+        font-size: 2.5rem;
+
+        line-height: 1;
+
+        cursor: pointer;
+
+        transition:
+            color 0.15s ease,
+            transform 0.15s ease;
+    }
+
+
+
+    /* Selected stars */
+
+    .star-rating input:checked ~ label {
+        color: #5eaf8b;
+    }
+
+
+
+    /* Hover */
+
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: #5eaf8b;
+
+        transform: translateY(-2px);
+    }
+
+
+
+    /* Keyboard focus */
+
+    .star-rating input:focus-visible + label {
+        outline:
+            2px solid
+            #0d6efd;
+
+        outline-offset: 4px;
+
+        border-radius: 4px;
+    }
+
+
+    .rating-message {
+        margin:
+            0.65rem
+            0
+            0;
+
+        color: #8a94a3;
+
+        font-size: 0.82rem;
+    }
+
+
+
+    /* =========================================================
+       COMMENT
+       ========================================================= */
+
+    .feedback-textarea {
+        min-height: 150px;
+
+        padding: 0.9rem;
+
+        color: #374151;
+
+        border:
+            1px solid
+            #d5dce5;
+
+        border-radius: 10px;
+
+        font-size: 0.92rem;
+
+        resize: vertical;
+    }
+
+
+    .feedback-textarea:focus {
+        border-color: #86b7fe;
+
+        box-shadow:
+            0 0 0
+            0.2rem
+            rgba(13, 110, 253, 0.11);
+    }
+
+
+    .feedback-help {
+        margin-top: 0.45rem;
+
+        color: #8a94a3;
+
+        font-size: 0.8rem;
+    }
+
+
+
+    /* =========================================================
+       ERRORS
+       ========================================================= */
+
+    .feedback-error {
+        margin-top: 0.4rem;
+
+        color: #dc3545;
+
+        font-size: 0.82rem;
+    }
+
+
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .feedback-actions {
+        display: flex;
+
+        justify-content: flex-end;
+
+        gap: 0.75rem;
+
+        padding-top: 1.4rem;
+
+        border-top:
+            1px solid
+            #edf0f4;
+    }
+
+
+    .feedback-cancel-btn,
+    .feedback-submit-btn {
+        min-width: 125px;
+
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 0.45rem;
+
+        padding:
+            0.7rem
+            1rem;
+
+        border-radius: 8px;
+
+        font-size: 0.88rem;
+        font-weight: 600;
+
+        text-decoration: none;
+
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+
+    .feedback-cancel-btn {
+        color: #5f6977;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #d4dae2;
+    }
+
+
+    .feedback-cancel-btn:hover {
+        color: #374151;
+
+        background: #f8f9fa;
+    }
+
+
+    .feedback-submit-btn {
+        color: #ffffff;
+
+        background: #0d6efd;
+
+        border:
+            1px solid
+            #0d6efd;
+    }
+
+
+    .feedback-submit-btn:hover {
+        color: #ffffff;
+
+        background: #0b5ed7;
+
+        transform: translateY(-1px);
+    }
+
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 575.98px) {
+
+        .feedback-title {
+            font-size: 1.6rem;
+        }
+
+
+        .course-summary {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+
+        .course-summary-image,
+        .course-summary-placeholder {
+            width: 100%;
+            height: 150px;
+        }
+
+
+        .star-rating label {
+            font-size: 2.2rem;
+        }
+
+
+        .feedback-actions {
+            flex-direction: column-reverse;
+        }
+
+
+        .feedback-cancel-btn,
+        .feedback-submit-btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+
+
+<!-- =============================================================
+     RATING TEXT
+     ============================================================= -->
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const ratingInputs =
+                document.querySelectorAll(
+                    'input[name="rating"]'
+                );
+
+            const ratingMessage =
+                document.getElementById(
+                    "rating-message"
+                );
+
+
+            const ratingLabels = {
+                "1": "1 star — Poor",
+                "2": "2 stars — Fair",
+                "3": "3 stars — Good",
+                "4": "4 stars — Very Good",
+                "5": "5 stars — Excellent"
+            };
+
+
+            function updateRatingMessage() {
+
+                const selected =
+                    document.querySelector(
+                        'input[name="rating"]:checked'
+                    );
+
+
+                if (selected) {
+
+                    ratingMessage.textContent =
+                        ratingLabels[
+                            selected.value
+                        ];
+
+                } else {
+
+                    ratingMessage.textContent =
+                        "Select a rating from 1 to 5 stars.";
+
+                }
+
+            }
+
+
+            ratingInputs.forEach(
+                function (input) {
+
+                    input.addEventListener(
+                        "change",
+                        updateRatingMessage
+                    );
+
+                }
+            );
+
+
+            updateRatingMessage();
+
+        }
+    );
+
+</script>
+
+
+{% endblock %}
