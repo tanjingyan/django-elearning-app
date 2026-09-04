@@ -8,25 +8,30 @@
 
 {% block content %}
 
-    <!-- =========================================================
-         PROFILE HEADER
-         ========================================================= -->
 
-    <div class="card content-card mb-4">
+<!-- =========================================================
+     PROFILE TOP SECTION
+     ========================================================= -->
 
-        <div class="card-body p-4">
+<div class="row g-4 align-items-stretch profile-top-row mb-5">
 
-            <div
-                class="
-                    d-flex
-                    align-items-center
-                    flex-wrap
-                    gap-4
-                "
-            >
+
+    <!-- =====================================================
+         LEFT - PROFILE CARD
+         ===================================================== -->
+
+    <div class="col-lg-7">
+
+        <div class="profile-card h-100">
+
+            <!-- Decorative Cover -->
+            <div class="profile-cover"></div>
+
+
+            <div class="profile-main">
 
                 <!-- =================================================
-                     PROFILE PICTURE
+                     PROFILE AVATAR
                      ================================================= -->
 
                 {% if profile_user.profile_picture %}
@@ -34,85 +39,49 @@
                     <img
                         src="{{ profile_user.profile_picture.url }}"
                         alt="{{ profile_user.username }}"
-                        class="rounded-circle border"
-                        style="
-                            width: 110px;
-                            height: 110px;
-                            object-fit: cover;
-                        "
+                        class="profile-avatar"
                     >
 
                 {% else %}
 
-                    <div
-                        class="
-                            rounded-circle
-                            bg-primary-subtle
-                            text-primary
-                            d-flex
-                            align-items-center
-                            justify-content-center
-                        "
-                        style="
-                            width: 110px;
-                            height: 110px;
-                            font-size: 2.5rem;
-                        "
-                    >
+                    <div class="profile-avatar-placeholder">
                         👤
                     </div>
 
                 {% endif %}
 
 
+
                 <!-- =================================================
                      PROFILE INFORMATION
                      ================================================= -->
 
-                <div class="flex-grow-1">
+                <div class="profile-details">
 
                     <div
                         class="
                             d-flex
                             align-items-center
-                            gap-2
                             flex-wrap
+                            gap-2
                             mb-2
                         "
                     >
 
-                        <h1 class="h3 fw-bold mb-0">
+                        <h1 class="profile-name">
                             {{ profile_user.username }}
                         </h1>
 
 
-                        <!-- User role -->
-
                         {% if profile_user.role == "teacher" %}
 
-                            <span
-                                class="
-                                    badge
-                                    bg-primary-subtle
-                                    text-primary
-                                    border
-                                    border-primary-subtle
-                                "
-                            >
+                            <span class="profile-role teacher-role">
                                 Teacher
                             </span>
 
                         {% else %}
 
-                            <span
-                                class="
-                                    badge
-                                    bg-success-subtle
-                                    text-success
-                                    border
-                                    border-success-subtle
-                                "
-                            >
+                            <span class="profile-role student-role">
                                 Student
                             </span>
 
@@ -121,11 +90,12 @@
                     </div>
 
 
-                    <!-- Real name -->
+
+                    <!-- Real Name -->
 
                     {% if profile_user.first_name or profile_user.last_name %}
 
-                        <p class="mb-2">
+                        <p class="profile-real-name">
 
                             {{ profile_user.first_name }}
                             {{ profile_user.last_name }}
@@ -135,48 +105,225 @@
                     {% endif %}
 
 
+
                     <!-- Bio -->
 
                     {% if profile_user.bio %}
 
-                        <p class="text-muted mb-3">
+                        <p class="profile-bio">
                             {{ profile_user.bio }}
                         </p>
 
                     {% else %}
 
-                        <p class="text-muted mb-3">
+                        <p class="profile-bio fst-italic">
                             No bio added yet.
                         </p>
 
                     {% endif %}
 
 
+
                     <!-- =================================================
-                         PROFILE ACTIONS
-                         Only visible to profile owner
+                         PROFILE META
+                         ================================================= -->
+
+                    <div class="profile-meta">
+
+
+                        <!-- Courses -->
+
+                        <div class="profile-meta-item">
+
+                            <div class="profile-meta-icon">
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                </svg>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+
+                                    {% if profile_user.role == "teacher" %}
+
+                                        {{ courses_created|length }}
+
+                                    {% else %}
+
+                                        {{ enrolments|length }}
+
+                                    {% endif %}
+
+                                </strong>
+
+
+                                <span>
+
+                                    {% if profile_user.role == "teacher" %}
+                                        Courses
+                                    {% else %}
+                                        Enrolled
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Status Updates -->
+
+                        <div class="profile-meta-item">
+
+                            <div class="profile-meta-icon">
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+                                </svg>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    {{ status_updates|length }}
+                                </strong>
+
+                                <span>
+                                    Updates
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Joined Date -->
+
+                        <div class="profile-meta-item">
+
+                            <div class="profile-meta-icon">
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect
+                                        x="3"
+                                        y="4"
+                                        width="18"
+                                        height="18"
+                                        rx="2"
+                                    ></rect>
+
+                                    <line
+                                        x1="16"
+                                        y1="2"
+                                        x2="16"
+                                        y2="6"
+                                    ></line>
+
+                                    <line
+                                        x1="8"
+                                        y1="2"
+                                        x2="8"
+                                        y2="6"
+                                    ></line>
+
+                                    <line
+                                        x1="3"
+                                        y1="10"
+                                        x2="21"
+                                        y2="10"
+                                    ></line>
+                                </svg>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    {{ profile_user.date_joined|date:"M Y" }}
+                                </strong>
+
+                                <span>
+                                    Joined
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         EDIT PROFILE
                          ================================================= -->
 
                     {% if request.user == profile_user %}
 
-                        <div class="d-flex gap-2 flex-wrap">
+                        <a
+                            href="{% url 'edit_profile' %}"
+                            class="profile-edit-btn"
+                        >
 
-                            <a
-                                href="{% url 'edit_profile' %}"
-                                class="btn btn-outline-primary btn-sm"
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
                             >
-                                Edit Profile
-                            </a>
+                                <path d="M12 20h9"></path>
+                                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+                            </svg>
 
+                            Edit Profile
 
-                            <a
-                                href="{% url 'create_status' %}"
-                                class="btn btn-primary btn-sm"
-                            >
-                                Post Status
-                            </a>
-
-                        </div>
+                        </a>
 
                     {% endif %}
 
@@ -190,629 +337,314 @@
 
 
 
-    <!-- =========================================================
-         PROFILE STATISTICS
-         ========================================================= -->
+    <!-- =====================================================
+         RIGHT - STATUS UPDATES
+         ===================================================== -->
 
-    <div class="row g-3 mb-4">
+    <div class="col-lg-5">
 
-
-        <!-- Student statistics -->
-
-        {% if profile_user.role == "student" %}
-
-            <div class="col-md-6">
-
-                <div class="card content-card h-100">
-
-                    <div class="card-body">
-
-                        <p class="text-muted small mb-1">
-                            Enrolled Courses
-                        </p>
-
-                        <h3 class="fw-bold mb-0">
-                            {{ courses_enrolled_count }}
-                        </h3>
-
-                    </div>
-
-                </div>
-
-            </div>
+        <div class="status-panel h-100">
 
 
-        <!-- Teacher statistics -->
+            <!-- =================================================
+                 STATUS HEADER
+                 ================================================= -->
 
-        {% else %}
+            <div class="status-panel-header">
 
-            <div class="col-md-6">
+                <div>
 
-                <div class="card content-card h-100">
-
-                    <div class="card-body">
-
-                        <p class="text-muted small mb-1">
-                            Courses Created
-                        </p>
-
-                        <h3 class="fw-bold mb-0">
-                            {{ courses_created_count }}
-                        </h3>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        {% endif %}
-
-
-        <!-- Status count -->
-
-        <div class="col-md-6">
-
-            <div class="card content-card h-100">
-
-                <div class="card-body">
-
-                    <p class="text-muted small mb-1">
+                    <h2>
                         Status Updates
+                    </h2>
+
+                    <p>
+                        Recent updates from {{ profile_user.username }}.
                     </p>
 
-                    <h3 class="fw-bold mb-0">
-                        {{ status_count }}
-                    </h3>
-
                 </div>
 
-            </div>
 
-        </div>
+                {% if request.user == profile_user %}
 
-    </div>
+                    <a
+                        href="{% url 'create_status' %}"
+                        class="status-post-btn"
+                    >
+                        + Post
+                    </a>
 
-
-
-    <!-- =========================================================
-         STUDENT ENROLLED COURSES
-         ========================================================= -->
-
-    {% if profile_user.role == "student" %}
-
-        <section class="mb-5">
-
-            <div class="mb-3">
-
-                <h2 class="h4 fw-bold mb-1">
-                    Enrolled Courses
-                </h2>
-
-                <p class="text-muted mb-0">
-
-                    Courses that
-                    {{ profile_user.username }}
-                    is currently enrolled in.
-
-                </p>
+                {% endif %}
 
             </div>
 
 
-            {% if enrolments %}
 
-                <div class="row g-4">
+            <!-- =================================================
+                 STATUS TIMELINE
+                 ================================================= -->
 
-                    {% for enrolment in enrolments %}
+            {% if status_updates %}
 
-                        <div class="col-md-6 col-lg-4">
+                <div class="status-timeline">
 
-                            <div
-                                class="
-                                    card
-                                    content-card
-                                    h-100
-                                    overflow-hidden
-                                "
-                            >
+                    {% for status in status_updates %}
 
-                                <!-- Course image -->
+                        <article class="timeline-item">
 
-                                {% if enrolment.course.image %}
 
-                                    <img
-                                        src="{{ enrolment.course.image.url }}"
-                                        class="card-img-top"
-                                        alt="{{ enrolment.course.title }}"
-                                        style="
-                                            height: 150px;
-                                            object-fit: cover;
-                                        "
-                                    >
+                            <!-- Avatar -->
 
-                                {% else %}
-
-                                    <div
-                                        class="
-                                            bg-primary-subtle
-                                            d-flex
-                                            align-items-center
-                                            justify-content-center
-                                        "
-                                        style="
-                                            height: 150px;
-                                            font-size: 2.5rem;
-                                        "
-                                    >
-                                        📚
-                                    </div>
-
-                                {% endif %}
-
-
-                                <div
-                                    class="
-                                        card-body
-                                        d-flex
-                                        flex-column
-                                    "
-                                >
-
-                                    <span
-                                        class="
-                                            badge
-                                            bg-success-subtle
-                                            text-success
-                                            border
-                                            border-success-subtle
-                                            align-self-start
-                                            mb-2
-                                        "
-                                    >
-                                        Enrolled
-                                    </span>
-
-
-                                    <h5 class="fw-semibold">
-                                        {{ enrolment.course.title }}
-                                    </h5>
-
-
-                                    <p
-                                        class="
-                                            text-muted
-                                            small
-                                            flex-grow-1
-                                        "
-                                    >
-
-                                        {{ enrolment.course.description|truncatechars:90 }}
-
-                                    </p>
-
-
-                                    <!-- Teacher profile -->
-
-                                    <p class="small text-muted">
-
-                                        Teacher:
-
-                                        <a
-                                            href="{% url 'profile' enrolment.course.teacher.username %}"
-                                            class="
-                                                text-decoration-none
-                                                fw-semibold
-                                            "
-                                        >
-                                            {{ enrolment.course.teacher.username }}
-                                        </a>
-
-                                    </p>
-
-
-                                    <a
-                                        href="{% url 'course_detail' enrolment.course.id %}"
-                                        class="
-                                            btn
-                                            btn-outline-primary
-                                            btn-sm
-                                        "
-                                    >
-                                        View Course
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    {% endfor %}
-
-                </div>
-
-
-            {% else %}
-
-                <div class="card content-card">
-
-                    <div class="card-body text-center py-5">
-
-                        <div class="display-6 mb-3">
-                            📚
-                        </div>
-
-                        <h5 class="fw-semibold">
-                            No enrolled courses
-                        </h5>
-
-                        <p class="text-muted mb-0">
-
-                            {{ profile_user.username }}
-                            is not enrolled in any courses yet.
-
-                        </p>
-
-                    </div>
-
-                </div>
-
-            {% endif %}
-
-        </section>
-
-    {% endif %}
-
-
-
-    <!-- =========================================================
-         TEACHER CREATED COURSES
-         ========================================================= -->
-
-    {% if profile_user.role == "teacher" %}
-
-        <section class="mb-5">
-
-            <div class="mb-3">
-
-                <h2 class="h4 fw-bold mb-1">
-                    Courses Created
-                </h2>
-
-                <p class="text-muted mb-0">
-
-                    Courses created by
-                    {{ profile_user.username }}.
-
-                </p>
-
-            </div>
-
-
-            {% if courses_created %}
-
-                <div class="row g-4">
-
-                    {% for course in courses_created %}
-
-                        <div class="col-md-6 col-lg-4">
-
-                            <div
-                                class="
-                                    card
-                                    content-card
-                                    h-100
-                                    overflow-hidden
-                                "
-                            >
-
-                                <!-- Course image -->
-
-                                {% if course.image %}
-
-                                    <img
-                                        src="{{ course.image.url }}"
-                                        class="card-img-top"
-                                        alt="{{ course.title }}"
-                                        style="
-                                            height: 150px;
-                                            object-fit: cover;
-                                        "
-                                    >
-
-                                {% else %}
-
-                                    <div
-                                        class="
-                                            bg-primary-subtle
-                                            d-flex
-                                            align-items-center
-                                            justify-content-center
-                                        "
-                                        style="
-                                            height: 150px;
-                                            font-size: 2.5rem;
-                                        "
-                                    >
-                                        📚
-                                    </div>
-
-                                {% endif %}
-
-
-                                <div
-                                    class="
-                                        card-body
-                                        d-flex
-                                        flex-column
-                                    "
-                                >
-
-                                    <span
-                                        class="
-                                            badge
-                                            bg-primary-subtle
-                                            text-primary
-                                            border
-                                            border-primary-subtle
-                                            align-self-start
-                                            mb-2
-                                        "
-                                    >
-                                        Teacher Course
-                                    </span>
-
-
-                                    <h5 class="fw-semibold">
-                                        {{ course.title }}
-                                    </h5>
-
-
-                                    <p
-                                        class="
-                                            text-muted
-                                            small
-                                            flex-grow-1
-                                        "
-                                    >
-
-                                        {{ course.description|truncatechars:90 }}
-
-                                    </p>
-
-
-                                    <a
-                                        href="{% url 'course_detail' course.id %}"
-                                        class="
-                                            btn
-                                            btn-outline-primary
-                                            btn-sm
-                                        "
-                                    >
-                                        View Course
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    {% endfor %}
-
-                </div>
-
-
-            {% else %}
-
-                <div class="card content-card">
-
-                    <div class="card-body text-center py-5">
-
-                        <div class="display-6 mb-3">
-                            📚
-                        </div>
-
-                        <h5 class="fw-semibold">
-                            No courses created
-                        </h5>
-
-                        <p class="text-muted mb-0">
-
-                            {{ profile_user.username }}
-                            has not created any courses yet.
-
-                        </p>
-
-                    </div>
-
-                </div>
-
-            {% endif %}
-
-        </section>
-
-    {% endif %}
-
-
-
-    <!-- =========================================================
-         STATUS UPDATES
-         ========================================================= -->
-
-    <section>
-
-        <div
-            class="
-                d-flex
-                justify-content-between
-                align-items-center
-                flex-wrap
-                gap-3
-                mb-3
-            "
-        >
-
-            <div>
-
-                <h2 class="h4 fw-bold mb-1">
-                    Status Updates
-                </h2>
-
-                <p class="text-muted mb-0">
-
-                    Recent updates from
-                    {{ profile_user.username }}.
-
-                </p>
-
-            </div>
-
-
-            <!--
-                Both Students and Teachers may post
-                status updates to THEIR OWN profile.
-            -->
-
-            {% if request.user == profile_user %}
-
-                <a
-                    href="{% url 'create_status' %}"
-                    class="btn btn-primary btn-sm"
-                >
-                    Post Status
-                </a>
-
-            {% endif %}
-
-        </div>
-
-
-
-        <!-- =====================================================
-             STATUS LIST
-             ===================================================== -->
-
-        {% if status_updates %}
-
-            <div class="d-grid gap-3">
-
-                {% for status in status_updates %}
-
-                    <div class="card content-card">
-
-                        <div class="card-body">
-
-                            <div
-                                class="
-                                    d-flex
-                                    gap-3
-                                    align-items-start
-                                "
-                            >
-
-                                <!-- Status user image -->
+                            <div class="timeline-avatar-wrapper">
 
                                 {% if profile_user.profile_picture %}
 
                                     <img
                                         src="{{ profile_user.profile_picture.url }}"
                                         alt="{{ profile_user.username }}"
-                                        class="
-                                            rounded-circle
-                                            flex-shrink-0
-                                        "
-                                        style="
-                                            width: 48px;
-                                            height: 48px;
-                                            object-fit: cover;
-                                        "
+                                        class="timeline-avatar"
                                     >
 
                                 {% else %}
 
-                                    <div
-                                        class="
-                                            rounded-circle
-                                            bg-primary-subtle
-                                            text-primary
-                                            d-flex
-                                            align-items-center
-                                            justify-content-center
-                                            flex-shrink-0
-                                        "
-                                        style="
-                                            width: 48px;
-                                            height: 48px;
-                                        "
-                                    >
+                                    <div class="timeline-avatar-placeholder">
                                         👤
                                     </div>
 
                                 {% endif %}
 
-
-                                <!-- Status content -->
-
-                                <div class="flex-grow-1">
-
-                                    <div
-                                        class="
-                                            d-flex
-                                            align-items-center
-                                            gap-2
-                                            flex-wrap
-                                            mb-2
-                                        "
-                                    >
-
-                                        <strong>
-                                            {{ profile_user.username }}
-                                        </strong>
+                            </div>
 
 
-                                        {% if profile_user.role == "teacher" %}
 
-                                            <span
-                                                class="
-                                                    badge
-                                                    bg-primary-subtle
-                                                    text-primary
-                                                "
-                                            >
-                                                Teacher
-                                            </span>
+                            <!-- Status Content -->
 
-                                        {% else %}
+                            <div class="timeline-content">
 
-                                            <span
-                                                class="
-                                                    badge
-                                                    bg-success-subtle
-                                                    text-success
-                                                "
-                                            >
-                                                Student
-                                            </span>
+                                <div class="timeline-user">
 
-                                        {% endif %}
-
-                                    </div>
+                                    <strong>
+                                        {{ profile_user.username }}
+                                    </strong>
 
 
-                                    <p class="mb-2">
-                                        {{ status.content }}
-                                    </p>
+                                    {% if profile_user.role == "teacher" %}
 
+                                        <span class="profile-role teacher-role">
+                                            Teacher
+                                        </span>
 
-                                    <small class="text-muted">
+                                    {% else %}
 
-                                        {{ status.created_at|date:"d M Y, g:i A" }}
+                                        <span class="profile-role student-role">
+                                            Student
+                                        </span>
 
-                                    </small>
+                                    {% endif %}
 
                                 </div>
+
+
+                                <p class="timeline-text">
+                                    {{ status.content|linebreaksbr }}
+                                </p>
+
+
+                                <small class="timeline-date">
+                                    {{ status.created_at|timesince }} ago
+                                </small>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+
+
+            <!-- =================================================
+                 EMPTY STATUS STATE
+                 ================================================= -->
+
+            {% else %}
+
+                <div class="status-empty">
+
+                    <div class="status-empty-icon">
+                        💬
+                    </div>
+
+
+                    <h6 class="fw-semibold">
+                        No status updates yet
+                    </h6>
+
+
+                    {% if request.user == profile_user %}
+
+                        <p>
+                            Share your first update with other LearnSpace users.
+                        </p>
+
+
+                        <a
+                            href="{% url 'create_status' %}"
+                            class="btn btn-primary btn-sm"
+                        >
+                            Post Your First Status
+                        </a>
+
+                    {% else %}
+
+                        <p class="mb-0">
+
+                            {{ profile_user.username }}
+                            has not posted any status updates yet.
+
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     STUDENT ENROLLED COURSES
+     ========================================================= -->
+
+{% if profile_user.role == "student" %}
+
+    <section class="profile-courses-section">
+
+        <div class="section-header mb-3">
+
+            <h2>
+                Courses you're enrolled in
+            </h2>
+
+
+            <p>
+
+                {{ enrolments|length }}
+                course{% if enrolments|length != 1 %}s{% endif %}
+                currently enrolled.
+
+            </p>
+
+        </div>
+
+
+
+        {% if enrolments %}
+
+            <div class="row g-4">
+
+                {% for enrolment in enrolments %}
+
+                    <div class="col-md-6 col-xl-3">
+
+                        <div
+                            class="
+                                course-profile-card
+                                h-100
+                            "
+                        >
+
+
+                            <!-- =================================================
+                                 COURSE IMAGE
+                                 ================================================= -->
+
+                            {% if enrolment.course.image %}
+
+                                <img
+                                    src="{{ enrolment.course.image.url }}"
+                                    alt="{{ enrolment.course.title }}"
+                                    class="profile-course-image"
+                                >
+
+                            {% else %}
+
+                                <div class="profile-course-placeholder">
+
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="40"
+                                        height="40"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.7"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                    </svg>
+
+                                </div>
+
+                            {% endif %}
+
+
+
+                            <!-- =================================================
+                                 COURSE BODY
+                                 ================================================= -->
+
+                            <div class="course-card-body">
+
+
+                                <span
+                                    class="
+                                        course-badge
+                                        student-course-badge
+                                    "
+                                >
+                                    Enrolled
+                                </span>
+
+
+                                <h5>
+                                    {{ enrolment.course.title }}
+                                </h5>
+
+
+                                <p class="course-description">
+                                    {{ enrolment.course.description|truncatechars:90 }}
+                                </p>
+
+
+                                <p class="course-teacher">
+
+                                    Teacher:
+
+                                    <a
+                                        href="{% url 'profile' enrolment.course.teacher.username %}"
+                                    >
+                                        {{ enrolment.course.teacher.username }}
+                                    </a>
+
+                                </p>
+
+
+                                <a
+                                    href="{% url 'course_detail' enrolment.course.id %}"
+                                    class="course-view-btn"
+                                >
+                                    View Course
+                                </a>
 
                             </div>
 
@@ -825,56 +657,1079 @@
             </div>
 
 
-        <!-- =====================================================
-             NO STATUS UPDATES
-             ===================================================== -->
 
         {% else %}
 
-            <div class="card content-card">
+            <div class="empty-course-card">
 
-                <div class="card-body text-center py-5">
-
-                    <div class="display-6 mb-3">
-                        💬
-                    </div>
-
-
-                    <h5 class="fw-semibold">
-                        No status updates yet
-                    </h5>
-
-
-                    {% if request.user == profile_user %}
-
-                        <p class="text-muted mb-3">
-                            Share your first update with other LearnSpace users.
-                        </p>
-
-                        <a
-                            href="{% url 'create_status' %}"
-                            class="btn btn-primary"
-                        >
-                            Post Your First Status
-                        </a>
-
-                    {% else %}
-
-                        <p class="text-muted mb-0">
-
-                            {{ profile_user.username }}
-                            has not posted any status updates yet.
-
-                        </p>
-
-                    {% endif %}
-
+                <div class="empty-course-icon">
+                    📚
                 </div>
+
+
+                <h5>
+                    No enrolled courses
+                </h5>
+
+
+                <p>
+                    {{ profile_user.username }}
+                    is not enrolled in any courses yet.
+                </p>
 
             </div>
 
         {% endif %}
 
     </section>
+
+{% endif %}
+
+
+
+<!-- =========================================================
+     TEACHER CREATED COURSES
+     ========================================================= -->
+
+{% if profile_user.role == "teacher" %}
+
+    <section class="profile-courses-section">
+
+        <div class="section-header mb-3">
+
+            <h2>
+                Courses you teach
+            </h2>
+
+
+            <p>
+
+                {{ courses_created|length }}
+                course{% if courses_created|length != 1 %}s{% endif %}
+                created by {{ profile_user.username }}.
+
+            </p>
+
+        </div>
+
+
+
+        {% if courses_created %}
+
+            <div class="row g-4">
+
+                {% for course in courses_created %}
+
+                    <div class="col-md-6 col-xl-3">
+
+                        <div
+                            class="
+                                course-profile-card
+                                h-100
+                            "
+                        >
+
+
+                            <!-- =================================================
+                                 COURSE IMAGE
+                                 ================================================= -->
+
+                            {% if course.image %}
+
+                                <img
+                                    src="{{ course.image.url }}"
+                                    alt="{{ course.title }}"
+                                    class="profile-course-image"
+                                >
+
+                            {% else %}
+
+                                <div class="profile-course-placeholder">
+
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="40"
+                                        height="40"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.7"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                    </svg>
+
+                                </div>
+
+                            {% endif %}
+
+
+
+                            <!-- =================================================
+                                 COURSE BODY
+                                 ================================================= -->
+
+                            <div class="course-card-body">
+
+
+                                <span
+                                    class="
+                                        course-badge
+                                        teacher-course-badge
+                                    "
+                                >
+                                    Teacher Course
+                                </span>
+
+
+                                <h5>
+                                    {{ course.title }}
+                                </h5>
+
+
+                                <p class="course-description">
+                                    {{ course.description|truncatechars:90 }}
+                                </p>
+
+
+                                <a
+                                    href="{% url 'course_detail' course.id %}"
+                                    class="course-view-btn"
+                                >
+                                    View Course
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+
+        {% else %}
+
+            <div class="empty-course-card">
+
+                <div class="empty-course-icon">
+                    📚
+                </div>
+
+
+                <h5>
+                    No courses created
+                </h5>
+
+
+                <p>
+                    {{ profile_user.username }}
+                    has not created any courses yet.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+{% endif %}
+
+
+
+
+
+<!-- =========================================================
+     PROFILE PAGE CSS
+     ========================================================= -->
+
+<style>
+
+    /* =========================================================
+       TOP SECTION
+       ========================================================= */
+
+    .profile-top-row {
+        margin-top: 0.25rem;
+    }
+
+
+
+    /* =========================================================
+       PROFILE CARD
+       ========================================================= */
+
+    .profile-card {
+        overflow: hidden;
+
+        background: #ffffff;
+
+        border: 1px solid #dfe5ec;
+        border-radius: 16px;
+
+        box-shadow:
+            0 4px 15px
+            rgba(31, 41, 55, 0.04);
+    }
+
+
+    .profile-cover {
+        height: 72px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #e7f0ff,
+                #f3f7fd
+            );
+    }
+
+
+    .profile-main {
+        position: relative;
+
+        padding:
+            0
+            1.6rem
+            1.5rem;
+    }
+
+
+
+    /* =========================================================
+       PROFILE AVATAR
+       ========================================================= */
+
+    .profile-avatar,
+    .profile-avatar-placeholder {
+        width: 88px;
+        height: 88px;
+
+        margin-top: -44px;
+        margin-bottom: 1rem;
+
+        border-radius: 50%;
+
+        border: 4px solid #ffffff;
+
+        box-shadow:
+            0 2px 10px
+            rgba(31, 41, 55, 0.14);
+    }
+
+
+    .profile-avatar {
+        display: block;
+
+        object-fit: cover;
+    }
+
+
+    .profile-avatar-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #0d6efd;
+
+        background: #dbeafe;
+
+        font-size: 2rem;
+    }
+
+
+
+    /* =========================================================
+       PROFILE INFORMATION
+       ========================================================= */
+
+    .profile-name {
+        margin: 0;
+
+        color: #172033;
+
+        font-size: 1.5rem;
+        font-weight: 700;
+
+        letter-spacing: -0.02em;
+    }
+
+
+    .profile-role {
+        display: inline-flex;
+
+        align-items: center;
+
+        padding:
+            0.22rem
+            0.55rem;
+
+        border-radius: 20px;
+
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+
+    .teacher-role {
+        color: #0d6efd;
+
+        background: #e7f0ff;
+    }
+
+
+    .student-role {
+        color: #198754;
+
+        background: #e7f6ed;
+    }
+
+
+    .profile-real-name {
+        margin-bottom: 0.25rem;
+
+        color: #4b5563;
+
+        font-size: 0.9rem;
+    }
+
+
+    .profile-bio {
+        margin-bottom: 1.2rem;
+
+        color: #8a94a3;
+
+        font-size: 0.9rem;
+    }
+
+
+
+    /* =========================================================
+       PROFILE META
+       ========================================================= */
+
+    .profile-meta {
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap:
+            1.6rem
+            2rem;
+
+        margin-bottom: 1.3rem;
+    }
+
+
+    .profile-meta-item {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.55rem;
+    }
+
+
+    .profile-meta-icon {
+        width: 34px;
+        height: 34px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #5c6f8b;
+
+        background: #f2f5f9;
+
+        border-radius: 8px;
+    }
+
+
+    .profile-meta-item strong,
+    .profile-meta-item span {
+        display: block;
+    }
+
+
+    .profile-meta-item strong {
+        color: #202938;
+
+        font-size: 0.95rem;
+        font-weight: 700;
+    }
+
+
+    .profile-meta-item span {
+        margin-top: 0.05rem;
+
+        color: #8a94a3;
+
+        font-size: 0.72rem;
+    }
+
+
+
+    /* =========================================================
+       EDIT PROFILE
+       ========================================================= */
+
+    .profile-edit-btn {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 0.45rem;
+
+        padding:
+            0.5rem
+            0.85rem;
+
+        color: #334155;
+
+        background: #ffffff;
+
+        border: 1px solid #bcc7d5;
+        border-radius: 7px;
+
+        text-decoration: none;
+
+        font-size: 0.83rem;
+        font-weight: 500;
+
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+
+    .profile-edit-btn:hover {
+        color: #1e293b;
+
+        background: #f8fafc;
+
+        border-color: #9cacbf;
+    }
+
+
+
+    /* =========================================================
+       STATUS PANEL
+       ========================================================= */
+
+    .status-panel {
+        padding: 1.4rem;
+
+        background: #ffffff;
+
+        border: 1px solid #dfe5ec;
+        border-radius: 16px;
+
+        box-shadow:
+            0 4px 15px
+            rgba(31, 41, 55, 0.04);
+    }
+
+
+    .status-panel-header {
+        display: flex;
+
+        align-items: flex-start;
+        justify-content: space-between;
+
+        gap: 1rem;
+
+        margin-bottom: 1.35rem;
+    }
+
+
+    .status-panel-header h2 {
+        margin:
+            0
+            0
+            0.2rem;
+
+        color: #172033;
+
+        font-size: 1.18rem;
+        font-weight: 700;
+    }
+
+
+    .status-panel-header p {
+        margin: 0;
+
+        color: #8a94a3;
+
+        font-size: 0.8rem;
+    }
+
+
+
+    /* =========================================================
+       STATUS POST BUTTON
+       ========================================================= */
+
+    .status-post-btn {
+        flex-shrink: 0;
+
+        padding:
+            0.46rem
+            0.8rem;
+
+        color: #ffffff;
+
+        background: #0d6efd;
+
+        border-radius: 7px;
+
+        text-decoration: none;
+
+        font-size: 0.8rem;
+        font-weight: 600;
+
+        transition:
+            background-color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+
+    .status-post-btn:hover {
+        color: #ffffff;
+
+        background: #0b5ed7;
+
+        transform: translateY(-1px);
+    }
+
+
+
+    /* =========================================================
+       STATUS TIMELINE
+       ========================================================= */
+
+    .status-timeline {
+        position: relative;
+
+        max-height: 285px;
+
+        overflow-y: auto;
+
+        padding-right: 0.4rem;
+    }
+
+
+    .timeline-item {
+        position: relative;
+
+        display: flex;
+
+        gap: 0.9rem;
+
+        padding-bottom: 1.4rem;
+    }
+
+
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+
+
+    .timeline-item:not(:last-child)::before {
+        content: "";
+
+        position: absolute;
+
+        z-index: 1;
+
+        top: 38px;
+        left: 18px;
+
+        width: 1px;
+        height: calc(100% - 22px);
+
+        background: #d7dee8;
+    }
+
+
+
+    /* Timeline Avatar */
+
+    .timeline-avatar-wrapper {
+        position: relative;
+
+        z-index: 2;
+
+        flex-shrink: 0;
+    }
+
+
+    .timeline-avatar,
+    .timeline-avatar-placeholder {
+        width: 38px;
+        height: 38px;
+
+        border-radius: 50%;
+    }
+
+
+    .timeline-avatar {
+        object-fit: cover;
+    }
+
+
+    .timeline-avatar-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #0d6efd;
+
+        background: #dbeafe;
+
+        font-size: 0.85rem;
+    }
+
+
+
+    /* Timeline Content */
+
+    .timeline-content {
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .timeline-user {
+        display: flex;
+
+        align-items: center;
+
+        flex-wrap: wrap;
+
+        gap: 0.45rem;
+
+        margin-bottom: 0.2rem;
+    }
+
+
+    .timeline-user strong {
+        color: #202938;
+
+        font-size: 0.87rem;
+        font-weight: 700;
+    }
+
+
+    .timeline-text {
+        margin:
+            0
+            0
+            0.45rem;
+
+        color: #455163;
+
+        font-size: 0.88rem;
+
+        line-height: 1.5;
+
+        word-break: break-word;
+    }
+
+
+    .timeline-date {
+        color: #98a2b1;
+
+        font-size: 0.72rem;
+    }
+
+
+
+    /* Timeline Scrollbar */
+
+    .status-timeline::-webkit-scrollbar {
+        width: 5px;
+    }
+
+
+    .status-timeline::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+
+    .status-timeline::-webkit-scrollbar-thumb {
+        background: #ccd5e1;
+
+        border-radius: 10px;
+    }
+
+
+
+    /* =========================================================
+       EMPTY STATUS
+       ========================================================= */
+
+    .status-empty {
+        padding:
+            2rem
+            1rem;
+
+        color: #7c8796;
+
+        text-align: center;
+    }
+
+
+    .status-empty-icon {
+        margin-bottom: 0.7rem;
+
+        font-size: 1.8rem;
+    }
+
+
+
+    /* =========================================================
+       COURSE SECTION
+       ========================================================= */
+
+    .profile-courses-section {
+        margin-bottom: 3rem;
+    }
+
+
+    .section-header h2 {
+        margin-bottom: 0.3rem;
+
+        color: #172033;
+
+        font-size: 1.35rem;
+        font-weight: 700;
+
+        letter-spacing: -0.015em;
+    }
+
+
+    .section-header p {
+        margin: 0;
+
+        color: #8a94a3;
+
+        font-size: 0.86rem;
+    }
+
+
+
+    /* =========================================================
+       COURSE CARD
+       ========================================================= */
+
+    .course-profile-card {
+        display: flex;
+        flex-direction: column;
+
+        overflow: hidden;
+
+        background: #ffffff;
+
+        border: 1px solid #dfe5ec;
+        border-radius: 14px;
+
+        box-shadow:
+            0 3px 12px
+            rgba(31, 41, 55, 0.035);
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+
+    .course-profile-card:hover {
+        transform: translateY(-3px);
+
+        border-color: #bfd3f3;
+
+        box-shadow:
+            0 9px 24px
+            rgba(31, 41, 55, 0.08);
+    }
+
+
+
+    /* Course Image */
+
+    .profile-course-image,
+    .profile-course-placeholder {
+        width: 100%;
+        height: 145px;
+    }
+
+
+    .profile-course-image {
+        display: block;
+
+        object-fit: cover;
+    }
+
+
+    .profile-course-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #2f5f9e;
+
+        background:
+            linear-gradient(
+                135deg,
+                #dbe8f7,
+                #edf3fa
+            );
+    }
+
+
+
+    /* Course Body */
+
+    .course-card-body {
+        display: flex;
+        flex-direction: column;
+
+        flex: 1;
+
+        padding: 1rem;
+    }
+
+
+    .course-badge {
+        align-self: flex-start;
+
+        margin-bottom: 0.7rem;
+
+        padding:
+            0.23rem
+            0.5rem;
+
+        border-radius: 5px;
+
+        font-size: 0.67rem;
+        font-weight: 600;
+    }
+
+
+    .teacher-course-badge {
+        color: #0d6efd;
+
+        background: #e7f0ff;
+    }
+
+
+    .student-course-badge {
+        color: #198754;
+
+        background: #e6f5ec;
+    }
+
+
+    .course-card-body h5 {
+        margin-bottom: 0.45rem;
+
+        color: #172033;
+
+        font-size: 1rem;
+        font-weight: 700;
+
+        line-height: 1.3;
+    }
+
+
+    .course-description {
+        flex-grow: 1;
+
+        margin-bottom: 0.8rem;
+
+        color: #6f7c8e;
+
+        font-size: 0.82rem;
+
+        line-height: 1.5;
+    }
+
+
+    .course-teacher {
+        margin-bottom: 0.8rem;
+
+        color: #8a94a3;
+
+        font-size: 0.77rem;
+    }
+
+
+    .course-teacher a {
+        color: #0d6efd;
+
+        text-decoration: none;
+
+        font-weight: 600;
+    }
+
+
+
+    /* Course Button */
+
+    .course-view-btn {
+        display: block;
+
+        width: 100%;
+
+        padding:
+            0.48rem
+            0.75rem;
+
+        color: #27364e;
+
+        background: #ffffff;
+
+        border: 1px solid #73849b;
+        border-radius: 7px;
+
+        text-align: center;
+        text-decoration: none;
+
+        font-size: 0.82rem;
+        font-weight: 600;
+
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease;
+    }
+
+
+    .course-view-btn:hover {
+        color: #0d6efd;
+
+        background: #f5f9ff;
+
+        border-color: #0d6efd;
+    }
+
+
+
+    /* =========================================================
+       EMPTY COURSE
+       ========================================================= */
+
+    .empty-course-card {
+        padding: 3rem 1.5rem;
+
+        background: #ffffff;
+
+        border: 1px solid #dfe5ec;
+        border-radius: 14px;
+
+        text-align: center;
+    }
+
+
+    .empty-course-icon {
+        margin-bottom: 0.8rem;
+
+        font-size: 2rem;
+    }
+
+
+    .empty-course-card h5 {
+        color: #172033;
+    }
+
+
+    .empty-course-card p {
+        margin: 0;
+
+        color: #8a94a3;
+    }
+
+
+
+    /* =========================================================
+       TABLET
+       ========================================================= */
+
+    @media (max-width: 991.98px) {
+
+        .profile-top-row {
+            margin-bottom: 2rem !important;
+        }
+
+
+        .status-timeline {
+            max-height: none;
+        }
+
+    }
+
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 575.98px) {
+
+        .profile-main {
+            padding:
+                0
+                1.2rem
+                1.3rem;
+        }
+
+
+        .profile-avatar,
+        .profile-avatar-placeholder {
+            width: 78px;
+            height: 78px;
+
+            margin-top: -39px;
+        }
+
+
+        .profile-name {
+            font-size: 1.3rem;
+        }
+
+
+        .profile-meta {
+            gap:
+                1rem
+                1.4rem;
+        }
+
+
+        .status-panel {
+            padding: 1.15rem;
+        }
+
+
+        .profile-course-image,
+        .profile-course-placeholder {
+            height: 150px;
+        }
+
+    }
+
+</style>
+
 
 {% endblock %}

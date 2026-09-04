@@ -1,85 +1,788 @@
 {% extends "base.html" %}
 
-
 {% block title %}
     Edit Course
 {% endblock %}
 
-
 {% block content %}
 
-    <div class="row justify-content-center">
+<div class="course-form-page">
 
-        <div class="col-lg-7">
+    <div class="course-form-card">
 
-            <div class="card content-card">
+        <!-- Header -->
+        <div class="course-form-header">
 
-                <div class="card-body p-4">
+            <div class="form-header-icon">
 
-                    <h1 class="page-heading">
-                        Edit Course
-                    </h1>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="23"
+                    height="23"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path
+                        d="M12 20h9"
+                    ></path>
 
-                    <p class="page-subheading">
-                        Update the course details and cover image.
-                    </p>
+                    <path
+                        d="M16.5 3.5
+                           a2.1 2.1 0 0 1
+                           3 3L7 19l-4 1
+                           1-4Z"
+                    ></path>
+                </svg>
 
-
-                    {% if course.image %}
-
-                        <div class="mb-4">
-
-                            <p class="fw-semibold mb-2">
-                                Current cover image
-                            </p>
-
-                            <img
-                                src="{{ course.image.url }}"
-                                alt="{{ course.title }}"
-                                class="img-fluid rounded"
-                                style="
-                                    width: 100%;
-                                    max-height: 300px;
-                                    object-fit: cover;
-                                "
-                            >
-
-                        </div>
-
-                    {% endif %}
+            </div>
 
 
-                    <form
-                        method="post"
-                        enctype="multipart/form-data"
-                    >
+            <div>
 
-                        {% csrf_token %}
+                <h1>
+                    Edit Course
+                </h1>
 
-                        {{ form.as_p }}
-
-                        <button
-                            type="submit"
-                            class="btn btn-primary"
-                        >
-                            Save Changes
-                        </button>
-
-                        <a
-                            href="{% url 'course_detail' course.id %}"
-                            class="btn btn-outline-secondary"
-                        >
-                            Cancel
-                        </a>
-
-                    </form>
-
-                </div>
+                <p>
+                    Update the course details and cover image.
+                </p>
 
             </div>
 
         </div>
 
+
+
+        <!-- Current Cover -->
+        {% if course.image %}
+
+            <div class="current-cover-section">
+
+                <div class="section-heading-row">
+
+                    <div>
+                        <p class="section-label">
+                            Current cover image
+                        </p>
+
+                        <p class="section-description">
+                            This image is currently displayed on the course.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="current-cover">
+
+                    <img
+                        src="{{ course.image.url }}"
+                        alt="{{ course.title }} cover image"
+                    >
+
+                    <div class="current-cover-overlay">
+                        Current cover
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+
+
+        <form
+            method="post"
+            enctype="multipart/form-data"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- Non-field errors -->
+            {% if form.non_field_errors %}
+
+                <div class="form-error-box">
+
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- Course Title -->
+            <div class="course-field">
+
+                <label for="{{ form.title.id_for_label }}">
+                    Course title
+                </label>
+
+                {{ form.title }}
+
+                <p class="field-help">
+                    Update the title shown to students.
+                </p>
+
+                {% for error in form.title.errors %}
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+
+            </div>
+
+
+            <!-- Description -->
+            <div class="course-field">
+
+                <label for="{{ form.description.id_for_label }}">
+                    Description
+                </label>
+
+                {{ form.description }}
+
+                <p class="field-help">
+                    Describe what students can expect from this course.
+                </p>
+
+                {% for error in form.description.errors %}
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+
+            </div>
+
+
+            <!-- New Cover Image -->
+            <div class="course-field">
+
+                <label for="{{ form.image.id_for_label }}">
+                    Change cover image
+                </label>
+
+
+                <div class="image-upload-box">
+
+                    <div class="upload-icon">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="27"
+                            height="27"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M12 3v12"></path>
+                            <path d="m7 8 5-5 5 5"></path>
+                            <path d="M5 21h14"></path>
+                        </svg>
+
+                    </div>
+
+
+                    <div class="upload-content">
+
+                        <span class="upload-title">
+                            Upload a new cover
+                        </span>
+
+                        <span class="upload-description">
+                            Leave empty to keep the current image.
+                        </span>
+
+                    </div>
+
+
+                    <input
+                        type="file"
+                        name="{{ form.image.html_name }}"
+                        id="{{ form.image.id_for_label }}"
+                        accept="image/*"
+                        class="course-file-input"
+                    >
+
+                </div>
+
+
+                <p class="field-help">
+                    Optional. Upload a JPG, JPEG or PNG image.
+                </p>
+
+
+                {% for error in form.image.errors %}
+
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+
+            <!-- Actions -->
+            <div class="course-form-actions">
+
+                <a
+                    href="{% url 'course_detail' course.id %}"
+                    class="course-cancel-btn"
+                >
+                    Cancel
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="course-submit-btn"
+                >
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
+
+</div>
+
+
+<style>
+
+    .course-form-page {
+        max-width: 780px;
+
+        margin: 0 auto;
+
+        padding:
+            1.5rem
+            1rem
+            4rem;
+    }
+
+
+    .course-form-card {
+        padding: 2.3rem;
+
+        background: #ffffff;
+
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+
+        box-shadow:
+            0 10px 30px
+            rgba(31, 41, 55, 0.07);
+    }
+
+
+
+    /* Header */
+
+    .course-form-header {
+        display: flex;
+
+        align-items: center;
+
+        gap: 1rem;
+
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+
+        border-bottom: 1px solid #edf0f4;
+    }
+
+
+    .form-header-icon {
+        width: 48px;
+        height: 48px;
+
+        min-width: 48px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #0d6efd;
+
+        background: #eaf2ff;
+
+        border-radius: 13px;
+    }
+
+
+    .course-form-header h1 {
+        margin:
+            0
+            0
+            0.3rem;
+
+        color: #202932;
+
+        font-size: 2rem;
+        font-weight: 700;
+
+        letter-spacing: -0.025em;
+    }
+
+
+    .course-form-header p {
+        margin: 0;
+
+        color: #718096;
+
+        font-size: 0.94rem;
+    }
+
+
+
+    /* Current Cover */
+
+    .current-cover-section {
+        margin-bottom: 2rem;
+    }
+
+
+    .section-heading-row {
+        margin-bottom: 0.75rem;
+    }
+
+
+    .section-label {
+        margin:
+            0
+            0
+            0.1rem;
+
+        color: #374151;
+
+        font-size: 0.92rem;
+        font-weight: 600;
+    }
+
+
+    .section-description {
+        margin: 0;
+
+        color: #8a94a3;
+
+        font-size: 0.82rem;
+    }
+
+
+    .current-cover {
+        position: relative;
+
+        width: 100%;
+        height: 220px;
+
+        overflow: hidden;
+
+        border: 1px solid #dfe5ec;
+        border-radius: 12px;
+
+        background: #f8f9fa;
+    }
+
+
+    .current-cover img {
+        width: 100%;
+        height: 100%;
+
+        display: block;
+
+        object-fit: cover;
+    }
+
+
+    .current-cover-overlay {
+        position: absolute;
+
+        right: 12px;
+        bottom: 12px;
+
+        padding:
+            0.35rem
+            0.65rem;
+
+        color: #ffffff;
+
+        background:
+            rgba(17, 24, 39, 0.72);
+
+        border-radius: 6px;
+
+        font-size: 0.76rem;
+        font-weight: 600;
+    }
+
+
+
+    /* Fields */
+
+    .course-field {
+        margin-bottom: 1.6rem;
+    }
+
+
+    .course-field label {
+        display: block;
+
+        margin-bottom: 0.5rem;
+
+        color: #374151;
+
+        font-size: 0.92rem;
+        font-weight: 600;
+    }
+
+
+    .course-field input[type="text"],
+    .course-field textarea {
+        width: 100%;
+
+        padding:
+            0.8rem
+            0.9rem;
+
+        color: #2b3440;
+
+        background: #ffffff;
+
+        border: 1px solid #d5dce5;
+        border-radius: 9px;
+
+        font-size: 0.95rem;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+
+    .course-field input[type="text"] {
+        height: 48px;
+    }
+
+
+    .course-field textarea {
+        min-height: 150px;
+
+        resize: vertical;
+    }
+
+
+    .course-field input[type="text"]:focus,
+    .course-field textarea:focus {
+        outline: none;
+
+        border-color: #86b7fe;
+
+        box-shadow:
+            0 0 0
+            0.2rem
+            rgba(13, 110, 253, 0.12);
+    }
+
+
+    .field-help {
+        margin:
+            0.45rem
+            0
+            0;
+
+        color: #8a94a3;
+
+        font-size: 0.82rem;
+    }
+
+
+    .field-error {
+        margin-top: 0.4rem;
+
+        color: #dc3545;
+
+        font-size: 0.85rem;
+    }
+
+
+    .form-error-box {
+        margin-bottom: 1.5rem;
+
+        padding:
+            0.9rem
+            1rem;
+
+        color: #b42335;
+
+        background: #fff5f6;
+
+        border: 1px solid #f1bec5;
+        border-radius: 9px;
+
+        font-size: 0.9rem;
+    }
+
+
+
+    /* Upload */
+
+    .image-upload-box {
+        display: flex;
+
+        align-items: center;
+
+        gap: 1rem;
+
+        padding: 1.2rem;
+
+        background: #f8faff;
+
+        border: 1px dashed #b8c6d8;
+        border-radius: 11px;
+    }
+
+
+    .upload-icon {
+        width: 46px;
+        height: 46px;
+
+        min-width: 46px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #0d6efd;
+
+        background: #e5efff;
+
+        border-radius: 10px;
+    }
+
+
+    .upload-content {
+        display: flex;
+
+        flex-direction: column;
+
+        flex: 1;
+    }
+
+
+    .upload-title {
+        color: #374151;
+
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+
+    .upload-description {
+        margin-top: 0.15rem;
+
+        color: #8a94a3;
+
+        font-size: 0.8rem;
+    }
+
+
+    .course-file-input {
+        max-width: 230px;
+
+        color: #6b7280;
+
+        font-size: 0.85rem;
+    }
+
+
+    .course-file-input::file-selector-button {
+        margin-right: 0.65rem;
+
+        padding:
+            0.5rem
+            0.75rem;
+
+        color: #0d6efd;
+
+        background: #ffffff;
+
+        border: 1px solid #b9c7da;
+        border-radius: 7px;
+
+        font-weight: 600;
+
+        cursor: pointer;
+    }
+
+
+    .course-file-input::file-selector-button:hover {
+        background: #edf4ff;
+    }
+
+
+
+    /* Actions */
+
+    .course-form-actions {
+        display: flex;
+
+        justify-content: flex-end;
+
+        gap: 0.75rem;
+
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+
+        border-top: 1px solid #edf0f4;
+    }
+
+
+    .course-cancel-btn,
+    .course-submit-btn {
+        min-width: 125px;
+
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 0.45rem;
+
+        padding:
+            0.7rem
+            1.1rem;
+
+        border-radius: 8px;
+
+        font-size: 0.9rem;
+        font-weight: 600;
+
+        text-decoration: none;
+
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+
+    .course-cancel-btn {
+        color: #5f6977;
+
+        background: #ffffff;
+
+        border: 1px solid #d4dae2;
+    }
+
+
+    .course-cancel-btn:hover {
+        color: #374151;
+
+        background: #f8f9fa;
+    }
+
+
+    .course-submit-btn {
+        color: #ffffff;
+
+        background: #0d6efd;
+
+        border: 1px solid #0d6efd;
+    }
+
+
+    .course-submit-btn:hover {
+        color: #ffffff;
+
+        background: #0b5ed7;
+
+        transform: translateY(-1px);
+    }
+
+
+
+    /* Mobile */
+
+    @media (max-width: 576px) {
+
+        .course-form-card {
+            padding: 1.5rem;
+        }
+
+
+        .course-form-header {
+            align-items: flex-start;
+        }
+
+
+        .course-form-header h1 {
+            font-size: 1.7rem;
+        }
+
+
+        .current-cover {
+            height: 170px;
+        }
+
+
+        .image-upload-box {
+            flex-direction: column;
+
+            align-items: flex-start;
+        }
+
+
+        .course-file-input {
+            max-width: 100%;
+            width: 100%;
+        }
+
+
+        .course-form-actions {
+            flex-direction: column-reverse;
+        }
+
+
+        .course-cancel-btn,
+        .course-submit-btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
 
 {% endblock %}
