@@ -1,908 +1,3401 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+{% block title %}
+    {{ course.title }} - Live Discussion
+{% endblock %}
 
-    <title>
-        {{ course.title }} - Live Discussion
-    </title>
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+{% block content %}
 
-    <style>
-        body {
-            background-color: #f4f6f9;
-        }
 
-        .discussion-wrapper {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 12px;
-        }
+<!-- =========================================================
+     LIVE DISCUSSION PAGE
+     ========================================================= -->
 
-        .chat-card {
-            height: 78vh;
-            min-height: 600px;
-            display: flex;
-            flex-direction: column;
-        }
+<div class="discussion-page">
 
-        .chat-header {
-            background-color: #ffffff;
-            border-bottom: 1px solid #dee2e6;
-        }
+    <div class="row g-4 align-items-stretch">
 
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            background-color: #eef1f5;
-        }
 
-        .message-row {
-            display: flex;
-            margin-bottom: 16px;
-        }
+        <!-- =====================================================
+             LEFT - COURSE INFORMATION
+             ===================================================== -->
 
-        .message-row.own-message {
-            justify-content: flex-end;
-        }
+        <div class="col-xl-3">
 
-        .message-row.other-message {
-            justify-content: flex-start;
-        }
+            <aside class="discussion-sidebar">
 
-        .message-bubble {
-            max-width: 72%;
-            min-width: 160px;
-            padding: 12px 16px;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px
-                rgba(0, 0, 0, 0.12);
-        }
-
-        .own-message .message-bubble {
-            background-color: #d1e7dd;
-            border-bottom-right-radius: 4px;
-        }
-
-        .teacher-message .message-bubble {
-            background-color: #cfe2ff;
-            border-bottom-left-radius: 4px;
-        }
-
-        .student-message .message-bubble {
-            background-color: #ffffff;
-            border-bottom-left-radius: 4px;
-        }
-
-        .message-meta {
-            font-size: 0.8rem;
-            margin-bottom: 7px;
-        }
-
-        .message-text {
-            margin: 0;
-            overflow-wrap: anywhere;
-            white-space: pre-wrap;
-        }
-
-        .chat-footer {
-            background-color: #ffffff;
-            border-top: 1px solid #dee2e6;
-            padding: 15px;
-        }
-
-        .connection-status {
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .chat-error {
-            display: none;
-        }
-
-        @media (max-width: 576px) {
-            .discussion-wrapper {
-                margin: 0;
-                padding: 0;
-            }
-
-            .chat-card {
-                height: 100vh;
-                min-height: 100vh;
-                border-radius: 0;
-            }
-
-            .message-bubble {
-                max-width: 88%;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="discussion-wrapper">
-
-        <div class="card shadow chat-card">
-
-            <!-- Chat heading -->
-            <div class="chat-header p-3">
-
-                <div
-                    class="
-                        d-flex
-                        justify-content-between
-                        align-items-start
-                        gap-3
-                    "
-                >
-
-                    <div>
-
-                        <h2 class="mb-1">
-                            {{ course.title }}
-                        </h2>
-
-                        <p class="mb-0 text-muted">
-                            Live Discussion
-                        </p>
-
-                    </div>
-
-                    <span
-                        id="connection-status"
-                        class="
-                            connection-status
-                            text-warning
-                            text-nowrap
-                        "
-                    >
-                        ● Connecting...
-                    </span>
-
+                <div class="discussion-sidebar-label">
+                    Course Discussion
                 </div>
 
-                <p class="mt-2 mb-0">
 
-                    Logged in as
-
-                    <strong>
-                        {{ request.user.username }}
-                    </strong>
-
-                    ({{ request.user.role|title }})
-
-                </p>
-
-                <div
-                    id="chat-error"
-                    class="
-                        chat-error
-                        alert
-                        alert-warning
-                        mt-3
-                        mb-0
-                        py-2
-                    "
-                >
-                    The discussion connection was interrupted.
-                    Reconnecting automatically…
-                </div>
-
-            </div>
+                <h1 class="discussion-course-title">
+                    {{ course.title }}
+                </h1>
 
 
-            <!-- Existing chat messages -->
-            <div
-                id="chat-messages"
-                class="chat-messages"
-            >
+                {% if course.description %}
 
-                {% if messages %}
-
-                    {% for chat_message in messages %}
-
-                        <div
-                            data-message-id="{{ chat_message.id }}"
-                            class="
-                                message-row
-
-                                {% if chat_message.sender == request.user %}
-                                    own-message
-                                {% else %}
-                                    other-message
-
-                                    {% if chat_message.sender.role == 'teacher' %}
-                                        teacher-message
-                                    {% else %}
-                                        student-message
-                                    {% endif %}
-                                {% endif %}
-                            "
-                        >
-
-                            <div class="message-bubble">
-
-                                <div class="message-meta">
-
-                                    <strong>
-
-                                        {% if chat_message.sender.role == "teacher" %}
-
-                                            🧑‍🏫
-                                            {{ chat_message.sender.username }}
-                                            (Teacher)
-
-                                        {% else %}
-
-                                            👨‍🎓
-                                            {{ chat_message.sender.username }}
-                                            (Student)
-
-                                        {% endif %}
-
-                                    </strong>
-
-                                    <span
-                                        class="text-muted ms-2"
-                                    >
-                                        {{ chat_message.created_at|date:"g:i A" }}
-                                    </span>
-
-                                </div>
-
-                                <p class="message-text">
-                                    {{ chat_message.message }}
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    {% endfor %}
+                    <p class="discussion-course-description">
+                        {{ course.description|truncatechars:160 }}
+                    </p>
 
                 {% else %}
 
-                    <p
-                        id="no-messages"
-                        class="text-center text-muted"
-                    >
-                        No messages yet. Start the discussion.
+                    <p class="discussion-course-description">
+                        Chat with the teacher and enrolled students
+                        in real time.
                     </p>
 
                 {% endif %}
 
-            </div>
 
 
-            <!-- Message input -->
-            <div class="chat-footer">
+                <!-- =================================================
+                     COURSE TEACHER
+                     ================================================= -->
 
-                <form
-                    id="chat-form"
-                    class="d-flex gap-2"
-                >
+                <div class="discussion-info-block">
 
-                    <input
-                        id="chat-message-input"
-                        class="form-control"
-                        type="text"
-                        maxlength="1000"
-                        placeholder="Type your message..."
-                        autocomplete="off"
-                        required
-                        disabled
-                    >
+                    <span class="discussion-info-label">
+                        Course Teacher
+                    </span>
 
-                    <button
-                        id="send-button"
-                        class="btn btn-primary"
-                        type="submit"
-                        disabled
-                    >
-                        Send
-                    </button>
-
-                </form>
-
-                <div
-                    class="
-                        d-flex
-                        justify-content-between
-                        align-items-center
-                        mt-2
-                    "
-                >
-
-                    <small class="text-muted">
-                        Maximum 1,000 characters
-                    </small>
-
-                    <small
-                        id="character-count"
-                        class="text-muted"
-                    >
-                        0 / 1000
-                    </small>
-
-                </div>
-
-                <div class="mt-3">
 
                     <a
-                        href="{% url 'course_detail' course.id %}"
-                        class="
-                            btn
-                            btn-outline-secondary
-                            btn-sm
-                        "
+                        href="{% url 'profile' course.teacher.username %}"
+                        class="discussion-teacher"
                     >
-                        Back to Course
+
+                        <div class="sidebar-user-avatar">
+
+                            {% if course.teacher.profile_picture %}
+
+                                <img
+                                    src="{{ course.teacher.profile_picture.url }}"
+                                    alt="{{ course.teacher.username }}"
+                                >
+
+                            {% else %}
+
+                                <span>
+                                    {{ course.teacher.username|first|upper }}
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+                                {{ course.teacher.username }}
+                            </strong>
+
+                            <small>
+                                Teacher
+                            </small>
+
+                        </div>
+
                     </a>
 
                 </div>
 
-            </div>
+
+
+                <!-- =================================================
+                     CURRENT USER
+                     ================================================= -->
+
+                <div class="discussion-info-block">
+
+                    <span class="discussion-info-label">
+                        You are chatting as
+                    </span>
+
+
+                    <div class="discussion-current-user">
+
+                        <div class="sidebar-user-avatar">
+
+                            {% if request.user.profile_picture %}
+
+                                <img
+                                    src="{{ request.user.profile_picture.url }}"
+                                    alt="{{ request.user.username }}"
+                                >
+
+                            {% else %}
+
+                                <span>
+                                    {{ request.user.username|first|upper }}
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+                                {{ request.user.username }}
+                            </strong>
+
+                            <small>
+                                {{ request.user.role|title }}
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     REAL-TIME INFO
+                     ================================================= -->
+
+                <div class="discussion-feature-box">
+
+                    <div class="discussion-feature-icon">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"
+                            ></path>
+                        </svg>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            Real-time Discussion
+                        </strong>
+
+                        <p>
+                            Messages appear instantly for everyone
+                            currently in this course discussion.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     GUIDELINES
+                     ================================================= -->
+
+                <div class="discussion-guidelines">
+
+                    <h2>
+                        Discussion Guidelines
+                    </h2>
+
+
+                    <div class="guideline-item">
+
+                        <span class="guideline-check">
+                            ✓
+                        </span>
+
+                        <span>
+                            Be respectful to other participants.
+                        </span>
+
+                    </div>
+
+
+                    <div class="guideline-item">
+
+                        <span class="guideline-check">
+                            ✓
+                        </span>
+
+                        <span>
+                            Keep messages relevant to the course.
+                        </span>
+
+                    </div>
+
+
+                    <div class="guideline-item">
+
+                        <span class="guideline-check">
+                            ✓
+                        </span>
+
+                        <span>
+                            Do not share sensitive personal information.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     BACK TO COURSE
+                     ================================================= -->
+
+                <a
+                    href="{% url 'course_detail' course.id %}"
+                    class="back-course-btn"
+                >
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+
+                    Back to Course
+
+                </a>
+
+            </aside>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             MIDDLE - CHAT
+             ===================================================== -->
+
+        <div class="col-xl-6">
+
+            <section class="discussion-chat-card">
+
+
+                <!-- =================================================
+                     CHAT HEADER
+                     ================================================= -->
+
+                <header class="discussion-chat-header">
+
+                    <div class="discussion-chat-heading">
+
+                        <div class="discussion-chat-icon">
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="22"
+                                height="22"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path
+                                    d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"
+                                ></path>
+                            </svg>
+
+                        </div>
+
+
+                        <div>
+
+                            <h2>
+                                Live Discussion
+                            </h2>
+
+                            <p>
+                                {{ course.title }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <span
+                        id="connection-status"
+                        class="connection-status connecting"
+                    >
+                        Connecting...
+                    </span>
+
+                </header>
+
+
+
+                <!-- =================================================
+                     CONNECTION ERROR
+                     ================================================= -->
+
+                <div
+                    id="chat-error"
+                    class="chat-error"
+                >
+
+                    <div class="chat-error-content">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="17"
+                            height="17"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                            ></circle>
+
+                            <line
+                                x1="12"
+                                y1="8"
+                                x2="12"
+                                y2="12"
+                            ></line>
+
+                            <line
+                                x1="12"
+                                y1="16"
+                                x2="12.01"
+                                y2="16"
+                            ></line>
+                        </svg>
+
+
+                        <span>
+                            The discussion connection was interrupted.
+                            Reconnecting automatically...
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     CHAT MESSAGES
+
+                     IMPORTANT:
+                     chat_messages instead of messages
+                     ================================================= -->
+
+                <div
+                    id="chat-messages"
+                    class="chat-messages"
+                >
+
+                    {% if chat_messages %}
+
+                        {% for chat_message in chat_messages %}
+
+                            <div
+                                data-message-id="{{ chat_message.id }}"
+                                class="
+                                    message-row
+
+                                    {% if chat_message.sender == request.user %}
+
+                                        own-message
+
+                                    {% else %}
+
+                                        other-message
+
+                                        {% if chat_message.sender.role == 'teacher' %}
+                                            teacher-message
+                                        {% else %}
+                                            student-message
+                                        {% endif %}
+
+                                    {% endif %}
+                                "
+                            >
+
+                                <div class="message-bubble">
+
+
+                                    <div class="message-meta">
+
+                                        <div class="message-sender">
+
+                                            {% if chat_message.sender.role == "teacher" %}
+
+                                                <span class="message-role-icon">
+                                                    🧑‍🏫
+                                                </span>
+
+                                                <strong>
+                                                    {{ chat_message.sender.username }}
+                                                </strong>
+
+                                                <span class="message-role-badge teacher">
+                                                    Teacher
+                                                </span>
+
+                                            {% else %}
+
+                                                <span class="message-role-icon">
+                                                    👨‍🎓
+                                                </span>
+
+                                                <strong>
+                                                    {{ chat_message.sender.username }}
+                                                </strong>
+
+                                                <span class="message-role-badge student">
+                                                    Student
+                                                </span>
+
+                                            {% endif %}
+
+                                        </div>
+
+
+                                        <span class="message-time">
+                                            {{ chat_message.created_at|date:"g:i A" }}
+                                        </span>
+
+                                    </div>
+
+
+                                    <p class="message-text">
+                                        {{ chat_message.message }}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+
+                    {% else %}
+
+                        <div
+                            id="no-messages"
+                            class="no-messages"
+                        >
+
+                            <div class="no-messages-icon">
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="34"
+                                    height="34"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"
+                                    ></path>
+                                </svg>
+
+                            </div>
+
+
+                            <h3>
+                                No messages yet
+                            </h3>
+
+
+                            <p>
+                                Start the discussion by sending the first message.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- =================================================
+                     MESSAGE INPUT
+                     ================================================= -->
+
+                <footer class="chat-footer">
+
+                    <form
+                        id="chat-form"
+                        class="message-form"
+                    >
+
+                        <input
+                            id="chat-message-input"
+                            class="message-input"
+                            type="text"
+                            maxlength="1000"
+                            placeholder="Type your message..."
+                            autocomplete="off"
+                            required
+                            disabled
+                        >
+
+
+                        <button
+                            id="send-button"
+                            class="send-button"
+                            type="submit"
+                            disabled
+                        >
+
+                            <span>
+                                Send
+                            </span>
+
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="17"
+                                height="17"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M22 2 11 13"></path>
+                                <path d="m22 2-7 20-4-9-9-4Z"></path>
+                            </svg>
+
+                        </button>
+
+                    </form>
+
+
+                    <div class="message-footer-info">
+
+                        <span>
+                            Maximum 1,000 characters
+                        </span>
+
+
+                        <span id="character-count">
+                            0 / 1000
+                        </span>
+
+                    </div>
+
+                </footer>
+
+            </section>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             RIGHT - ONLINE USERS
+             ===================================================== -->
+
+        <div class="col-xl-3">
+
+            <aside class="online-members-panel">
+
+
+                <div class="online-members-header">
+
+                    <div>
+
+                        <h2>
+                            In This Discussion
+                        </h2>
+
+                        <p>
+                            Users currently online.
+                        </p>
+
+                    </div>
+
+
+                    <span
+                        id="online-count"
+                        class="online-count"
+                    >
+                        0
+                    </span>
+
+                </div>
+
+
+
+                <div class="online-section-label">
+
+                    <span class="online-status-dot"></span>
+
+                    Online Now
+
+                </div>
+
+
+
+                <div
+                    id="online-members-list"
+                    class="online-members-list"
+                >
+
+                    <div class="online-members-empty">
+
+                        <div class="online-empty-icon">
+                            👥
+                        </div>
+
+                        <strong>
+                            Waiting for participants
+                        </strong>
+
+                        <p>
+                            Users will appear here when they open
+                            this discussion.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="online-info-box">
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                        ></circle>
+
+                        <path d="M12 16v-4"></path>
+                        <path d="M12 8h.01"></path>
+                    </svg>
+
+
+                    <span>
+                        Only the course teacher and enrolled students
+                        can join this discussion.
+                    </span>
+
+                </div>
+
+            </aside>
 
         </div>
 
     </div>
 
-
-    {{ course.id|json_script:"course-id" }}
-
-    {{ request.user.username|json_script:"current-username" }}
+</div>
 
 
-    <script>
-        const courseId = JSON.parse(
+
+<!-- =========================================================
+     STYLING
+     ========================================================= -->
+
+<style>
+
+    .discussion-page {
+        max-width: 1420px;
+        margin: 0 auto;
+    }
+
+
+    /* =========================================================
+       LEFT PANEL
+       ========================================================= */
+
+    .discussion-sidebar,
+    .online-members-panel {
+        height: 650px;
+
+        display: flex;
+        flex-direction: column;
+
+        padding: 1.35rem;
+
+        background: #ffffff;
+
+        border: 1px solid #dfe5ec;
+        border-radius: 16px;
+
+        box-shadow:
+            0 4px 16px
+            rgba(31, 41, 55, 0.04);
+    }
+
+
+    .discussion-sidebar-label {
+        margin-bottom: 0.45rem;
+
+        color: #0d6efd;
+
+        font-size: 0.65rem;
+        font-weight: 700;
+
+        letter-spacing: 0.05em;
+
+        text-transform: uppercase;
+    }
+
+
+    .discussion-course-title {
+        margin-bottom: 0.5rem;
+
+        color: #172033;
+
+        font-size: 1.4rem;
+        font-weight: 700;
+
+        line-height: 1.3;
+    }
+
+
+    .discussion-course-description {
+        margin-bottom: 1.2rem;
+
+        color: #748094;
+
+        font-size: 0.78rem;
+
+        line-height: 1.55;
+    }
+
+
+    .discussion-info-block {
+        padding:
+            0.9rem
+            0;
+
+        border-top:
+            1px solid
+            #edf1f5;
+    }
+
+
+    .discussion-info-label {
+        display: block;
+
+        margin-bottom: 0.55rem;
+
+        color: #98a1ae;
+
+        font-size: 0.61rem;
+        font-weight: 600;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.035em;
+    }
+
+
+    .sidebar-user-avatar {
+        width: 39px;
+        height: 39px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        overflow: hidden;
+
+        color: #ffffff;
+
+        background: #16233d;
+
+        border-radius: 50%;
+
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+
+    .sidebar-user-avatar img {
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+    }
+
+
+    .discussion-teacher,
+    .discussion-current-user {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.65rem;
+    }
+
+
+    .discussion-teacher {
+        color: inherit;
+
+        text-decoration: none;
+    }
+
+
+    .discussion-teacher strong,
+    .discussion-current-user strong {
+        display: block;
+
+        color: #263143;
+
+        font-size: 0.78rem;
+    }
+
+
+    .discussion-teacher small,
+    .discussion-current-user small {
+        display: block;
+
+        margin-top: 0.1rem;
+
+        color: #929ba8;
+
+        font-size: 0.65rem;
+    }
+
+
+    .discussion-teacher:hover strong {
+        color: #0d6efd;
+    }
+
+
+
+    /* Real-time Box */
+
+    .discussion-feature-box {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 0.65rem;
+
+        margin:
+            0.7rem
+            0;
+
+        padding: 0.8rem;
+
+        background: #f4f8ff;
+
+        border: 1px solid #dce9fa;
+        border-radius: 10px;
+    }
+
+
+    .discussion-feature-icon {
+        width: 32px;
+        height: 32px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        color: #0d6efd;
+
+        background: #e3efff;
+
+        border-radius: 8px;
+    }
+
+
+    .discussion-feature-box strong {
+        display: block;
+
+        margin-bottom: 0.15rem;
+
+        color: #33445b;
+
+        font-size: 0.7rem;
+    }
+
+
+    .discussion-feature-box p {
+        margin: 0;
+
+        color: #738197;
+
+        font-size: 0.63rem;
+
+        line-height: 1.4;
+    }
+
+
+
+    /* Guidelines */
+
+    .discussion-guidelines {
+        padding:
+            0.9rem
+            0;
+
+        border-top:
+            1px solid
+            #edf1f5;
+    }
+
+
+    .discussion-guidelines h2 {
+        margin-bottom: 0.65rem;
+
+        color: #39475b;
+
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+
+    .guideline-item {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 0.45rem;
+
+        margin-bottom: 0.45rem;
+
+        color: #7b8797;
+
+        font-size: 0.65rem;
+
+        line-height: 1.4;
+    }
+
+
+    .guideline-check {
+        color: #198754;
+
+        font-weight: 700;
+    }
+
+
+
+    /* Back Button */
+
+    .back-course-btn {
+        width: 100%;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 0.4rem;
+
+        margin-top: auto;
+
+        padding:
+            0.55rem
+            0.7rem;
+
+        color: #344054;
+
+        background: #ffffff;
+
+        border: 1px solid #b8c3d1;
+        border-radius: 7px;
+
+        text-decoration: none;
+
+        font-size: 0.73rem;
+        font-weight: 600;
+    }
+
+
+    .back-course-btn:hover {
+        color: #16233d;
+
+        background: #f8fafc;
+    }
+
+
+
+    /* =========================================================
+       CHAT PANEL
+       ========================================================= */
+
+    .discussion-chat-card {
+        height: 650px;
+
+        display: flex;
+        flex-direction: column;
+
+        overflow: hidden;
+
+        background: #ffffff;
+
+        border: 1px solid #dfe5ec;
+        border-radius: 16px;
+
+        box-shadow:
+            0 5px 20px
+            rgba(31, 41, 55, 0.055);
+    }
+
+
+    .discussion-chat-header {
+        min-height: 82px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 1rem;
+
+        padding:
+            1rem
+            1.2rem;
+
+        border-bottom:
+            1px solid
+            #e8edf3;
+    }
+
+
+    .discussion-chat-heading {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.7rem;
+    }
+
+
+    .discussion-chat-icon {
+        width: 42px;
+        height: 42px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #0d6efd;
+
+        background: #e7f0ff;
+
+        border-radius: 11px;
+    }
+
+
+    .discussion-chat-heading h2 {
+        margin: 0;
+
+        color: #172033;
+
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+
+    .discussion-chat-heading p {
+        margin:
+            0.12rem
+            0
+            0;
+
+        color: #8a94a3;
+
+        font-size: 0.69rem;
+    }
+
+
+
+    /* Connection State */
+
+    .connection-status {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 0.4rem;
+
+        padding:
+            0.35rem
+            0.6rem;
+
+        border-radius: 999px;
+
+        font-size: 0.65rem;
+        font-weight: 600;
+    }
+
+
+    .connection-status::before {
+        content: "";
+
+        width: 7px;
+        height: 7px;
+
+        border-radius: 50%;
+    }
+
+
+    .connection-status.connecting {
+        color: #a66a12;
+
+        background: #fff5d8;
+    }
+
+
+    .connection-status.connecting::before {
+        background: #f2a500;
+    }
+
+
+    .connection-status.connected {
+        color: #18794e;
+
+        background: #e8f7ef;
+    }
+
+
+    .connection-status.connected::before {
+        background: #24a568;
+    }
+
+
+    .connection-status.disconnected {
+        color: #b42318;
+
+        background: #feeceb;
+    }
+
+
+    .connection-status.disconnected::before {
+        background: #dc3545;
+    }
+
+
+
+    /* Error */
+
+    .chat-error {
+        display: none;
+
+        padding:
+            0.7rem
+            1.2rem;
+
+        color: #8a5a13;
+
+        background: #fff8e7;
+
+        border-bottom:
+            1px solid
+            #f2dfb5;
+
+        font-size: 0.68rem;
+    }
+
+
+    .chat-error-content {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.45rem;
+    }
+
+
+
+    /* Messages */
+
+    .chat-messages {
+        flex: 1;
+
+        overflow-y: auto;
+
+        padding: 1.25rem;
+
+        background: #f5f7fb;
+    }
+
+
+    .no-messages {
+        height: 100%;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        flex-direction: column;
+
+        color: #8a94a3;
+
+        text-align: center;
+    }
+
+
+    .no-messages-icon {
+        width: 58px;
+        height: 58px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 0.75rem;
+
+        color: #7a96bd;
+
+        background: #e9f0f9;
+
+        border-radius: 50%;
+    }
+
+
+    .no-messages h3 {
+        margin-bottom: 0.25rem;
+
+        color: #475467;
+
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+
+    .no-messages p {
+        margin: 0;
+
+        color: #939daa;
+
+        font-size: 0.69rem;
+    }
+
+
+
+    /* Message Bubble */
+
+    .message-row {
+        display: flex;
+
+        margin-bottom: 1rem;
+    }
+
+
+    .own-message {
+        justify-content: flex-end;
+    }
+
+
+    .other-message {
+        justify-content: flex-start;
+    }
+
+
+    .message-bubble {
+        max-width: 78%;
+        min-width: 150px;
+
+        padding:
+            0.7rem
+            0.85rem;
+
+        background: #ffffff;
+
+        border: 1px solid #e0e6ed;
+
+        border-radius:
+            5px
+            13px
+            13px
+            13px;
+
+        box-shadow:
+            0 2px 6px
+            rgba(31, 41, 55, 0.04);
+    }
+
+
+    .own-message .message-bubble {
+        color: #ffffff;
+
+        background: #16233d;
+
+        border-color: #16233d;
+
+        border-radius:
+            13px
+            5px
+            13px
+            13px;
+    }
+
+
+    .teacher-message .message-bubble {
+        background: #edf5ff;
+
+        border-color: #d3e4fa;
+    }
+
+
+    .message-meta {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 0.7rem;
+
+        margin-bottom: 0.4rem;
+    }
+
+
+    .message-sender {
+        display: flex;
+
+        align-items: center;
+
+        flex-wrap: wrap;
+
+        gap: 0.3rem;
+    }
+
+
+    .message-sender strong {
+        color: #344054;
+
+        font-size: 0.69rem;
+    }
+
+
+    .own-message .message-sender strong {
+        color: #ffffff;
+    }
+
+
+    .message-role-icon {
+        font-size: 0.74rem;
+    }
+
+
+    .message-role-badge {
+        padding:
+            0.14rem
+            0.34rem;
+
+        border-radius: 999px;
+
+        font-size: 0.51rem;
+        font-weight: 600;
+    }
+
+
+    .message-role-badge.teacher {
+        color: #1d5b9f;
+
+        background: #dcecff;
+    }
+
+
+    .message-role-badge.student {
+        color: #18794e;
+
+        background: #e2f5eb;
+    }
+
+
+    .own-message .message-role-badge {
+        color: #ffffff;
+
+        background:
+            rgba(255, 255, 255, 0.15);
+    }
+
+
+    .message-time {
+        color: #98a2af;
+
+        font-size: 0.57rem;
+
+        white-space: nowrap;
+    }
+
+
+    .own-message .message-time {
+        color:
+            rgba(255, 255, 255, 0.65);
+    }
+
+
+    .message-text {
+        margin: 0;
+
+        color: #455163;
+
+        font-size: 0.77rem;
+
+        line-height: 1.5;
+
+        overflow-wrap: anywhere;
+
+        white-space: pre-wrap;
+    }
+
+
+    .own-message .message-text {
+        color: #ffffff;
+    }
+
+
+
+    /* Chat Footer */
+
+    .chat-footer {
+        padding:
+            0.95rem
+            1.1rem;
+
+        background: #ffffff;
+
+        border-top:
+            1px solid
+            #e5eaf0;
+    }
+
+
+    .message-form {
+        display: flex;
+
+        gap: 0.6rem;
+    }
+
+
+    .message-input {
+        flex: 1;
+
+        min-width: 0;
+
+        height: 44px;
+
+        padding:
+            0
+            0.85rem;
+
+        color: #374151;
+
+        background: #f8fafc;
+
+        border: 1px solid #d9e0e8;
+        border-radius: 8px;
+
+        font-size: 0.78rem;
+
+        outline: none;
+    }
+
+
+    .message-input:focus {
+        background: #ffffff;
+
+        border-color: #86b7fe;
+
+        box-shadow:
+            0 0 0
+            0.17rem
+            rgba(13, 110, 253, 0.08);
+    }
+
+
+    .message-input:disabled {
+        opacity: 0.65;
+
+        cursor: not-allowed;
+    }
+
+
+    .send-button {
+        height: 44px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 0.35rem;
+
+        padding:
+            0
+            1rem;
+
+        color: #ffffff;
+
+        background: #0d6efd;
+
+        border: 1px solid #0d6efd;
+        border-radius: 8px;
+
+        font-size: 0.76rem;
+        font-weight: 600;
+    }
+
+
+    .send-button:hover:not(:disabled) {
+        background: #0b5ed7;
+    }
+
+
+    .send-button:disabled {
+        opacity: 0.55;
+
+        cursor: not-allowed;
+    }
+
+
+    .message-footer-info {
+        display: flex;
+
+        justify-content: space-between;
+
+        margin-top: 0.45rem;
+
+        color: #99a2af;
+
+        font-size: 0.61rem;
+    }
+
+
+
+    /* =========================================================
+       ONLINE MEMBERS
+       ========================================================= */
+
+    .online-members-header {
+        display: flex;
+
+        justify-content: space-between;
+
+        gap: 0.6rem;
+
+        padding-bottom: 1rem;
+
+        border-bottom:
+            1px solid
+            #edf1f5;
+    }
+
+
+    .online-members-header h2 {
+        margin:
+            0
+            0
+            0.15rem;
+
+        color: #172033;
+
+        font-size: 0.92rem;
+        font-weight: 700;
+    }
+
+
+    .online-members-header p {
+        margin: 0;
+
+        color: #8a94a3;
+
+        font-size: 0.64rem;
+    }
+
+
+    .online-count {
+        min-width: 28px;
+        height: 25px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #18794e;
+
+        background: #e6f6ed;
+
+        border: 1px solid #c9ead8;
+        border-radius: 999px;
+
+        font-size: 0.65rem;
+        font-weight: 700;
+    }
+
+
+    .online-section-label {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.4rem;
+
+        padding:
+            0.85rem
+            0
+            0.4rem;
+
+        color: #758195;
+
+        font-size: 0.59rem;
+        font-weight: 700;
+
+        letter-spacing: 0.04em;
+
+        text-transform: uppercase;
+    }
+
+
+    .online-status-dot {
+        width: 7px;
+        height: 7px;
+
+        background: #22a765;
+
+        border-radius: 50%;
+    }
+
+
+    .online-members-list {
+        flex: 1;
+
+        overflow-y: auto;
+    }
+
+
+    .online-member {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.65rem;
+
+        padding:
+            0.62rem
+            0.35rem;
+
+        border-radius: 9px;
+    }
+
+
+    .online-member:hover {
+        background: #f6f8fb;
+    }
+
+
+    .online-avatar-wrapper {
+        position: relative;
+
+        flex-shrink: 0;
+    }
+
+
+    .online-avatar,
+    .online-avatar-placeholder {
+        width: 39px;
+        height: 39px;
+
+        border-radius: 50%;
+    }
+
+
+    .online-avatar {
+        display: block;
+
+        object-fit: cover;
+    }
+
+
+    .online-avatar-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #ffffff;
+
+        background: #16233d;
+
+        font-size: 0.74rem;
+        font-weight: 700;
+    }
+
+
+    .online-avatar-dot {
+        position: absolute;
+
+        right: -1px;
+        bottom: -1px;
+
+        width: 11px;
+        height: 11px;
+
+        background: #22a765;
+
+        border:
+            2px solid
+            #ffffff;
+
+        border-radius: 50%;
+    }
+
+
+    .online-member-info {
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .online-member-name {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.3rem;
+    }
+
+
+    .online-member-name strong {
+        overflow: hidden;
+
+        color: #344054;
+
+        font-size: 0.7rem;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+    }
+
+
+    .online-role-row {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.3rem;
+
+        margin-top: 0.1rem;
+    }
+
+
+    .online-role {
+        color: #98a1ae;
+
+        font-size: 0.59rem;
+    }
+
+
+    .online-role-badge,
+    .online-you-badge {
+        padding:
+            0.1rem
+            0.28rem;
+
+        border-radius: 999px;
+
+        font-size: 0.48rem;
+        font-weight: 600;
+    }
+
+
+    .online-role-badge.teacher {
+        color: #1d5b9f;
+
+        background: #dcecff;
+    }
+
+
+    .online-role-badge.student {
+        color: #18794e;
+
+        background: #e2f5eb;
+    }
+
+
+    .online-you-badge {
+        color: #0d6efd;
+
+        background: #e7f0ff;
+    }
+
+
+    .online-members-empty {
+        padding:
+            2.5rem
+            0.5rem;
+
+        color: #98a1ae;
+
+        text-align: center;
+    }
+
+
+    .online-empty-icon {
+        margin-bottom: 0.5rem;
+
+        font-size: 1.4rem;
+    }
+
+
+    .online-members-empty strong {
+        display: block;
+
+        margin-bottom: 0.25rem;
+
+        color: #596578;
+
+        font-size: 0.7rem;
+    }
+
+
+    .online-members-empty p {
+        margin: 0;
+
+        font-size: 0.61rem;
+
+        line-height: 1.45;
+    }
+
+
+    .online-info-box {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 0.4rem;
+
+        margin-top: auto;
+
+        padding: 0.7rem;
+
+        color: #718096;
+
+        background: #f7f9fc;
+
+        border: 1px solid #e7ebf0;
+        border-radius: 9px;
+
+        font-size: 0.58rem;
+
+        line-height: 1.4;
+    }
+
+
+    .online-info-box svg {
+        flex-shrink: 0;
+    }
+
+
+
+    /* =========================================================
+       SCROLLBARS
+       ========================================================= */
+
+    .chat-messages::-webkit-scrollbar,
+    .online-members-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+
+    .chat-messages::-webkit-scrollbar-track,
+    .online-members-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+
+    .chat-messages::-webkit-scrollbar-thumb,
+    .online-members-list::-webkit-scrollbar-thumb {
+        background: #cbd3dd;
+
+        border-radius: 999px;
+    }
+
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1199.98px) {
+
+        .discussion-sidebar,
+        .online-members-panel {
+            height: auto;
+        }
+
+
+        .discussion-chat-card {
+            height: 620px;
+        }
+
+
+        .online-members-panel {
+            min-height: 250px;
+        }
+
+    }
+
+
+    @media (max-width: 575.98px) {
+
+        .discussion-chat-card {
+            height: 600px;
+        }
+
+
+        .discussion-chat-header {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+
+        .message-bubble {
+            max-width: 90%;
+        }
+
+
+        .message-footer-info span:first-child {
+            display: none;
+        }
+
+
+        .send-button span {
+            display: none;
+        }
+
+    }
+
+</style>
+
+
+
+<!-- =========================================================
+     DJANGO DATA
+     ========================================================= -->
+
+{{ course.id|json_script:"course-id" }}
+
+{{ request.user.username|json_script:"current-username" }}
+
+
+
+<!-- =========================================================
+     WEBSOCKET JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+    const courseId =
+        JSON.parse(
             document.getElementById(
                 "course-id"
             ).textContent
         );
 
-        const currentUsername = JSON.parse(
+
+    const currentUsername =
+        JSON.parse(
             document.getElementById(
                 "current-username"
             ).textContent
         );
 
-        const websocketScheme =
-            window.location.protocol === "https:"
-                ? "wss"
-                : "ws";
 
-        const websocketUrl =
-            `${websocketScheme}://` +
-            `${window.location.host}` +
-            `/ws/chat/course/${courseId}/`;
+    const websocketScheme =
+        window.location.protocol === "https:"
+            ? "wss"
+            : "ws";
 
 
-        const chatMessages =
-            document.getElementById(
-                "chat-messages"
-            );
-
-        const chatForm =
-            document.getElementById(
-                "chat-form"
-            );
-
-        const messageInput =
-            document.getElementById(
-                "chat-message-input"
-            );
-
-        const sendButton =
-            document.getElementById(
-                "send-button"
-            );
-
-        const connectionStatus =
-            document.getElementById(
-                "connection-status"
-            );
-
-        const chatError =
-            document.getElementById(
-                "chat-error"
-            );
-
-        const characterCount =
-            document.getElementById(
-                "character-count"
-            );
+    const websocketUrl =
+        `${websocketScheme}://` +
+        `${window.location.host}` +
+        `/ws/chat/course/${courseId}/`;
 
 
-        let chatSocket = null;
-        let reconnectTimer = null;
-        let reconnectAttempts = 0;
-        let pageIsClosing = false;
-
-        const maximumReconnectDelay = 10000;
+    const chatMessages =
+        document.getElementById(
+            "chat-messages"
+        );
 
 
-        function setConnectedState() {
-            connectionStatus.textContent =
-                "● Connected";
+    const chatForm =
+        document.getElementById(
+            "chat-form"
+        );
 
-            connectionStatus.className =
-                "connection-status text-success text-nowrap";
 
-            chatError.style.display =
-                "none";
+    const messageInput =
+        document.getElementById(
+            "chat-message-input"
+        );
 
-            messageInput.disabled =
-                false;
 
-            sendButton.disabled =
-                false;
+    const sendButton =
+        document.getElementById(
+            "send-button"
+        );
+
+
+    const connectionStatus =
+        document.getElementById(
+            "connection-status"
+        );
+
+
+    const chatError =
+        document.getElementById(
+            "chat-error"
+        );
+
+
+    const characterCount =
+        document.getElementById(
+            "character-count"
+        );
+
+
+    const onlineMembersList =
+        document.getElementById(
+            "online-members-list"
+        );
+
+
+    const onlineCount =
+        document.getElementById(
+            "online-count"
+        );
+
+
+    let chatSocket = null;
+
+    let reconnectTimer = null;
+
+    let reconnectAttempts = 0;
+
+    let pageIsClosing = false;
+
+
+    const maximumReconnectDelay =
+        10000;
+
+
+    const onlineConnections =
+        new Map();
+
+
+
+    /* =========================================================
+       CONNECTION STATES
+       ========================================================= */
+
+    function setConnectedState() {
+
+        connectionStatus.textContent =
+            "Connected";
+
+
+        connectionStatus.className =
+            "connection-status connected";
+
+
+        chatError.style.display =
+            "none";
+
+
+        messageInput.disabled =
+            false;
+
+
+        sendButton.disabled =
+            false;
+
+    }
+
+
+    function setConnectingState() {
+
+        connectionStatus.textContent =
+            "Connecting...";
+
+
+        connectionStatus.className =
+            "connection-status connecting";
+
+
+        messageInput.disabled =
+            true;
+
+
+        sendButton.disabled =
+            true;
+
+    }
+
+
+    function setDisconnectedState() {
+
+        connectionStatus.textContent =
+            "Disconnected — reconnecting...";
+
+
+        connectionStatus.className =
+            "connection-status disconnected";
+
+
+        chatError.style.display =
+            "block";
+
+
+        messageInput.disabled =
+            true;
+
+
+        sendButton.disabled =
+            true;
+
+
+        onlineConnections.clear();
+
+
+        renderOnlineMembers();
+
+    }
+
+
+
+    /* =========================================================
+       CONNECT
+       ========================================================= */
+
+    function connectWebSocket() {
+
+        if (
+            chatSocket &&
+            (
+                chatSocket.readyState === WebSocket.OPEN ||
+                chatSocket.readyState === WebSocket.CONNECTING
+            )
+        ) {
+
+            return;
+
         }
 
 
-        function setConnectingState() {
-            connectionStatus.textContent =
-                "● Connecting...";
-
-            connectionStatus.className =
-                "connection-status text-warning text-nowrap";
-
-            messageInput.disabled =
-                true;
-
-            sendButton.disabled =
-                true;
-        }
+        setConnectingState();
 
 
-        function setDisconnectedState() {
-            connectionStatus.textContent =
-                "● Disconnected — reconnecting...";
-
-            connectionStatus.className =
-                "connection-status text-danger text-nowrap";
-
-            chatError.style.display =
-                "block";
-
-            messageInput.disabled =
-                true;
-
-            sendButton.disabled =
-                true;
-        }
+        chatSocket =
+            new WebSocket(
+                websocketUrl
+            );
 
 
-        function connectWebSocket() {
-            if (
-                chatSocket &&
-                (
-                    chatSocket.readyState ===
-                    WebSocket.OPEN ||
+        chatSocket.onopen =
+            function () {
 
-                    chatSocket.readyState ===
-                    WebSocket.CONNECTING
-                )
-            ) {
-                return;
-            }
+                reconnectAttempts =
+                    0;
 
-            setConnectingState();
-
-            chatSocket =
-                new WebSocket(
-                    websocketUrl
-                );
-
-
-            chatSocket.onopen = function () {
-                reconnectAttempts = 0;
 
                 if (reconnectTimer) {
+
                     clearTimeout(
                         reconnectTimer
                     );
 
-                    reconnectTimer = null;
+
+                    reconnectTimer =
+                        null;
+
                 }
+
 
                 setConnectedState();
 
+
                 messageInput.focus();
+
             };
 
 
-            chatSocket.onmessage = function (event) {
-                const data =
-                    JSON.parse(
-                        event.data
+        chatSocket.onmessage =
+            function (event) {
+
+                let data;
+
+
+                try {
+
+                    data =
+                        JSON.parse(
+                            event.data
+                        );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Invalid WebSocket event:",
+                        error
                     );
 
-                displayMessage(data);
+
+                    return;
+
+                }
+
+
+                /* Chat Message */
+
+                if (
+                    data.event ===
+                    "chat_message"
+                ) {
+
+                    displayMessage(
+                        data
+                    );
+
+
+                    return;
+
+                }
+
+
+                /* User Joined / Presence Snapshot */
+
+                if (
+                    data.event === "presence_join" ||
+                    data.event === "presence_snapshot"
+                ) {
+
+                    addOnlineConnection(
+                        data
+                    );
+
+
+                    return;
+
+                }
+
+
+                /* User Left */
+
+                if (
+                    data.event ===
+                    "presence_leave"
+                ) {
+
+                    removeOnlineConnection(
+                        data.connection_id
+                    );
+
+
+                    return;
+
+                }
+
+
+                /* Backwards compatibility */
+
+                if (
+                    data.message &&
+                    data.username
+                ) {
+
+                    displayMessage(
+                        data
+                    );
+
+                }
+
             };
 
 
-            chatSocket.onclose = function (event) {
+        chatSocket.onclose =
+            function (event) {
+
                 console.log(
                     "WebSocket closed:",
-                    {
-                        code: event.code,
-                        reason: event.reason,
-                        wasClean: event.wasClean
-                    }
+                    event.code
                 );
 
-                chatSocket = null;
+
+                chatSocket =
+                    null;
+
 
                 if (pageIsClosing) {
+
                     return;
+
                 }
+
 
                 setDisconnectedState();
 
+
                 scheduleReconnect();
+
             };
 
 
-            chatSocket.onerror = function (error) {
+        chatSocket.onerror =
+            function (error) {
+
                 console.error(
                     "WebSocket error:",
                     error
                 );
 
+
                 if (chatSocket) {
+
                     chatSocket.close();
+
                 }
+
             };
+
+    }
+
+
+
+    /* =========================================================
+       RECONNECT
+       ========================================================= */
+
+    function scheduleReconnect() {
+
+        if (
+            reconnectTimer ||
+            pageIsClosing
+        ) {
+
+            return;
+
         }
 
 
-        function scheduleReconnect() {
-            if (
-                reconnectTimer ||
-                pageIsClosing
-            ) {
-                return;
-            }
+        reconnectAttempts += 1;
 
-            reconnectAttempts += 1;
 
-            const delay = Math.min(
+        const delay =
+            Math.min(
                 1000 * reconnectAttempts,
                 maximumReconnectDelay
             );
 
-            reconnectTimer = setTimeout(
+
+        reconnectTimer =
+            setTimeout(
                 function () {
-                    reconnectTimer = null;
+
+                    reconnectTimer =
+                        null;
+
 
                     connectWebSocket();
+
                 },
                 delay
             );
-        }
+
+    }
 
 
-        function messageAlreadyDisplayed(
-            messageId
+
+    /* =========================================================
+       ONLINE PRESENCE
+       ========================================================= */
+
+    function addOnlineConnection(
+        data
+    ) {
+
+        if (
+            !data.connection_id ||
+            !data.username
         ) {
-            if (!messageId) {
-                return false;
-            }
 
-            return Boolean(
-                document.querySelector(
-                    `[data-message-id="${messageId}"]`
-                )
-            );
+            return;
+
         }
 
 
-        function displayMessage(data) {
-            if (
-                messageAlreadyDisplayed(
-                    data.id
-                )
-            ) {
-                return;
+        onlineConnections.set(
+            data.connection_id,
+            {
+                username:
+                    data.username,
+
+                role:
+                    data.role || "student",
+
+                profile_picture:
+                    data.profile_picture || null
             }
-
-            const noMessages =
-                document.getElementById(
-                    "no-messages"
-                );
-
-            if (noMessages) {
-                noMessages.remove();
-            }
+        );
 
 
-            const messageRow =
-                document.createElement(
-                    "div"
-                );
+        renderOnlineMembers();
 
-            messageRow.classList.add(
-                "message-row"
-            );
-
-            if (data.id) {
-                messageRow.dataset.messageId =
-                    data.id;
-            }
+    }
 
 
-            const isOwnMessage =
-                data.username ===
-                currentUsername;
+    function removeOnlineConnection(
+        connectionId
+    ) {
+
+        if (!connectionId) {
+
+            return;
+
+        }
 
 
-            if (isOwnMessage) {
-                messageRow.classList.add(
-                    "own-message"
-                );
-            }
-            else {
-                messageRow.classList.add(
-                    "other-message"
-                );
+        onlineConnections.delete(
+            connectionId
+        );
+
+
+        renderOnlineMembers();
+
+    }
+
+
+
+    function renderOnlineMembers() {
+
+        const uniqueUsers =
+            new Map();
+
+
+        onlineConnections.forEach(
+            function (connection) {
 
                 if (
-                    data.role ===
-                    "teacher"
+                    !uniqueUsers.has(
+                        connection.username
+                    )
                 ) {
-                    messageRow.classList.add(
-                        "teacher-message"
+
+                    uniqueUsers.set(
+                        connection.username,
+                        connection
                     );
+
                 }
-                else {
-                    messageRow.classList.add(
-                        "student-message"
-                    );
-                }
+
             }
+        );
 
 
-            const bubble =
+        const users =
+            Array.from(
+                uniqueUsers.values()
+            );
+
+
+        users.sort(
+            function (a, b) {
+
+                if (
+                    a.role === "teacher" &&
+                    b.role !== "teacher"
+                ) {
+
+                    return -1;
+
+                }
+
+
+                if (
+                    a.role !== "teacher" &&
+                    b.role === "teacher"
+                ) {
+
+                    return 1;
+
+                }
+
+
+                return a.username.localeCompare(
+                    b.username
+                );
+
+            }
+        );
+
+
+        onlineCount.textContent =
+            users.length;
+
+
+        onlineMembersList.innerHTML =
+            "";
+
+
+        if (
+            users.length === 0
+        ) {
+
+            const empty =
                 document.createElement(
                     "div"
                 );
 
-            bubble.classList.add(
-                "message-bubble"
-            );
+
+            empty.className =
+                "online-members-empty";
 
 
-            const meta =
+            const icon =
                 document.createElement(
                     "div"
                 );
 
-            meta.classList.add(
-                "message-meta"
-            );
+
+            icon.className =
+                "online-empty-icon";
 
 
-            const sender =
+            icon.textContent =
+                "👥";
+
+
+            const title =
                 document.createElement(
                     "strong"
                 );
 
-            if (
-                data.role ===
-                "teacher"
-            ) {
-                sender.textContent =
-                    `🧑‍🏫 ${data.username} (Teacher)`;
-            }
-            else {
-                sender.textContent =
-                    `👨‍🎓 ${data.username} (Student)`;
-            }
+
+            title.textContent =
+                "No participants online";
 
 
-            const timestamp =
-                document.createElement(
-                    "span"
-                );
-
-            timestamp.classList.add(
-                "text-muted",
-                "ms-2"
-            );
-
-            timestamp.textContent =
-                data.created_at;
-
-
-            const message =
+            const text =
                 document.createElement(
                     "p"
                 );
 
-            message.classList.add(
-                "message-text"
+
+            text.textContent =
+                "Users will appear here when they open this discussion.";
+
+
+            empty.appendChild(
+                icon
             );
 
-            // textContent protects against
-            // HTML and script injection.
-            message.textContent =
-                data.message;
 
-
-            meta.appendChild(sender);
-            meta.appendChild(timestamp);
-
-            bubble.appendChild(meta);
-            bubble.appendChild(message);
-
-            messageRow.appendChild(bubble);
-
-            chatMessages.appendChild(
-                messageRow
+            empty.appendChild(
+                title
             );
 
-            scrollToLatestMessage();
+
+            empty.appendChild(
+                text
+            );
+
+
+            onlineMembersList.appendChild(
+                empty
+            );
+
+
+            return;
+
         }
 
 
-        function scrollToLatestMessage() {
-            chatMessages.scrollTop =
-                chatMessages.scrollHeight;
-        }
+        users.forEach(
+            function (user) {
 
-
-        chatForm.addEventListener(
-            "submit",
-            function (event) {
-                event.preventDefault();
-
-                const message =
-                    messageInput.value.trim();
-
-                if (!message) {
-                    return;
-                }
-
-                if (
-                    message.length > 1000
-                ) {
-                    alert(
-                        "Messages cannot exceed 1,000 characters."
+                const member =
+                    document.createElement(
+                        "div"
                     );
 
-                    return;
-                }
 
-                if (
-                    !chatSocket ||
-                    chatSocket.readyState !==
-                    WebSocket.OPEN
-                ) {
-                    setDisconnectedState();
+                member.className =
+                    "online-member";
 
-                    connectWebSocket();
 
-                    alert(
-                        "The discussion is reconnecting. Please try again shortly."
+                const avatarWrapper =
+                    document.createElement(
+                        "div"
                     );
 
-                    return;
+
+                avatarWrapper.className =
+                    "online-avatar-wrapper";
+
+
+                let avatar;
+
+
+                if (
+                    user.profile_picture
+                ) {
+
+                    avatar =
+                        document.createElement(
+                            "img"
+                        );
+
+
+                    avatar.src =
+                        user.profile_picture;
+
+
+                    avatar.alt =
+                        user.username;
+
+
+                    avatar.className =
+                        "online-avatar";
+
+                }
+                else {
+
+                    avatar =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    avatar.className =
+                        "online-avatar-placeholder";
+
+
+                    avatar.textContent =
+                        user.username
+                            .charAt(0)
+                            .toUpperCase();
+
                 }
 
-                chatSocket.send(
-                    JSON.stringify(
-                        {
-                            message: message
-                        }
-                    )
+
+                const onlineDot =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                onlineDot.className =
+                    "online-avatar-dot";
+
+
+                avatarWrapper.appendChild(
+                    avatar
                 );
 
-                messageInput.value = "";
 
-                characterCount.textContent =
-                    "0 / 1000";
-
-                messageInput.focus();
-            }
-        );
+                avatarWrapper.appendChild(
+                    onlineDot
+                );
 
 
-        messageInput.addEventListener(
-            "input",
-            function () {
-                characterCount.textContent =
-                    `${messageInput.value.length} / 1000`;
-            }
-        );
+                const memberInfo =
+                    document.createElement(
+                        "div"
+                    );
 
 
-        /*
-         * Reconnect as soon as the user
-         * returns to the browser tab.
-         */
-        document.addEventListener(
-            "visibilitychange",
-            function () {
+                memberInfo.className =
+                    "online-member-info";
+
+
+                const nameRow =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                nameRow.className =
+                    "online-member-name";
+
+
+                const username =
+                    document.createElement(
+                        "strong"
+                    );
+
+
+                username.textContent =
+                    user.username;
+
+
+                nameRow.appendChild(
+                    username
+                );
+
+
                 if (
-                    document.visibilityState ===
-                    "visible"
+                    user.username ===
+                    currentUsername
                 ) {
-                    if (
-                        !chatSocket ||
-                        chatSocket.readyState ===
-                        WebSocket.CLOSED
-                    ) {
-                        connectWebSocket();
-                    }
+
+                    const you =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    you.className =
+                        "online-you-badge";
+
+
+                    you.textContent =
+                        "You";
+
+
+                    nameRow.appendChild(
+                        you
+                    );
+
                 }
+
+
+                const roleRow =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                roleRow.className =
+                    "online-role-row";
+
+
+                const roleText =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                roleText.className =
+                    "online-role";
+
+
+                roleText.textContent =
+                    user.role === "teacher"
+                        ? "Course Teacher"
+                        : "Student";
+
+
+                const roleBadge =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                roleBadge.className =
+                    "online-role-badge";
+
+
+                if (
+                    user.role === "teacher"
+                ) {
+
+                    roleBadge.classList.add(
+                        "teacher"
+                    );
+
+
+                    roleBadge.textContent =
+                        "Teacher";
+
+                }
+                else {
+
+                    roleBadge.classList.add(
+                        "student"
+                    );
+
+
+                    roleBadge.textContent =
+                        "Student";
+
+                }
+
+
+                roleRow.appendChild(
+                    roleText
+                );
+
+
+                roleRow.appendChild(
+                    roleBadge
+                );
+
+
+                memberInfo.appendChild(
+                    nameRow
+                );
+
+
+                memberInfo.appendChild(
+                    roleRow
+                );
+
+
+                member.appendChild(
+                    avatarWrapper
+                );
+
+
+                member.appendChild(
+                    memberInfo
+                );
+
+
+                onlineMembersList.appendChild(
+                    member
+                );
+
             }
         );
 
+    }
+
+
+
+    /* =========================================================
+       MESSAGE DISPLAY
+       ========================================================= */
+
+    function messageAlreadyDisplayed(
+        messageId
+    ) {
+
+        if (!messageId) {
+
+            return false;
+
+        }
+
+
+        return Boolean(
+            document.querySelector(
+                `[data-message-id="${messageId}"]`
+            )
+        );
+
+    }
+
+
+
+    function displayMessage(
+        data
+    ) {
+
+        if (
+            messageAlreadyDisplayed(
+                data.id
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        const noMessages =
+            document.getElementById(
+                "no-messages"
+            );
+
+
+        if (noMessages) {
+
+            noMessages.remove();
+
+        }
+
+
+        const messageRow =
+            document.createElement(
+                "div"
+            );
+
+
+        messageRow.classList.add(
+            "message-row"
+        );
+
+
+        if (data.id) {
+
+            messageRow.dataset.messageId =
+                data.id;
+
+        }
+
+
+        const isOwnMessage =
+            data.username ===
+            currentUsername;
+
+
+        if (isOwnMessage) {
+
+            messageRow.classList.add(
+                "own-message"
+            );
+
+        }
+        else {
+
+            messageRow.classList.add(
+                "other-message"
+            );
+
+
+            messageRow.classList.add(
+                data.role === "teacher"
+                    ? "teacher-message"
+                    : "student-message"
+            );
+
+        }
+
+
+        const bubble =
+            document.createElement(
+                "div"
+            );
+
+
+        bubble.className =
+            "message-bubble";
+
+
+        const meta =
+            document.createElement(
+                "div"
+            );
+
+
+        meta.className =
+            "message-meta";
+
+
+        const senderArea =
+            document.createElement(
+                "div"
+            );
+
+
+        senderArea.className =
+            "message-sender";
+
+
+        const roleIcon =
+            document.createElement(
+                "span"
+            );
+
+
+        roleIcon.className =
+            "message-role-icon";
+
+
+        roleIcon.textContent =
+            data.role === "teacher"
+                ? "🧑‍🏫"
+                : "👨‍🎓";
+
+
+        const sender =
+            document.createElement(
+                "strong"
+            );
+
+
+        sender.textContent =
+            data.username;
+
+
+        const roleBadge =
+            document.createElement(
+                "span"
+            );
+
+
+        roleBadge.className =
+            "message-role-badge";
+
+
+        if (
+            data.role ===
+            "teacher"
+        ) {
+
+            roleBadge.classList.add(
+                "teacher"
+            );
+
+
+            roleBadge.textContent =
+                "Teacher";
+
+        }
+        else {
+
+            roleBadge.classList.add(
+                "student"
+            );
+
+
+            roleBadge.textContent =
+                "Student";
+
+        }
+
+
+        const timestamp =
+            document.createElement(
+                "span"
+            );
+
+
+        timestamp.className =
+            "message-time";
+
+
+        timestamp.textContent =
+            data.created_at;
+
+
+        const message =
+            document.createElement(
+                "p"
+            );
+
+
+        message.className =
+            "message-text";
+
 
         /*
-         * Also reconnect when the browser
-         * window receives focus.
+         * textContent means user-entered HTML/JS
+         * is not executed.
          */
-        window.addEventListener(
-            "focus",
-            function () {
+        message.textContent =
+            data.message;
+
+
+        senderArea.appendChild(
+            roleIcon
+        );
+
+
+        senderArea.appendChild(
+            sender
+        );
+
+
+        senderArea.appendChild(
+            roleBadge
+        );
+
+
+        meta.appendChild(
+            senderArea
+        );
+
+
+        meta.appendChild(
+            timestamp
+        );
+
+
+        bubble.appendChild(
+            meta
+        );
+
+
+        bubble.appendChild(
+            message
+        );
+
+
+        messageRow.appendChild(
+            bubble
+        );
+
+
+        chatMessages.appendChild(
+            messageRow
+        );
+
+
+        scrollToLatestMessage();
+
+    }
+
+
+
+    function scrollToLatestMessage() {
+
+        chatMessages.scrollTop =
+            chatMessages.scrollHeight;
+
+    }
+
+
+
+    /* =========================================================
+       SEND MESSAGE
+       ========================================================= */
+
+    chatForm.addEventListener(
+        "submit",
+        function (event) {
+
+            event.preventDefault();
+
+
+            const message =
+                messageInput.value.trim();
+
+
+            if (!message) {
+
+                return;
+
+            }
+
+
+            if (
+                message.length > 1000
+            ) {
+
+                alert(
+                    "Messages cannot exceed 1,000 characters."
+                );
+
+
+                return;
+
+            }
+
+
+            if (
+                !chatSocket ||
+                chatSocket.readyState !==
+                WebSocket.OPEN
+            ) {
+
+                setDisconnectedState();
+
+
+                connectWebSocket();
+
+
+                alert(
+                    "The discussion is reconnecting. Please try again shortly."
+                );
+
+
+                return;
+
+            }
+
+
+            chatSocket.send(
+                JSON.stringify(
+                    {
+                        message: message
+                    }
+                )
+            );
+
+
+            messageInput.value =
+                "";
+
+
+            characterCount.textContent =
+                "0 / 1000";
+
+
+            messageInput.focus();
+
+        }
+    );
+
+
+
+    /* =========================================================
+       CHARACTER COUNT
+       ========================================================= */
+
+    messageInput.addEventListener(
+        "input",
+        function () {
+
+            characterCount.textContent =
+                `${messageInput.value.length} / 1000`;
+
+        }
+    );
+
+
+
+    /* =========================================================
+       RECONNECT SUPPORT
+       ========================================================= */
+
+    document.addEventListener(
+        "visibilitychange",
+        function () {
+
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
+
                 if (
                     !chatSocket ||
                     chatSocket.readyState ===
                     WebSocket.CLOSED
                 ) {
+
                     connectWebSocket();
+
                 }
+
             }
-        );
+
+        }
+    );
 
 
-        /*
-         * Avoid reconnecting while the
-         * user is leaving the page.
-         */
-        window.addEventListener(
-            "beforeunload",
-            function () {
-                pageIsClosing = true;
+    window.addEventListener(
+        "focus",
+        function () {
 
-                if (reconnectTimer) {
-                    clearTimeout(
-                        reconnectTimer
-                    );
-                }
+            if (
+                !chatSocket ||
+                chatSocket.readyState ===
+                WebSocket.CLOSED
+            ) {
 
-                if (
-                    chatSocket &&
-                    chatSocket.readyState ===
-                    WebSocket.OPEN
-                ) {
-                    chatSocket.close(
-                        1000,
-                        "Page closed"
-                    );
-                }
+                connectWebSocket();
+
             }
-        );
+
+        }
+    );
 
 
-        connectWebSocket();
+    window.addEventListener(
+        "beforeunload",
+        function () {
 
-        scrollToLatestMessage();
-    </script>
+            pageIsClosing =
+                true;
 
-</body>
 
-</html>
+            if (reconnectTimer) {
+
+                clearTimeout(
+                    reconnectTimer
+                );
+
+            }
+
+
+            if (
+                chatSocket &&
+                chatSocket.readyState ===
+                WebSocket.OPEN
+            ) {
+
+                chatSocket.close(
+                    1000,
+                    "Page closed"
+                );
+
+            }
+
+        }
+    );
+
+
+
+    /* =========================================================
+       START
+       ========================================================= */
+
+    connectWebSocket();
+
+
+    scrollToLatestMessage();
+
+</script>
+
+
+{% endblock %}

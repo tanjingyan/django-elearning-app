@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+
 {% block title %}
     My Courses
 {% endblock %}
@@ -7,249 +8,1400 @@
 
 {% block content %}
 
-    <!-- =========================================================
-         PAGE HEADER
-         ========================================================= -->
 
-    <div
-        class="
-            d-flex
-            justify-content-between
-            align-items-center
-            flex-wrap
-            gap-3
-            mb-4
-        "
+<!-- =========================================================
+     PAGE HEADER
+     ========================================================= -->
+
+<div
+    class="
+        d-flex
+        justify-content-between
+        align-items-start
+        flex-wrap
+        gap-3
+        mb-4
+    "
+>
+
+    <div>
+
+        <h1 class="my-courses-title">
+            My Courses
+        </h1>
+
+        <p class="my-courses-subtitle">
+            Continue learning from the courses you are enrolled in.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{% url 'course_list' %}"
+        class="browse-courses-btn"
     >
+        Browse Courses
+    </a>
 
-        <div>
+</div>
 
-            <h1 class="page-heading">
-                My Courses
-            </h1>
 
-            <p class="page-subheading mb-0">
-                Continue learning from the courses you are enrolled in.
-            </p>
+
+{% if enrolments %}
+
+
+    <!-- =====================================================
+         COURSE CONTROLS
+         ===================================================== -->
+
+    <section class="courses-control-section">
+
+
+        <!-- =================================================
+             COURSE TAB / COUNT
+             ================================================= -->
+
+        <div class="courses-tabs-row">
+
+            <div class="courses-tab active">
+                Courses
+            </div>
+
+
+            <div class="course-result-count">
+
+                {{ enrolments|length }}
+                enrolled
+                course{% if enrolments|length != 1 %}s{% endif %}
+
+            </div>
 
         </div>
 
 
+
+        <!-- =================================================
+             SEARCH + SORT
+             ================================================= -->
+
+        <div class="course-tools">
+
+
+            <!-- Search -->
+
+            <div class="course-search-wrapper">
+
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <circle
+                        cx="11"
+                        cy="11"
+                        r="8"
+                    ></circle>
+
+                    <path
+                        d="m21 21-4.3-4.3"
+                    ></path>
+                </svg>
+
+
+                <input
+                    type="search"
+                    id="course-search"
+                    placeholder="Search your courses..."
+                    aria-label="Search enrolled courses"
+                >
+
+            </div>
+
+
+
+            <!-- Sort -->
+
+            <div class="course-sort-wrapper">
+
+                <label for="course-sort">
+                    Sort by
+                </label>
+
+
+                <select id="course-sort">
+
+                    <option value="newest">
+                        Newest Enrolled
+                    </option>
+
+                    <option value="oldest">
+                        Oldest Enrolled
+                    </option>
+
+                    <option value="az">
+                        Alphabetical A–Z
+                    </option>
+
+                    <option value="za">
+                        Alphabetical Z–A
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         ENROLLED COURSE GRID
+         ===================================================== -->
+
+    <div
+        class="row g-4"
+        id="course-grid"
+    >
+
+        {% for enrolment in enrolments %}
+
+            <div
+                class="col-md-6 col-lg-4 course-grid-item"
+
+                data-title="{{ enrolment.course.title|default:''|lower }}"
+                data-description="{{ enrolment.course.description|default:''|lower }}"
+                data-teacher="{{ enrolment.course.teacher.username|default:''|lower }}"
+                data-enrolled="{{ enrolment.enrolled_at|date:'c' }}"
+            >
+
+                <article class="student-course-card">
+
+
+                    <!-- =================================================
+                         COURSE IMAGE
+                         ================================================= -->
+
+                    <div class="student-course-cover">
+
+                        {% if enrolment.course.image %}
+
+                            <img
+                                src="{{ enrolment.course.image.url }}"
+                                alt="{{ enrolment.course.title }}"
+                                class="student-course-image"
+                            >
+
+                        {% else %}
+
+                            <div class="student-course-placeholder">
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="42"
+                                    height="42"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"
+                                    ></path>
+
+                                    <path
+                                        d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                                    ></path>
+                                </svg>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         COURSE BODY
+                         ================================================= -->
+
+                    <div class="student-course-body">
+
+
+                        <!-- Status -->
+
+                        <span class="enrolled-badge">
+                            Enrolled
+                        </span>
+
+
+
+                        <!-- Course Title -->
+
+                        <h2 class="student-course-title">
+                            {{ enrolment.course.title }}
+                        </h2>
+
+
+
+                        <!-- Course Description -->
+
+                        <p class="student-course-description">
+
+                            {% if enrolment.course.description %}
+
+                                {{ enrolment.course.description|truncatechars:105 }}
+
+                            {% else %}
+
+                                No course description available.
+
+                            {% endif %}
+
+                        </p>
+
+
+
+                        <!-- =================================================
+                             COURSE META
+                             ================================================= -->
+
+                        <div class="student-course-meta">
+
+
+                            <!-- Teacher -->
+
+                            <div>
+
+                                <span class="course-meta-label">
+                                    Teacher
+                                </span>
+
+
+                                <a
+                                    href="{% url 'profile' enrolment.course.teacher.username %}"
+                                    class="course-teacher-link"
+                                >
+                                    {{ enrolment.course.teacher.username }}
+                                </a>
+
+                            </div>
+
+
+
+                            <!-- Enrolled Date -->
+
+                            <div>
+
+                                <span class="course-meta-label">
+                                    Enrolled
+                                </span>
+
+
+                                <span class="course-meta-value">
+                                    {{ enrolment.enrolled_at|date:"d M Y" }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- =================================================
+                             CONTINUE COURSE
+                             ================================================= -->
+
+                        <a
+                            href="{% url 'course_detail' enrolment.course.id %}"
+                            class="continue-course-btn"
+                        >
+                            Continue Course
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SEARCH EMPTY STATE
+         ===================================================== -->
+
+    <div
+        id="course-search-empty"
+        class="course-search-empty"
+        hidden
+    >
+
+        <div class="search-empty-icon">
+
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="34"
+                height="34"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <circle
+                    cx="11"
+                    cy="11"
+                    r="8"
+                ></circle>
+
+                <path
+                    d="m21 21-4.3-4.3"
+                ></path>
+            </svg>
+
+        </div>
+
+
+        <h4>
+            No matching courses
+        </h4>
+
+
+        <p>
+            Try searching with a different course title or teacher.
+        </p>
+
+    </div>
+
+
+
+<!-- =========================================================
+     NO ENROLMENTS
+     ========================================================= -->
+
+{% else %}
+
+    <div class="empty-courses-panel">
+
+
+        <div class="empty-courses-icon">
+
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="44"
+                height="44"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path
+                    d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"
+                ></path>
+
+                <path
+                    d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                ></path>
+            </svg>
+
+        </div>
+
+
+        <h3>
+            No enrolled courses yet
+        </h3>
+
+
+        <p>
+            Browse the available courses and enrol to start learning.
+        </p>
+
+
         <a
             href="{% url 'course_list' %}"
-            class="btn btn-primary"
+            class="browse-courses-btn"
         >
             Browse Courses
         </a>
 
     </div>
 
-
-    <!-- =========================================================
-         ENROLLED COURSES
-         ========================================================= -->
-
-    {% if enrolments %}
-
-        <div class="row g-4">
-
-            {% for enrolment in enrolments %}
-
-                <div class="col-md-6 col-lg-4">
-
-                    <div
-                        class="
-                            card
-                            content-card
-                            h-100
-                            overflow-hidden
-                        "
-                    >
+{% endif %}
 
 
-                        <!-- =====================================
-                             COURSE IMAGE
-                             ===================================== -->
-
-                        {% if enrolment.course.image %}
-
-                            <img
-                                src="{{ enrolment.course.image.url }}"
-                                class="card-img-top"
-                                alt="{{ enrolment.course.title }}"
-                                style="
-                                    height: 180px;
-                                    object-fit: cover;
-                                "
-                            >
-
-                        {% else %}
-
-                            <div
-                                class="
-                                    bg-primary-subtle
-                                    d-flex
-                                    justify-content-center
-                                    align-items-center
-                                "
-                                style="
-                                    height: 180px;
-                                    font-size: 2.5rem;
-                                "
-                            >
-                                📚
-                            </div>
-
-                        {% endif %}
 
 
-                        <!-- =====================================
-                             COURSE INFORMATION
-                             ===================================== -->
 
-                        <div
-                            class="
-                                card-body
-                                d-flex
-                                flex-column
-                            "
-                        >
+<!-- =========================================================
+     PAGE STYLING
+     ========================================================= -->
 
-                            <div class="mb-2">
+<style>
 
-                                <span
-                                    class="
-                                        badge
-                                        bg-success-subtle
-                                        text-success
-                                        border
-                                        border-success-subtle
-                                    "
-                                >
-                                    Enrolled
-                                </span>
+    /* =========================================================
+       PAGE HEADER
+       ========================================================= */
 
-                            </div>
+    .my-courses-title {
+        margin:
+            0
+            0
+            0.3rem;
+
+        color: #172033;
+
+        font-size: 2rem;
+        font-weight: 700;
+
+        letter-spacing: -0.025em;
+    }
 
 
-                            <h5 class="card-title fw-semibold">
-                                {{ enrolment.course.title }}
-                            </h5>
+    .my-courses-subtitle {
+        margin: 0;
+
+        color: #7c8797;
+
+        font-size: 0.92rem;
+    }
 
 
-                            <p
-                                class="
-                                    text-muted
-                                    small
-                                    flex-grow-1
-                                "
-                            >
-                                {{ enrolment.course.description|truncatechars:110 }}
-                            </p>
+
+    /* Browse Courses Button */
+
+    .browse-courses-btn {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        padding:
+            0.6rem
+            1rem;
+
+        color: #ffffff;
+
+        background: #0d6efd;
+
+        border:
+            1px solid
+            #0d6efd;
+
+        border-radius: 7px;
+
+        text-decoration: none;
+
+        font-size: 0.84rem;
+        font-weight: 600;
+
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease;
+    }
 
 
-                            <!-- =================================
-                                 COURSE DETAILS
-                                 ================================= -->
+    .browse-courses-btn:hover {
+        color: #ffffff;
 
-                            .
+        background: #0b5ed7;
 
-                            <div class="small text-muted mb-3">
+        border-color: #0b5ed7;
 
-                                <div class="mb-1">
-
-                                    <strong>
-                                        Teacher:
-                                    </strong>
-
-                                    <a
-                                        href="{% url 'profile' enrolment.course.teacher.username %}"
-                                        class="text-decoration-none fw-semibold"
-                                    >
-                                        {{ enrolment.course.teacher.username }}
-                                    </a>
-
-                                </div>
+        transform: translateY(-1px);
+    }
 
 
-                                <div>
 
-                                    <strong>
-                                        Enrolled:
-                                    </strong>
+    /* =========================================================
+       COURSE CONTROLS
+       ========================================================= */
 
-                                    {{ enrolment.enrolled_at|date:"d M Y" }}
-
-                                </div>
-
-                            </div>
+    .courses-control-section {
+        margin-bottom: 1.5rem;
+    }
 
 
-                            <!-- =================================
-                                 ACTION
-                                 ================================= -->
 
-                            <div class="d-grid">
+    /* Course Tab */
 
-                                <a
-                                    href="{% url 'course_detail' enrolment.course.id %}"
-                                    class="btn btn-primary"
-                                >
-                                    Continue Course
-                                </a>
+    .courses-tabs-row {
+        display: flex;
 
-                            </div>
+        align-items: center;
+        justify-content: space-between;
 
-                        </div>
+        margin-bottom: 1rem;
 
-                    </div>
-
-                </div>
-
-            {% endfor %}
-
-        </div>
+        border-bottom:
+            1px solid
+            #dfe5ec;
+    }
 
 
-    <!-- =========================================================
-         EMPTY STATE
-         ========================================================= -->
+    .courses-tab {
+        position: relative;
 
-    {% else %}
+        padding:
+            0.7rem
+            0.3rem;
 
-        <div class="card content-card">
+        color: #64748b;
 
-            <div class="card-body text-center py-5">
-
-                <div
-                    class="display-5 mb-3"
-                >
-                    📚
-                </div>
+        font-size: 0.86rem;
+        font-weight: 600;
+    }
 
 
-                <h4 class="fw-semibold">
-                    No enrolled courses yet
-                </h4>
+    .courses-tab.active {
+        color: #0d6efd;
+    }
 
 
-                <p class="text-muted mb-4">
-                    Browse the available courses and enrol
-                    to start learning.
-                </p>
+    .courses-tab.active::after {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        right: 0;
+        bottom: -1px;
+
+        height: 2px;
+
+        background: #0d6efd;
+
+        border-radius: 999px;
+    }
 
 
-                <a
-                    href="{% url 'course_list' %}"
-                    class="btn btn-primary"
-                >
-                    Browse Courses
-                </a>
+    .course-result-count {
+        color: #8a94a3;
 
-            </div>
+        font-size: 0.76rem;
+    }
 
-        </div>
 
-    {% endif %}
+
+    /* =========================================================
+       SEARCH + SORT
+       ========================================================= */
+
+    .course-tools {
+        display: flex;
+
+        align-items: center;
+
+        gap: 1rem;
+    }
+
+
+
+    /* Search */
+
+    .course-search-wrapper {
+        position: relative;
+
+        flex: 1;
+    }
+
+
+    .course-search-wrapper svg {
+        position: absolute;
+
+        top: 50%;
+        left: 0.85rem;
+
+        color: #929dac;
+
+        transform: translateY(-50%);
+
+        pointer-events: none;
+    }
+
+
+    .course-search-wrapper input {
+        width: 100%;
+        height: 42px;
+
+        padding:
+            0
+            0.9rem
+            0
+            2.55rem;
+
+        color: #374151;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #d8dfe7;
+
+        border-radius: 7px;
+
+        font-size: 0.84rem;
+
+        outline: none;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+
+    .course-search-wrapper input::placeholder {
+        color: #9aa3af;
+    }
+
+
+    .course-search-wrapper input:focus {
+        border-color: #86b7fe;
+
+        box-shadow:
+            0 0 0
+            0.18rem
+            rgba(13, 110, 253, 0.08);
+    }
+
+
+
+    /* Sort */
+
+    .course-sort-wrapper {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.6rem;
+
+        flex-shrink: 0;
+    }
+
+
+    .course-sort-wrapper label {
+        color: #6f7b8b;
+
+        font-size: 0.76rem;
+
+        white-space: nowrap;
+    }
+
+
+    .course-sort-wrapper select {
+        height: 42px;
+
+        padding:
+            0
+            2rem
+            0
+            0.75rem;
+
+        color: #4b5563;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #d8dfe7;
+
+        border-radius: 7px;
+
+        font-size: 0.8rem;
+
+        outline: none;
+
+        cursor: pointer;
+    }
+
+
+    .course-sort-wrapper select:focus {
+        border-color: #86b7fe;
+
+        box-shadow:
+            0 0 0
+            0.18rem
+            rgba(13, 110, 253, 0.08);
+    }
+
+
+
+    /* =========================================================
+       COURSE CARDS
+       ========================================================= */
+
+    .student-course-card {
+        height: 100%;
+
+        display: flex;
+
+        flex-direction: column;
+
+        overflow: hidden;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #dde4ec;
+
+        border-radius: 12px;
+
+        box-shadow:
+            0 3px 12px
+            rgba(31, 41, 55, 0.04);
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+
+    .student-course-card:hover {
+        transform: translateY(-3px);
+
+        border-color: #c2d7fa;
+
+        box-shadow:
+            0 9px 24px
+            rgba(31, 41, 55, 0.08);
+    }
+
+
+
+    /* =========================================================
+       COURSE COVER
+       ========================================================= */
+
+    .student-course-cover {
+        overflow: hidden;
+
+        background: #edf4fc;
+    }
+
+
+    .student-course-image,
+    .student-course-placeholder {
+        width: 100%;
+        height: 155px;
+    }
+
+
+    .student-course-image {
+        display: block;
+
+        object-fit: cover;
+
+        transition:
+            transform 0.25s ease;
+    }
+
+
+    .student-course-card:hover
+    .student-course-image {
+        transform: scale(1.02);
+    }
+
+
+    .student-course-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #2d65ad;
+
+        background:
+            linear-gradient(
+                135deg,
+                #dbe8f8,
+                #edf4fc
+            );
+    }
+
+
+
+    /* =========================================================
+       COURSE BODY
+       ========================================================= */
+
+    .student-course-body {
+        display: flex;
+
+        flex-direction: column;
+
+        flex: 1;
+
+        padding: 1rem;
+    }
+
+
+
+    /* Enrolled Badge */
+
+    .enrolled-badge {
+        align-self: flex-start;
+
+        margin-bottom: 0.6rem;
+
+        padding:
+            0.2rem
+            0.45rem;
+
+        color: #198754;
+
+        background: #e6f5ec;
+
+        border:
+            1px solid
+            #c9ead6;
+
+        border-radius: 5px;
+
+        font-size: 0.66rem;
+        font-weight: 600;
+    }
+
+
+
+    /* Course Title */
+
+    .student-course-title {
+        margin:
+            0
+            0
+            0.4rem;
+
+        color: #172033;
+
+        font-size: 1rem;
+        font-weight: 700;
+
+        line-height: 1.35;
+    }
+
+
+
+    /* Description */
+
+    .student-course-description {
+        min-height: 42px;
+
+        margin-bottom: 1rem;
+
+        color: #6f7c8e;
+
+        font-size: 0.8rem;
+
+        line-height: 1.5;
+    }
+
+
+
+    /* =========================================================
+       COURSE META
+       ========================================================= */
+
+    .student-course-meta {
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap: 0.75rem;
+
+        margin-top: auto;
+
+        padding-top: 0.9rem;
+
+        border-top:
+            1px solid
+            #edf0f4;
+    }
+
+
+    .course-meta-label {
+        display: block;
+
+        margin-bottom: 0.15rem;
+
+        color: #9aa3b0;
+
+        font-size: 0.67rem;
+    }
+
+
+    .course-meta-value,
+    .course-teacher-link {
+        color: #4b5563;
+
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+
+    .course-teacher-link {
+        color: #0d6efd;
+
+        text-decoration: none;
+    }
+
+
+    .course-teacher-link:hover {
+        text-decoration: underline;
+    }
+
+
+
+    /* =========================================================
+       CONTINUE BUTTON
+       ========================================================= */
+
+    .continue-course-btn {
+        width: 100%;
+
+        display: block;
+
+        margin-top: 1rem;
+
+        padding:
+            0.5rem
+            0.75rem;
+
+        color: #263750;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #73849b;
+
+        border-radius: 6px;
+
+        text-align: center;
+        text-decoration: none;
+
+        font-size: 0.8rem;
+        font-weight: 600;
+
+        transition:
+            color 0.2s ease,
+            background-color 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+
+    .continue-course-btn:hover {
+        color: #ffffff;
+
+        background: #16233d;
+
+        border-color: #16233d;
+    }
+
+
+
+    /* =========================================================
+       SEARCH EMPTY
+       ========================================================= */
+
+    .course-search-empty {
+        margin-top: 1.5rem;
+
+        padding:
+            3rem
+            1rem;
+
+        color: #7b8797;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #e1e6ed;
+
+        border-radius: 12px;
+
+        text-align: center;
+    }
+
+
+    .search-empty-icon {
+        margin-bottom: 0.8rem;
+
+        color: #0d6efd;
+    }
+
+
+    .course-search-empty h4 {
+        margin-bottom: 0.4rem;
+
+        color: #202938;
+
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+
+    .course-search-empty p {
+        margin: 0;
+
+        font-size: 0.82rem;
+    }
+
+
+
+    /* =========================================================
+       EMPTY ENROLMENTS
+       ========================================================= */
+
+    .empty-courses-panel {
+        padding:
+            4rem
+            1.5rem;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #dfe5ec;
+
+        border-radius: 14px;
+
+        text-align: center;
+    }
+
+
+    .empty-courses-icon {
+        margin-bottom: 1rem;
+
+        color: #0d6efd;
+    }
+
+
+    .empty-courses-panel h3 {
+        margin-bottom: 0.5rem;
+
+        color: #202938;
+
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+
+    .empty-courses-panel p {
+        margin-bottom: 1.25rem;
+
+        color: #7c8797;
+
+        font-size: 0.88rem;
+    }
+
+
+
+    /* =========================================================
+       TABLET / MOBILE
+       ========================================================= */
+
+    @media (max-width: 767.98px) {
+
+        .course-tools {
+            align-items: stretch;
+
+            flex-direction: column;
+        }
+
+
+        .course-sort-wrapper {
+            justify-content: space-between;
+        }
+
+
+        .course-sort-wrapper select {
+            flex: 1;
+        }
+
+    }
+
+
+    @media (max-width: 575.98px) {
+
+        .my-courses-title {
+            font-size: 1.7rem;
+        }
+
+
+        .student-course-image,
+        .student-course-placeholder {
+            height: 180px;
+        }
+
+
+        .student-course-meta {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+
+
+<!-- =========================================================
+     SEARCH + SORT JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const searchInput =
+                document.getElementById(
+                    "course-search"
+                );
+
+
+            const sortSelect =
+                document.getElementById(
+                    "course-sort"
+                );
+
+
+            const courseGrid =
+                document.getElementById(
+                    "course-grid"
+                );
+
+
+            const emptyMessage =
+                document.getElementById(
+                    "course-search-empty"
+                );
+
+
+            if (
+                !searchInput ||
+                !sortSelect ||
+                !courseGrid
+            ) {
+                return;
+            }
+
+
+
+            /* =====================================================
+               GET COURSE ITEMS
+               ===================================================== */
+
+            function getCourses() {
+
+                return Array.from(
+                    courseGrid.querySelectorAll(
+                        ".course-grid-item"
+                    )
+                );
+
+            }
+
+
+
+            /* =====================================================
+               SEARCH
+               ===================================================== */
+
+            function filterCourses() {
+
+                const searchTerm =
+                    searchInput.value
+                        .trim()
+                        .toLowerCase();
+
+
+                let visibleCount = 0;
+
+
+                getCourses().forEach(
+                    function (course) {
+
+                        const searchableText = [
+                            course.dataset.title || "",
+                            course.dataset.description || "",
+                            course.dataset.teacher || ""
+                        ]
+                            .join(" ")
+                            .toLowerCase();
+
+
+                        const matches =
+                            searchableText.includes(
+                                searchTerm
+                            );
+
+
+                        course.hidden =
+                            !matches;
+
+
+                        if (matches) {
+                            visibleCount++;
+                        }
+
+                    }
+                );
+
+
+                emptyMessage.hidden =
+                    visibleCount !== 0;
+
+            }
+
+
+
+            /* =====================================================
+               SORT
+               ===================================================== */
+
+            function sortCourses() {
+
+                const courses =
+                    getCourses();
+
+
+                const sortType =
+                    sortSelect.value;
+
+
+                courses.sort(
+                    function (a, b) {
+
+                        const titleA =
+                            a.dataset.title || "";
+
+
+                        const titleB =
+                            b.dataset.title || "";
+
+
+                        const dateA =
+                            new Date(
+                                a.dataset.enrolled
+                            );
+
+
+                        const dateB =
+                            new Date(
+                                b.dataset.enrolled
+                            );
+
+
+                        /* Alphabetical A-Z */
+
+                        if (sortType === "az") {
+
+                            return titleA.localeCompare(
+                                titleB
+                            );
+
+                        }
+
+
+                        /* Alphabetical Z-A */
+
+                        if (sortType === "za") {
+
+                            return titleB.localeCompare(
+                                titleA
+                            );
+
+                        }
+
+
+                        /* Oldest first */
+
+                        if (sortType === "oldest") {
+
+                            return dateA - dateB;
+
+                        }
+
+
+                        /* Newest first */
+
+                        return dateB - dateA;
+
+                    }
+                );
+
+
+                courses.forEach(
+                    function (course) {
+
+                        courseGrid.appendChild(
+                            course
+                        );
+
+                    }
+                );
+
+            }
+
+
+
+            /* =====================================================
+               EVENT LISTENERS
+               ===================================================== */
+
+            searchInput.addEventListener(
+                "input",
+                filterCourses
+            );
+
+
+            sortSelect.addEventListener(
+                "change",
+                function () {
+
+                    sortCourses();
+
+                    filterCourses();
+
+                }
+            );
+
+
+            /* Default: newest enrolment first */
+
+            sortCourses();
+
+        }
+    );
+
+</script>
+
 
 {% endblock %}

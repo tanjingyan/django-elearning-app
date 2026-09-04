@@ -8,10 +8,15 @@ from .models import ChatMessage
 
 @login_required
 def course_chat(request, course_id):
+
     course = get_object_or_404(
-        Course,
+        Course.objects.select_related("teacher"),
         id=course_id,
     )
+
+    # =========================================================
+    # CHECK ACCESS
+    # =========================================================
 
     is_teacher = (
         request.user.role == "teacher"
@@ -27,24 +32,49 @@ def course_chat(request, course_id):
     )
 
     if not is_teacher and not is_enrolled_student:
+
         if request.user.role == "teacher":
             return redirect("teacher_courses")
 
         return redirect("course_list")
 
-    messages = ChatMessage.objects.filter(
-        course=course,
-    ).select_related(
-        "sender",
-    ).order_by(
-        "created_at",
+    # =========================================================
+    # CHAT MESSAGES
+    #
+    # IMPORTANT:
+    # We call this chat_messages instead of messages because
+    # Django's global notification framework also uses the
+    # context variable "messages".
+    # =========================================================
+
+    chat_messages = (
+        ChatMessage.objects
+        .filter(course=course)
+        .select_related("sender")
+        .order_by("created_at")
     )
+
+    # =========================================================
+    # ENROLLED PARTICIPANTS
+    # =========================================================
+
+    participants = (
+        Enrolment.objects
+        .filter(course=course)
+        .select_related("student")
+        .order_by("student__username")
+    )
+
+    # =========================================================
+    # RENDER
+    # =========================================================
 
     return render(
         request,
         "chat/course_chat.html",
         {
             "course": course,
-            "messages": messages,
+            "chat_messages": chat_messages,
+            "participants": participants,
         },
     )

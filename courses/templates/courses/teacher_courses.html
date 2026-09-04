@@ -8,304 +8,1579 @@
 
 {% block content %}
 
-    <!-- =========================================================
-         PAGE HEADER
-         ========================================================= -->
 
-    <div
-        class="
-            d-flex
-            justify-content-between
-            align-items-center
-            flex-wrap
-            gap-3
-            mb-4
-        "
-    >
+<!-- =========================================================
+     PAGE HEADER
+     ========================================================= -->
 
-        <div>
+<div
+    class="
+        d-flex
+        justify-content-between
+        align-items-start
+        flex-wrap
+        gap-3
+        mb-4
+    "
+>
 
-            <p
-                class="
-                    text-primary
-                    fw-semibold
-                    small
-                    text-uppercase
-                    mb-1
-                "
-            >
-                Course Management
-            </p>
+    <div>
 
-            <h1 class="page-heading mb-1">
-                My Courses
-            </h1>
+        <p class="course-management-label">
+            Course Management
+        </p>
 
-            <p class="page-subheading mb-0">
-                View and manage the courses you teach.
-            </p>
+        <h1 class="my-courses-title">
+            My Courses
+        </h1>
 
-        </div>
-
-
-        <a
-            href="{% url 'create_course' %}"
-            class="btn btn-primary"
-        >
-            + Create New Course
-        </a>
+        <p class="my-courses-subtitle">
+            View and manage the courses you teach.
+        </p>
 
     </div>
 
 
+    <a
+        href="{% url 'create_course' %}"
+        class="create-course-btn"
+    >
 
-    <!-- =========================================================
-         COURSE LIST
-         ========================================================= -->
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+        </svg>
 
-    {% if courses %}
+        Create New Course
 
-        <div class="row g-4">
+    </a>
 
-            {% for course in courses %}
-
-                <div class="col-md-6 col-xl-4">
-
-                    <div
-                        class="
-                            card
-                            content-card
-                            h-100
-                            overflow-hidden
-                        "
-                    >
+</div>
 
 
-                        <!-- =================================================
-                             COURSE IMAGE
-                             ================================================= -->
+
+{% if courses %}
+
+
+    <!-- =====================================================
+         COURSE CONTROLS
+         ===================================================== -->
+
+    <section class="courses-control-section">
+
+
+        <!-- Course Tab + Count -->
+
+        <div class="courses-tabs-row">
+
+            <div class="courses-tab active">
+                Courses
+            </div>
+
+
+            <div class="course-result-count">
+
+                {{ courses|length }}
+                course{% if courses|length != 1 %}s{% endif %}
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Search + Sort -->
+
+        <div class="course-tools">
+
+
+            <!-- Search -->
+
+            <div class="course-search-wrapper">
+
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <circle
+                        cx="11"
+                        cy="11"
+                        r="8"
+                    ></circle>
+
+                    <path
+                        d="m21 21-4.3-4.3"
+                    ></path>
+                </svg>
+
+
+                <input
+                    type="search"
+                    id="course-search"
+                    placeholder="Search your courses..."
+                    aria-label="Search courses"
+                >
+
+            </div>
+
+
+
+            <!-- Sort -->
+
+            <div class="course-sort-wrapper">
+
+                <label for="course-sort">
+                    Sort by
+                </label>
+
+
+                <select id="course-sort">
+
+                    <option value="newest">
+                        Newest Created
+                    </option>
+
+                    <option value="oldest">
+                        Oldest Created
+                    </option>
+
+                    <option value="az">
+                        Alphabetical A–Z
+                    </option>
+
+                    <option value="za">
+                        Alphabetical Z–A
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         COURSE GRID
+         ===================================================== -->
+
+    <div
+        class="row g-4"
+        id="course-grid"
+    >
+
+        {% for course in courses %}
+
+            <div
+                class="col-md-6 col-lg-4 course-grid-item"
+
+                data-title="{{ course.title|default:''|lower }}"
+                data-description="{{ course.description|default:''|lower }}"
+                data-created="{{ course.created_at|date:'c' }}"
+            >
+
+                <article class="teacher-course-card">
+
+
+                    <!-- =================================================
+                         COURSE COVER
+                         ================================================= -->
+
+                    <div class="teacher-course-cover">
 
                         {% if course.image %}
 
                             <img
                                 src="{{ course.image.url }}"
-                                class="card-img-top"
                                 alt="{{ course.title }}"
-                                style="
-                                    height: 190px;
-                                    object-fit: cover;
-                                "
+                                class="teacher-course-image"
                             >
 
                         {% else %}
 
-                            <div
-                                class="
-                                    d-flex
-                                    align-items-center
-                                    justify-content-center
-                                    bg-primary-subtle
-                                    text-primary
-                                "
-                                style="
-                                    height: 190px;
-                                "
-                            >
+                            <div class="teacher-course-placeholder">
 
-                                <span class="display-4">
-                                    📚
-                                </span>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="50"
+                                    height="50"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.6"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"
+                                    ></path>
+
+                                    <path
+                                        d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                                    ></path>
+                                </svg>
 
                             </div>
 
                         {% endif %}
 
 
+                        <!-- Course ID Overlay -->
+
+                        <div class="course-id-overlay">
+                            Course #{{ course.id }}
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         COURSE BODY
+                         ================================================= -->
+
+                    <div class="teacher-course-body">
+
+
+                        <!-- Teaching Badge -->
+
+                        <div class="course-status-row">
+
+                            <span class="teacher-course-badge">
+
+                                <span class="status-dot"></span>
+
+                                Teaching
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- Course Title -->
+
+                        <h2 class="teacher-course-title">
+                            {{ course.title }}
+                        </h2>
+
+
+
+                        <!-- Course Description -->
+
+                        <p class="teacher-course-description">
+
+                            {% if course.description %}
+
+                                {{ course.description|truncatechars:105 }}
+
+                            {% else %}
+
+                                No course description available.
+
+                            {% endif %}
+
+                        </p>
+
+
 
                         <!-- =================================================
-                             COURSE INFORMATION
+                             COURSE INFO
                              ================================================= -->
 
-                        <div class="card-body d-flex flex-column p-4">
+                        <div class="teacher-course-meta">
 
+                            <div class="course-meta-icon">
 
-                            <!-- Course badge -->
-
-                            <div class="mb-2">
-
-                                <span
-                                    class="
-                                        badge
-                                        bg-primary-subtle
-                                        text-primary
-                                        border
-                                        border-primary-subtle
-                                    "
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="17"
+                                    height="17"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
                                 >
-                                    Your Course
+
+                                    <rect
+                                        x="3"
+                                        y="4"
+                                        width="18"
+                                        height="18"
+                                        rx="2"
+                                    ></rect>
+
+                                    <line
+                                        x1="16"
+                                        y1="2"
+                                        x2="16"
+                                        y2="6"
+                                    ></line>
+
+                                    <line
+                                        x1="8"
+                                        y1="2"
+                                        x2="8"
+                                        y2="6"
+                                    ></line>
+
+                                    <line
+                                        x1="3"
+                                        y1="10"
+                                        x2="21"
+                                        y2="10"
+                                    ></line>
+
+                                </svg>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="course-meta-label">
+                                    Created
                                 </span>
 
-                            </div>
-
-
-
-                            <!-- Course title -->
-
-                            <h4 class="card-title fw-bold mb-2">
-
-                                {{ course.title }}
-
-                            </h4>
-
-
-
-                            <!-- Description -->
-
-                            <p
-                                class="
-                                    card-text
-                                    text-muted
-                                    flex-grow-1
-                                    mb-3
-                                "
-                            >
-
-                                {% if course.description %}
-
-                                    {{ course.description|truncatechars:100 }}
-
-                                {% else %}
-
-                                    No description available.
-
-                                {% endif %}
-
-                            </p>
-
-
-
-                            <!-- =================================================
-                                 COURSE INFORMATION
-                                 ================================================= -->
-
-                            <div
-                                class="
-                                    border-top
-                                    border-bottom
-                                    py-3
-                                    mb-3
-                                "
-                            >
-
-                                <div
-                                    class="
-                                        d-flex
-                                        justify-content-between
-                                        mb-2
-                                    "
-                                >
-
-                                    <span class="text-muted small">
-                                        Course ID
-                                    </span>
-
-                                    <span class="small fw-semibold">
-                                        #{{ course.id }}
-                                    </span>
-
-                                </div>
-
-
-                                <div
-                                    class="
-                                        d-flex
-                                        justify-content-between
-                                    "
-                                >
-
-                                    <span class="text-muted small">
-                                        Created
-                                    </span>
-
-                                    <span class="small fw-semibold">
-
-                                        {{ course.created_at|date:"d M Y" }}
-
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-
-
-                            <!-- =================================================
-                                 PRIMARY ACTION
-                                 ================================================= -->
-
-                            <div class="d-grid">
-
-                                <a
-                                    href="{% url 'course_detail' course.id %}"
-                                    class="btn btn-primary"
-                                >
-                                    Manage Course
-                                </a>
+                                <strong class="course-meta-value">
+                                    {{ course.created_at|date:"d M Y" }}
+                                </strong>
 
                             </div>
 
                         </div>
 
+
+
+                        <!-- =================================================
+                             MANAGE COURSE
+                             ================================================= -->
+
+                        <a
+                            href="{% url 'course_detail' course.id %}"
+                            class="manage-course-btn"
+                        >
+
+                            <span>
+                                Manage Course
+                            </span>
+
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="17"
+                                height="17"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+
+                        </a>
+
                     </div>
 
-                </div>
-
-            {% endfor %}
-
-        </div>
-
-
-
-    <!-- =========================================================
-         EMPTY STATE
-         ========================================================= -->
-
-    {% else %}
-
-        <div class="card content-card">
-
-            <div class="card-body text-center py-5">
-
-                <div class="display-4 mb-3">
-                    📚
-                </div>
-
-
-                <h4 class="fw-bold">
-                    No courses created yet
-                </h4>
-
-
-                <p class="text-muted mb-4">
-
-                    Create your first course to start
-                    adding teaching materials and enrolling students.
-
-                </p>
-
-
-                <a
-                    href="{% url 'create_course' %}"
-                    class="btn btn-primary"
-                >
-                    Create Your First Course
-                </a>
+                </article>
 
             </div>
 
+        {% endfor %}
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SEARCH EMPTY STATE
+         ===================================================== -->
+
+    <div
+        id="course-search-empty"
+        class="course-search-empty"
+        hidden
+    >
+
+        <div class="search-empty-icon">
+
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="36"
+                height="36"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <circle
+                    cx="11"
+                    cy="11"
+                    r="8"
+                ></circle>
+
+                <path
+                    d="m21 21-4.3-4.3"
+                ></path>
+            </svg>
+
         </div>
 
-    {% endif %}
+
+        <h4>
+            No matching courses
+        </h4>
+
+
+        <p>
+            Try searching with a different course title.
+        </p>
+
+    </div>
+
+
+
+<!-- =========================================================
+     EMPTY STATE
+     ========================================================= -->
+
+{% else %}
+
+    <div class="empty-courses-panel">
+
+        <div class="empty-courses-icon">
+
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="50"
+                height="50"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path
+                    d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"
+                ></path>
+
+                <path
+                    d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                ></path>
+            </svg>
+
+        </div>
+
+
+        <h3>
+            No courses created yet
+        </h3>
+
+
+        <p>
+            Create your first course to start adding teaching materials
+            and enrolling students.
+        </p>
+
+
+        <a
+            href="{% url 'create_course' %}"
+            class="create-course-btn"
+        >
+            Create Your First Course
+        </a>
+
+    </div>
+
+{% endif %}
+
+
+
+
+
+<!-- =========================================================
+     PAGE STYLING
+     ========================================================= -->
+
+<style>
+
+    /* =========================================================
+       PAGE HEADER
+       ========================================================= */
+
+    .course-management-label {
+        margin-bottom: 0.25rem;
+
+        color: #0d6efd;
+
+        font-size: 0.68rem;
+        font-weight: 700;
+
+        letter-spacing: 0.04em;
+
+        text-transform: uppercase;
+    }
+
+
+    .my-courses-title {
+        margin:
+            0
+            0
+            0.3rem;
+
+        color: #172033;
+
+        font-size: 2rem;
+        font-weight: 700;
+
+        letter-spacing: -0.025em;
+    }
+
+
+    .my-courses-subtitle {
+        margin: 0;
+
+        color: #7c8797;
+
+        font-size: 0.92rem;
+    }
+
+
+
+    /* =========================================================
+       CREATE COURSE BUTTON
+       ========================================================= */
+
+    .create-course-btn {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 0.4rem;
+
+        padding:
+            0.62rem
+            1rem;
+
+        color: #ffffff;
+
+        background: #0d6efd;
+
+        border:
+            1px solid
+            #0d6efd;
+
+        border-radius: 8px;
+
+        text-decoration: none;
+
+        font-size: 0.84rem;
+        font-weight: 600;
+
+        box-shadow:
+            0 3px 9px
+            rgba(13, 110, 253, 0.18);
+
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+
+    .create-course-btn:hover {
+        color: #ffffff;
+
+        background: #0b5ed7;
+
+        border-color: #0b5ed7;
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 6px 14px
+            rgba(13, 110, 253, 0.22);
+    }
+
+
+
+    /* =========================================================
+       COURSE CONTROLS
+       ========================================================= */
+
+    .courses-control-section {
+        margin-bottom: 1.5rem;
+    }
+
+
+    .courses-tabs-row {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 1rem;
+
+        border-bottom:
+            1px solid
+            #dfe5ec;
+    }
+
+
+    .courses-tab {
+        position: relative;
+
+        padding:
+            0.7rem
+            0.3rem;
+
+        color: #64748b;
+
+        font-size: 0.86rem;
+        font-weight: 600;
+    }
+
+
+    .courses-tab.active {
+        color: #0d6efd;
+    }
+
+
+    .courses-tab.active::after {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        right: 0;
+        bottom: -1px;
+
+        height: 2px;
+
+        background: #0d6efd;
+
+        border-radius: 999px;
+    }
+
+
+    .course-result-count {
+        color: #8a94a3;
+
+        font-size: 0.76rem;
+    }
+
+
+
+    /* =========================================================
+       SEARCH + SORT
+       ========================================================= */
+
+    .course-tools {
+        display: flex;
+
+        align-items: center;
+
+        gap: 1rem;
+    }
+
+
+    .course-search-wrapper {
+        position: relative;
+
+        flex: 1;
+    }
+
+
+    .course-search-wrapper svg {
+        position: absolute;
+
+        top: 50%;
+        left: 0.85rem;
+
+        color: #929dac;
+
+        transform: translateY(-50%);
+
+        pointer-events: none;
+    }
+
+
+    .course-search-wrapper input {
+        width: 100%;
+        height: 42px;
+
+        padding:
+            0
+            0.9rem
+            0
+            2.55rem;
+
+        color: #374151;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #d8dfe7;
+
+        border-radius: 8px;
+
+        font-size: 0.84rem;
+
+        outline: none;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+
+    .course-search-wrapper input::placeholder {
+        color: #9aa3af;
+    }
+
+
+    .course-search-wrapper input:focus {
+        border-color: #86b7fe;
+
+        box-shadow:
+            0 0 0
+            0.18rem
+            rgba(13, 110, 253, 0.08);
+    }
+
+
+
+    .course-sort-wrapper {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.6rem;
+
+        flex-shrink: 0;
+    }
+
+
+    .course-sort-wrapper label {
+        color: #6f7b8b;
+
+        font-size: 0.76rem;
+
+        white-space: nowrap;
+    }
+
+
+    .course-sort-wrapper select {
+        height: 42px;
+
+        padding:
+            0
+            2rem
+            0
+            0.75rem;
+
+        color: #4b5563;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #d8dfe7;
+
+        border-radius: 8px;
+
+        font-size: 0.8rem;
+
+        outline: none;
+
+        cursor: pointer;
+    }
+
+
+    .course-sort-wrapper select:focus {
+        border-color: #86b7fe;
+
+        box-shadow:
+            0 0 0
+            0.18rem
+            rgba(13, 110, 253, 0.08);
+    }
+
+
+
+    /* =========================================================
+       TEACHER COURSE CARD
+       ========================================================= */
+
+    .teacher-course-card {
+        position: relative;
+
+        height: 100%;
+
+        display: flex;
+        flex-direction: column;
+
+        overflow: hidden;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #dce3ec;
+
+        border-radius: 16px;
+
+        box-shadow:
+            0 4px 15px
+            rgba(30, 41, 59, 0.055);
+
+        transition:
+            transform 0.22s ease,
+            box-shadow 0.22s ease,
+            border-color 0.22s ease;
+    }
+
+
+    .teacher-course-card:hover {
+        transform: translateY(-5px);
+
+        border-color: #a9c5ee;
+
+        box-shadow:
+            0 16px 32px
+            rgba(30, 41, 59, 0.11);
+    }
+
+
+
+    /* =========================================================
+       COURSE COVER
+       ========================================================= */
+
+    .teacher-course-cover {
+        position: relative;
+
+        height: 175px;
+
+        overflow: hidden;
+
+        background: #e7effa;
+    }
+
+
+    .teacher-course-image,
+    .teacher-course-placeholder {
+        width: 100%;
+        height: 100%;
+    }
+
+
+    .teacher-course-image {
+        display: block;
+
+        object-fit: cover;
+
+        transition:
+            transform 0.35s ease;
+    }
+
+
+    .teacher-course-card:hover
+    .teacher-course-image {
+        transform: scale(1.045);
+    }
+
+
+    .teacher-course-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #315f9a;
+
+        background:
+            linear-gradient(
+                135deg,
+                #d9e8f8 0%,
+                #edf4fc 100%
+            );
+    }
+
+
+
+    /* =========================================================
+       COURSE ID OVERLAY
+       ========================================================= */
+
+    .course-id-overlay {
+        position: absolute;
+
+        right: 12px;
+        bottom: 12px;
+
+        padding:
+            0.32rem
+            0.58rem;
+
+        color: #ffffff;
+
+        background:
+            rgba(22, 35, 61, 0.84);
+
+        backdrop-filter: blur(5px);
+
+        border:
+            1px solid
+            rgba(255, 255, 255, 0.12);
+
+        border-radius: 7px;
+
+        font-size: 0.68rem;
+        font-weight: 600;
+
+        box-shadow:
+            0 2px 7px
+            rgba(15, 23, 42, 0.15);
+    }
+
+
+
+    /* =========================================================
+       COURSE BODY
+       ========================================================= */
+
+    .teacher-course-body {
+        display: flex;
+
+        flex-direction: column;
+
+        flex: 1;
+
+        padding: 1.15rem;
+    }
+
+
+
+    /* =========================================================
+       TEACHING BADGE
+       ========================================================= */
+
+    .course-status-row {
+        display: flex;
+
+        align-items: center;
+
+        margin-bottom: 0.75rem;
+    }
+
+
+    .teacher-course-badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 0.38rem;
+
+        padding:
+            0.3rem
+            0.58rem;
+
+        color: #2563a8;
+
+        background: #eaf3ff;
+
+        border:
+            1px solid
+            #cfe0f8;
+
+        border-radius: 999px;
+
+        font-size: 0.68rem;
+        font-weight: 600;
+    }
+
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+
+        background: #3b82f6;
+
+        border-radius: 50%;
+    }
+
+
+
+    /* =========================================================
+       COURSE TITLE
+       ========================================================= */
+
+    .teacher-course-title {
+        margin:
+            0
+            0
+            0.45rem;
+
+        color: #172033;
+
+        font-size: 1.08rem;
+        font-weight: 700;
+
+        line-height: 1.35;
+
+        letter-spacing: -0.01em;
+    }
+
+
+
+    /* =========================================================
+       DESCRIPTION
+       ========================================================= */
+
+    .teacher-course-description {
+        min-height: 48px;
+
+        margin-bottom: 1rem;
+
+        color: #697586;
+
+        font-size: 0.82rem;
+
+        line-height: 1.55;
+    }
+
+
+
+    /* =========================================================
+       COURSE META
+       ========================================================= */
+
+    .teacher-course-meta {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.7rem;
+
+        margin-top: auto;
+
+        padding:
+            0.9rem
+            0;
+
+        border-top:
+            1px solid
+            #edf1f5;
+    }
+
+
+    .course-meta-icon {
+        width: 36px;
+        height: 36px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        color: #5b6e88;
+
+        background: #f2f5f9;
+
+        border-radius: 9px;
+    }
+
+
+    .course-meta-label {
+        display: block;
+
+        margin-bottom: 0.06rem;
+
+        color: #98a1ae;
+
+        font-size: 0.66rem;
+    }
+
+
+    .course-meta-value {
+        display: block;
+
+        color: #394557;
+
+        font-size: 0.77rem;
+        font-weight: 600;
+    }
+
+
+
+    /* =========================================================
+       MANAGE COURSE BUTTON
+       ========================================================= */
+
+    .manage-course-btn {
+        width: 100%;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 0.4rem;
+
+        margin-top: 0.35rem;
+
+        padding:
+            0.64rem
+            0.8rem;
+
+        color: #ffffff;
+
+        background: #16233d;
+
+        border:
+            1px solid
+            #16233d;
+
+        border-radius: 8px;
+
+        text-align: center;
+        text-decoration: none;
+
+        font-size: 0.82rem;
+        font-weight: 600;
+
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            gap 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+
+    .manage-course-btn:hover {
+        color: #ffffff;
+
+        background: #243654;
+
+        border-color: #243654;
+
+        gap: 0.6rem;
+
+        box-shadow:
+            0 4px 10px
+            rgba(22, 35, 61, 0.18);
+    }
+
+
+
+    /* =========================================================
+       SEARCH EMPTY STATE
+       ========================================================= */
+
+    .course-search-empty {
+        margin-top: 1.5rem;
+
+        padding:
+            3rem
+            1rem;
+
+        color: #7b8797;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #e1e6ed;
+
+        border-radius: 14px;
+
+        text-align: center;
+    }
+
+
+    .search-empty-icon {
+        margin-bottom: 0.8rem;
+
+        color: #0d6efd;
+    }
+
+
+    .course-search-empty h4 {
+        margin-bottom: 0.4rem;
+
+        color: #202938;
+
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+
+    .course-search-empty p {
+        margin: 0;
+
+        font-size: 0.82rem;
+    }
+
+
+
+    /* =========================================================
+       EMPTY COURSES
+       ========================================================= */
+
+    .empty-courses-panel {
+        padding:
+            4rem
+            1.5rem;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #dfe5ec;
+
+        border-radius: 16px;
+
+        text-align: center;
+    }
+
+
+    .empty-courses-icon {
+        margin-bottom: 1rem;
+
+        color: #0d6efd;
+    }
+
+
+    .empty-courses-panel h3 {
+        margin-bottom: 0.5rem;
+
+        color: #202938;
+
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+
+    .empty-courses-panel p {
+        max-width: 500px;
+
+        margin:
+            0
+            auto
+            1.25rem;
+
+        color: #7c8797;
+
+        font-size: 0.88rem;
+    }
+
+
+
+    /* =========================================================
+       TABLET / MOBILE
+       ========================================================= */
+
+    @media (max-width: 767.98px) {
+
+        .course-tools {
+            align-items: stretch;
+
+            flex-direction: column;
+        }
+
+
+        .course-sort-wrapper {
+            justify-content: space-between;
+        }
+
+
+        .course-sort-wrapper select {
+            flex: 1;
+        }
+
+    }
+
+
+    @media (max-width: 575.98px) {
+
+        .my-courses-title {
+            font-size: 1.7rem;
+        }
+
+
+        .teacher-course-cover {
+            height: 190px;
+        }
+
+    }
+
+</style>
+
+
+
+<!-- =========================================================
+     SEARCH + SORT JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const searchInput =
+                document.getElementById(
+                    "course-search"
+                );
+
+
+            const sortSelect =
+                document.getElementById(
+                    "course-sort"
+                );
+
+
+            const courseGrid =
+                document.getElementById(
+                    "course-grid"
+                );
+
+
+            const emptyMessage =
+                document.getElementById(
+                    "course-search-empty"
+                );
+
+
+            if (
+                !searchInput ||
+                !sortSelect ||
+                !courseGrid
+            ) {
+                return;
+            }
+
+
+
+            /* =====================================================
+               GET COURSES
+               ===================================================== */
+
+            function getCourses() {
+
+                return Array.from(
+                    courseGrid.querySelectorAll(
+                        ".course-grid-item"
+                    )
+                );
+
+            }
+
+
+
+            /* =====================================================
+               SEARCH
+               ===================================================== */
+
+            function filterCourses() {
+
+                const searchTerm =
+                    searchInput.value
+                        .trim()
+                        .toLowerCase();
+
+
+                let visibleCount = 0;
+
+
+                getCourses().forEach(
+                    function (course) {
+
+                        const searchableText = [
+                            course.dataset.title || "",
+                            course.dataset.description || ""
+                        ]
+                            .join(" ")
+                            .toLowerCase();
+
+
+                        const matches =
+                            searchableText.includes(
+                                searchTerm
+                            );
+
+
+                        course.hidden =
+                            !matches;
+
+
+                        if (matches) {
+                            visibleCount++;
+                        }
+
+                    }
+                );
+
+
+                emptyMessage.hidden =
+                    visibleCount !== 0;
+
+            }
+
+
+
+            /* =====================================================
+               SORT
+               ===================================================== */
+
+            function sortCourses() {
+
+                const courses =
+                    getCourses();
+
+
+                const sortType =
+                    sortSelect.value;
+
+
+                courses.sort(
+                    function (a, b) {
+
+                        const titleA =
+                            a.dataset.title || "";
+
+
+                        const titleB =
+                            b.dataset.title || "";
+
+
+                        const dateA =
+                            new Date(
+                                a.dataset.created
+                            );
+
+
+                        const dateB =
+                            new Date(
+                                b.dataset.created
+                            );
+
+
+                        /* A-Z */
+
+                        if (sortType === "az") {
+
+                            return titleA.localeCompare(
+                                titleB
+                            );
+
+                        }
+
+
+                        /* Z-A */
+
+                        if (sortType === "za") {
+
+                            return titleB.localeCompare(
+                                titleA
+                            );
+
+                        }
+
+
+                        /* Oldest */
+
+                        if (sortType === "oldest") {
+
+                            return dateA - dateB;
+
+                        }
+
+
+                        /* Newest */
+
+                        return dateB - dateA;
+
+                    }
+                );
+
+
+                courses.forEach(
+                    function (course) {
+
+                        courseGrid.appendChild(
+                            course
+                        );
+
+                    }
+                );
+
+            }
+
+
+
+            /* =====================================================
+               EVENTS
+               ===================================================== */
+
+            searchInput.addEventListener(
+                "input",
+                filterCourses
+            );
+
+
+            sortSelect.addEventListener(
+                "change",
+                function () {
+
+                    sortCourses();
+
+                    filterCourses();
+
+                }
+            );
+
+
+            /* Default to newest first */
+
+            sortCourses();
+
+        }
+    );
+
+</script>
 
 
 {% endblock %}
