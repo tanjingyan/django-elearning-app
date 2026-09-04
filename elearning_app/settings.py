@@ -16,17 +16,56 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def env_bool(name, default=False):
+    """
+    Read a boolean value from an environment variable.
+    """
+    value = os.environ.get(name)
+
+    if value is None:
+        return default
+
+    return value.strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def env_list(name, default=""):
+    """
+    Read a comma-separated environment variable as a Python list.
+    """
+    value = os.environ.get(name, default)
+
+    return [
+        item.strip()
+        for item in value.split(",")
+        if item.strip()
+    ]
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f=x413d7q3tucf#z0-^rj0t_lyq13_7def4dp435xb8azyr@)p'
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-local-development-only-key"
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env_bool(
+    "DJANGO_DEBUG",
+    True
+)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env_list(
+    "DJANGO_ALLOWED_HOSTS",
+    "127.0.0.1,localhost"
+)
 
+CSRF_TRUSTED_ORIGINS = env_list(
+    "DJANGO_CSRF_TRUSTED_ORIGINS"
+)
 
 # Application definition
 
@@ -132,7 +171,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "static_files"
 
 AUTH_USER_MODEL = "accounts.CustomUser"
 
@@ -201,3 +241,23 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_TASK_IGNORE_RESULT = True
 
 CELERY_TIMEZONE = TIME_ZONE
+
+SECURE_PROXY_SSL_HEADER = (
+    "HTTP_X_FORWARDED_PROTO",
+    "https",
+)
+
+SECURE_SSL_REDIRECT = env_bool(
+    "DJANGO_SECURE_SSL_REDIRECT",
+    False
+)
+
+SESSION_COOKIE_SECURE = env_bool(
+    "DJANGO_SESSION_COOKIE_SECURE",
+    False
+)
+
+CSRF_COOKIE_SECURE = env_bool(
+    "DJANGO_CSRF_COOKIE_SECURE",
+    False
+)
