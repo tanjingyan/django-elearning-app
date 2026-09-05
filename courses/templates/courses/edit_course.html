@@ -161,6 +161,28 @@
 
             </div>
 
+            <!-- Category -->
+            <div class="course-field">
+
+                <label for="{{ form.category.id_for_label }}">
+                    Category
+                </label>
+
+                {{ form.category }}
+
+                <p class="field-help">
+                    Select the subject area that best describes this course.
+                </p>
+
+                {% for error in form.category.errors %}
+
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
 
             <!-- New Cover Image -->
             <div class="course-field">

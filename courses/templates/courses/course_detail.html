@@ -8,1106 +8,900 @@
 
 {% block content %}
 
-    <!-- =========================================================
-         COURSE ACCESS
-         ========================================================= -->
 
-    <div
-        class="
-            course-access-bar
-            d-flex
-            align-items-center
-            gap-3
-            mb-4
-            {% if is_blocked %}
-                course-access-blocked
-            {% endif %}
-        "
-    >
+<!-- =========================================================
+     BREADCRUMB
+     ========================================================= -->
 
-        <!-- =====================================================
-             TEACHER ACCESS
-             ===================================================== -->
+<div class="course-breadcrumb">
 
-        {% if request.user == course.teacher %}
+    {% if request.user == course.teacher %}
 
-            <div class="course-access-icon">
-                ✓
-            </div>
+        <a href="{% url 'teacher_courses' %}">
+            My Courses
+        </a>
 
-            <div>
+    {% elif request.user.role == "student" and is_enrolled %}
 
-                <span class="fw-semibold">
-                    Teacher Access
-                </span>
+        <a href="{% url 'student_courses' %}">
+            My Courses
+        </a>
 
-                <span class="course-access-description ms-2">
-                    You are managing this course.
-                </span>
+    {% else %}
 
-            </div>
+        <a href="{% url 'course_list' %}">
+            Browse Courses
+        </a>
+
+    {% endif %}
+
+    <span>/</span>
+
+    <span>
+        {{ course.title }}
+    </span>
+
+</div>
 
 
-        <!-- =====================================================
-             BLOCKED STUDENT
-             ===================================================== -->
 
-        {% elif is_blocked %}
+<!-- =========================================================
+     COURSE ACCESS
+     ========================================================= -->
 
-            <div
-                class="
-                    course-access-icon
-                    course-access-icon-blocked
-                "
-            >
-                !
-            </div>
-
-            <div>
-
-                <span class="fw-semibold text-danger">
-                    Course Access
-                </span>
-
-                <span class="course-access-description ms-2">
-                    You have been blocked from this course.
-                </span>
-
-            </div>
-
-
-        <!-- =====================================================
-             ENROLLED STUDENT
-             ===================================================== -->
-
-        {% elif is_enrolled %}
-
-            <div
-                class="
-                    course-access-icon
-                    course-access-icon-success
-                "
-            >
-                ✓
-            </div>
-
-            <div>
-
-                <span class="fw-semibold">
-                    Course Access
-                </span>
-
-                <span class="course-access-description ms-2">
-                    You are enrolled in this course.
-                </span>
-
-            </div>
-
-
-        <!-- =====================================================
-             NOT ENROLLED
-             ===================================================== -->
-
-        {% else %}
-
-            <div class="course-access-icon">
-                🔒
-            </div>
-
-            <div>
-
-                <span class="fw-semibold">
-                    Course Access
-                </span>
-
-                <span class="course-access-description ms-2">
-                    Enrol to access materials and live discussion.
-                </span>
-
-            </div>
-
+<div
+    class="
+        course-access-bar
+        {% if is_blocked %}
+            course-access-blocked
         {% endif %}
+    "
+>
+
+
+    {% if request.user == course.teacher %}
+
+        <div class="course-access-icon">
+            ✓
+        </div>
+
+        <div>
+
+            <strong>
+                Teacher access
+            </strong>
+
+            <span>
+                You're managing this course.
+            </span>
+
+        </div>
+
+
+    {% elif is_blocked %}
+
+        <div class="course-access-icon course-access-icon-blocked">
+            !
+        </div>
+
+        <div>
+
+            <strong class="text-danger">
+                Course access
+            </strong>
+
+            <span>
+                You have been blocked from this course.
+            </span>
+
+        </div>
+
+
+    {% elif is_enrolled %}
+
+        <div class="course-access-icon course-access-icon-success">
+            ✓
+        </div>
+
+        <div>
+
+            <strong>
+                Course access
+            </strong>
+
+            <span>
+                You're enrolled in this course.
+            </span>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="course-access-icon">
+            🔒
+        </div>
+
+        <div>
+
+            <strong>
+                Course access
+            </strong>
+
+            <span>
+                Enrol to access materials and live discussion.
+            </span>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+
+<!-- =========================================================
+     COURSE SUMMARY
+     ========================================================= -->
+
+<section class="course-summary-card">
+
+
+    <!-- =====================================================
+         COURSE INFORMATION
+         ===================================================== -->
+
+    <div class="course-summary-main">
+
+
+        <!-- Course image / icon -->
+
+        <div class="course-summary-cover">
+
+            {% if course.image %}
+
+                <img
+                    src="{{ course.image.url }}"
+                    alt="{{ course.title }}"
+                >
+
+            {% else %}
+
+                <span>
+                    {{ course.title|slice:":2"|upper }}
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- Main content -->
+
+        <div class="course-summary-content">
+
+
+            <!-- Category -->
+
+            <div class="mb-2">
+
+                <span class="course-category-badge">
+
+                    {% if course.category %}
+
+                        {{ course.get_category_display }}
+
+                    {% else %}
+
+                        Course
+
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+
+            <!-- Title -->
+
+            <h1 class="course-summary-title">
+                {{ course.title }}
+            </h1>
+
+
+
+            <!-- Description -->
+
+            <p class="course-summary-description">
+
+                {% if course.description %}
+
+                    {{ course.description }}
+
+                {% else %}
+
+                    No description available.
+
+                {% endif %}
+
+            </p>
+
+
+
+            <!-- Metadata -->
+
+            <div class="course-summary-meta">
+
+
+                <!-- Teacher -->
+
+                <div>
+
+                    <span class="meta-label">
+                        Teacher
+                    </span>
+
+                    <a
+                        href="{% url 'profile' course.teacher.username %}"
+                        class="meta-value meta-link"
+                    >
+                        {{ course.teacher.username }}
+                    </a>
+
+                </div>
+
+
+
+                <!-- Created -->
+
+                <div>
+
+                    <span class="meta-label">
+                        Created
+                    </span>
+
+                    <span class="meta-value">
+                        {{ course.created_at|date:"d M Y" }}
+                    </span>
+
+                </div>
+
+
+
+                <!-- Students -->
+
+                {% if request.user == course.teacher %}
+
+                    <div>
+
+                        <span class="meta-label">
+                            Students
+                        </span>
+
+                        <span class="meta-value">
+
+                            {{ student_count }}
+
+                            {% if student_count == 1 %}
+                                enrolled
+                            {% else %}
+                                enrolled
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
 
     </div>
 
 
 
-    <!-- =========================================================
-         COURSE INFORMATION + STUDENT MANAGEMENT
-         ========================================================= -->
+    <!-- =====================================================
+         ACTION
+         ===================================================== -->
 
-    <div class="row g-4 mb-4 align-items-start">
+    <div class="course-summary-action">
 
 
-        <!-- =====================================================
-             COURSE INFORMATION
-             ===================================================== -->
+        {% if request.user == course.teacher %}
 
-        <div
-            class="
+            <a
+                href="{% url 'edit_course' course.id %}"
+                class="summary-edit-btn"
+            >
+                Edit Course
+            </a>
+
+
+        {% elif request.user.role == "student" and is_blocked %}
+
+            <span class="summary-blocked-btn">
+                Blocked
+            </span>
+
+
+        {% elif request.user.role == "student" and is_enrolled %}
+
+            <span class="summary-enrolled-btn">
+                ✓ Enrolled
+            </span>
+
+
+        {% elif request.user.role == "student" %}
+
+            <a
+                href="{% url 'enrol_course' course.id %}"
+                class="summary-enrol-btn"
+            >
+                Enrol on this Course
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     MAIN COURSE DASHBOARD
+     ========================================================= -->
+
+<div class="row g-4 align-items-start course-dashboard-grid">
+
+
+    <!-- =====================================================
+         LEFT COLUMN
+         ===================================================== -->
+
+    <div
+        class="
+            {% if request.user == course.teacher %}
+                col-lg-7
+            {% else %}
+                col-lg-8
+            {% endif %}
+        "
+    >
+
+
+        <!-- =================================================
+             COURSE MATERIALS
+             ================================================= -->
+
+        <section class="course-dashboard-card mb-4">
+
+
+            <!-- Header -->
+
+            <div class="dashboard-card-header">
+
+                <div>
+
+                    <h2>
+                        Course Materials
+                    </h2>
+
+                    <p>
+                        Files and teaching resources for this course.
+                    </p>
+
+                </div>
+
+
                 {% if request.user == course.teacher %}
-                    col-lg-8
-                {% else %}
-                    col-12
+
+                    <span class="dashboard-count">
+                        {{ materials|length }}
+                    </span>
+
                 {% endif %}
-            "
-        >
 
-            <div class="card content-card">
-
-                <div class="card-body p-4">
-
-                    <div
-                        class="
-                            d-flex
-                            flex-column
-                            flex-md-row
-                            align-items-md-start
-                            gap-4
-                        "
-                    >
+            </div>
 
 
-                        <!-- =====================================
-                             COURSE IMAGE
-                             ===================================== -->
 
-                        <div class="course-thumbnail flex-shrink-0">
+            <!-- =================================================
+                 BLOCKED
+                 ================================================= -->
 
-                            {% if course.image %}
+            {% if is_blocked %}
 
-                                <img
-                                    src="{{ course.image.url }}"
-                                    alt="{{ course.title }}"
-                                    class="course-thumbnail-image"
-                                >
+                <div class="dashboard-empty-state">
 
-                            {% else %}
+                    <div class="dashboard-empty-icon">
+                        🔒
+                    </div>
 
-                                <div
-                                    class="
-                                        course-thumbnail-placeholder
-                                        d-flex
-                                        align-items-center
-                                        justify-content-center
-                                        bg-primary-subtle
-                                        text-primary
-                                    "
-                                >
+                    <h3>
+                        Materials Unavailable
+                    </h3>
 
-                                    <span class="display-5">
-                                        📚
+                    <p>
+                        You have been blocked from accessing
+                        materials for this course.
+                    </p>
+
+                </div>
+
+
+
+            <!-- =================================================
+                 MATERIAL LIST
+                 ================================================= -->
+
+            {% elif materials %}
+
+                <div class="material-list">
+
+                    {% for material in materials %}
+
+                        <div class="material-row">
+
+
+                            <div class="material-main">
+
+
+                                <div class="material-icon">
+
+                                    <span>
+                                        DOC
                                     </span>
 
                                 </div>
 
-                            {% endif %}
+
+                                <div class="material-information">
+
+                                    <div class="material-title">
+                                        {{ material.title }}
+                                    </div>
+
+
+                                    {% if material.description %}
+
+                                        <div class="material-description">
+                                            {{ material.description|truncatechars:75 }}
+                                        </div>
+
+                                    {% endif %}
+
+
+                                    <div class="material-meta">
+
+                                        Uploaded
+                                        {{ material.uploaded_at|timesince }}
+                                        ago
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+
+                            <a
+                                href="{{ material.file.url }}"
+                                target="_blank"
+                                class="material-download"
+                            >
+                                Download
+                            </a>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+
+                {% if request.user == course.teacher %}
+
+                    <a
+                        href="{% url 'upload_material' course.id %}"
+                        class="material-upload-link"
+                    >
+                        + Upload another file
+                    </a>
+
+                {% endif %}
+
+
+
+            <!-- =================================================
+                 STUDENT NOT ENROLLED
+                 ================================================= -->
+
+            {% elif request.user.role == "student" and not is_enrolled %}
+
+                <div class="dashboard-empty-state">
+
+                    <div class="dashboard-empty-icon">
+                        🔒
+                    </div>
+
+                    <h3>
+                        Enrol to Access Materials
+                    </h3>
+
+                    <p>
+                        Course materials are available
+                        to enrolled students.
+                    </p>
+
+                </div>
+
+
+
+            <!-- =================================================
+                 NO MATERIALS
+                 ================================================= -->
+
+            {% else %}
+
+                <div class="dashboard-empty-state">
+
+                    <div class="dashboard-empty-icon">
+                        📂
+                    </div>
+
+                    <h3>
+                        No materials yet
+                    </h3>
+
+
+                    {% if request.user == course.teacher %}
+
+                        <p>
+                            Upload teaching materials for your students.
+                        </p>
+
+                        <a
+                            href="{% url 'upload_material' course.id %}"
+                            class="material-upload-link"
+                        >
+                            + Upload first material
+                        </a>
+
+                    {% else %}
+
+                        <p>
+                            Teaching materials will appear here.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+
+        <!-- =================================================
+             LIVE DISCUSSION
+             ================================================= -->
+
+        <section class="course-dashboard-card">
+
+
+            <div class="dashboard-card-header">
+
+                <div>
+
+                    <h2>
+                        Live Discussion
+                    </h2>
+
+                    <p>
+                        Discuss this course in real time.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            {% if is_blocked %}
+
+                <div class="discussion-disabled">
+
+                    You have been blocked from this
+                    course discussion.
+
+                </div>
+
+
+
+            {% elif request.user == course.teacher or is_enrolled %}
+
+
+                <!-- =============================================
+                     RECENT CHAT PREVIEW
+                     ============================================= -->
+
+                <div class="discussion-preview">
+
+                    {% if recent_chat_messages %}
+
+                        <div class="discussion-status">
+
+                            <span class="discussion-status-dot"></span>
+
+                            Recent discussion
 
                         </div>
 
 
+                        {% for message in recent_chat_messages %}
 
-                        <!-- =====================================
-                             COURSE DETAILS
-                             ===================================== -->
+                            <div class="discussion-preview-message">
 
-                        <div class="flex-grow-1">
+                                <strong>
+                                    {{ message.sender.username }}:
+                                </strong>
 
-                            <span
-                                class="
-                                    badge
-                                    bg-primary-subtle
-                                    text-primary
-                                    border
-                                    border-primary-subtle
-                                    mb-2
-                                "
-                            >
-                                Course
-                            </span>
+                                <span>
+                                    {{ message.message|truncatechars:100 }}
+                                </span>
+
+                            </div>
+
+                        {% endfor %}
 
 
-                            <h1 class="page-heading mb-2">
-                                {{ course.title }}
-                            </h1>
+                    {% else %}
 
+                        <div class="discussion-empty">
 
-                            {% if course.description %}
+                            No messages yet.
+                            Start the discussion with your class.
 
-                                <p class="text-muted mb-4">
-                                    {{ course.description }}
-                                </p>
+                        </div>
 
-                            {% else %}
+                    {% endif %}
 
-                                <p class="text-muted mb-4">
-                                    No description available.
-                                </p>
-
-                            {% endif %}
+                </div>
 
 
 
-                            <!-- =================================
-                                 COURSE METADATA
-                                 ================================= -->
-
-                            <div
-                                class="
-                                    d-flex
-                                    flex-wrap
-                                    gap-4
-                                    border-top
-                                    pt-3
-                                "
-                            >
+                <a
+                    href="{% url 'course_chat' course.id %}"
+                    class="discussion-open-btn"
+                >
+                    Open Live Discussion
+                </a>
 
 
-                                <!-- Teacher -->
+            {% else %}
 
-                                <div>
+                <div class="discussion-disabled">
 
-                                    <small class="text-muted d-block">
-                                        Teacher
-                                    </small>
+                    Enrol in this course to join
+                    the live discussion.
 
-                                    <a
-                                        href="{% url 'profile' course.teacher.username %}"
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RIGHT COLUMN
+         ===================================================== -->
+
+    <div
+        class="
+            {% if request.user == course.teacher %}
+                col-lg-5
+            {% else %}
+                col-lg-4
+            {% endif %}
+        "
+    >
+
+
+        <!-- =================================================
+             MANAGE STUDENTS
+             TEACHER ONLY
+             ================================================= -->
+
+        {% if request.user == course.teacher %}
+
+            <section class="course-dashboard-card mb-4">
+
+
+                <div class="dashboard-card-header">
+
+                    <div>
+
+                        <h2>
+                            Manage Students
+                        </h2>
+
+                        <p>
+                            Students enrolled in this course.
+                        </p>
+
+                    </div>
+
+
+                    <span class="dashboard-count">
+                        {{ student_count }}
+                    </span>
+
+                </div>
+
+
+
+                {% if student_preview %}
+
+                    <div class="student-list">
+
+                        {% for enrolment in student_preview %}
+
+                            <div class="student-row">
+
+
+                                <!-- Avatar -->
+
+                                {% if enrolment.student.profile_picture %}
+
+                                    <img
+                                        src="{{ enrolment.student.profile_picture.url }}"
+                                        alt="{{ enrolment.student.username }}"
+                                        class="student-avatar"
+                                    >
+
+                                {% else %}
+
+                                    <div
                                         class="
-                                            text-decoration-none
-                                            fw-semibold
+                                            student-avatar
+                                            student-avatar-placeholder
                                         "
                                     >
-                                        {{ course.teacher.username }}
+                                        {{ enrolment.student.username|first|upper }}
+                                    </div>
+
+                                {% endif %}
+
+
+
+                                <!-- Student Information -->
+
+                                <div class="student-information">
+
+                                    <a
+                                        href="{% url 'profile' enrolment.student.username %}"
+                                        class="student-name"
+                                    >
+
+                                        {% if enrolment.student.first_name or enrolment.student.last_name %}
+
+                                            {{ enrolment.student.first_name }}
+                                            {{ enrolment.student.last_name }}
+
+                                        {% else %}
+
+                                            {{ enrolment.student.username }}
+
+                                        {% endif %}
+
                                     </a>
 
                                 </div>
 
 
 
-                                <!-- Created -->
+                                <!-- Enrolled -->
 
-                                <div>
+                                <div class="student-joined">
 
-                                    <small class="text-muted d-block">
-                                        Created
-                                    </small>
-
-                                    <span class="fw-semibold">
-                                        {{ course.created_at|date:"d M Y" }}
-                                    </span>
+                                    Joined
+                                    {{ enrolment.enrolled_at|timesince }}
+                                    ago
 
                                 </div>
 
-
-
-                                <!-- Student count - teacher only -->
-
-                                {% if request.user == course.teacher %}
-
-                                    <div>
-
-                                        <small class="text-muted d-block">
-                                            Students
-                                        </small>
-
-                                        <span class="fw-semibold">
-                                            {{ student_count }}
-                                        </span>
-
-                                    </div>
-
-                                {% endif %}
-
                             </div>
 
-                        </div>
-
-
-
-                        <!-- =====================================
-                             COURSE ACTIONS
-                             ===================================== -->
-
-                        {% if request.user == course.teacher %}
-
-
-                            <!-- Teacher controls -->
-
-                            <div
-                                class="
-                                    d-flex
-                                    flex-md-column
-                                    gap-2
-                                    flex-shrink-0
-                                "
-                            >
-
-                                <a
-                                    href="{% url 'edit_course' course.id %}"
-                                    class="
-                                        btn
-                                        btn-outline-primary
-                                        btn-sm
-                                    "
-                                >
-                                    Edit Course
-                                </a>
-
-
-                                <a
-                                    href="{% url 'upload_material' course.id %}"
-                                    class="
-                                        btn
-                                        btn-outline-success
-                                        btn-sm
-                                    "
-                                >
-                                    Upload Material
-                                </a>
-
-                            </div>
-
-
-
-                        {% elif request.user.role == "student" and is_blocked %}
-
-
-                            <!-- =================================
-                                 BLOCKED STUDENT
-                                 ================================= -->
-
-                            <div
-                                class="
-                                    d-flex
-                                    flex-column
-                                    align-items-end
-                                    flex-shrink-0
-                                "
-                            >
-
-                                <span
-                                    class="
-                                        btn
-                                        btn-outline-danger
-                                        disabled
-                                    "
-                                    style="min-width: 165px;"
-                                >
-                                    Blocked
-                                </span>
-
-                            </div>
-
-
-
-                        {% elif request.user.role == "student" and is_enrolled %}
-
-
-                            <!-- =================================
-                                 ENROLLED STUDENT
-                                 ================================= -->
-
-                            <div
-                                class="
-                                    d-flex
-                                    flex-column
-                                    align-items-end
-                                    flex-shrink-0
-                                "
-                            >
-
-                                <span
-                                    class="
-                                        btn
-                                        btn-success
-                                        disabled
-                                    "
-                                    style="min-width: 165px;"
-                                >
-                                    ✓ Enrolled
-                                </span>
-
-                            </div>
-
-
-
-                        {% elif request.user.role == "student" %}
-
-
-                            <!-- =================================
-                                 STUDENT NOT ENROLLED
-                                 ================================= -->
-
-                            <div
-                                class="
-                                    d-flex
-                                    flex-column
-                                    align-items-end
-                                    flex-shrink-0
-                                "
-                            >
-
-                                <a
-                                    href="{% url 'enrol_course' course.id %}"
-                                    class="btn btn-primary"
-                                    style="min-width: 165px;"
-                                >
-                                    Enrol on this Course
-                                </a>
-
-                            </div>
-
-                        {% endif %}
+                        {% endfor %}
 
                     </div>
 
-                </div>
 
-            </div>
+                {% else %}
 
-        </div>
+                    <div class="dashboard-empty-state compact">
 
-
-
-        <!-- =====================================================
-             MANAGE STUDENTS
-             Teacher only
-             ===================================================== -->
-
-        {% if request.user == course.teacher %}
-
-            <div class="col-lg-4">
-
-                <div class="card content-card">
-
-                    <div class="card-body p-4">
-
-
-                        <!-- Header -->
-
-                        <div
-                            class="
-                                d-flex
-                                justify-content-between
-                                align-items-start
-                                gap-3
-                                mb-3
-                            "
-                        >
-
-                            <div>
-
-                                <h2 class="h5 fw-bold mb-1">
-                                    Manage Students
-                                </h2>
-
-                                <p class="text-muted small mb-0">
-                                    Students enrolled in this course.
-                                </p>
-
-                            </div>
-
-
-                            <span
-                                class="
-                                    badge
-                                    bg-primary-subtle
-                                    text-primary
-                                    border
-                                    border-primary-subtle
-                                "
-                            >
-                                {{ student_count }}
-                            </span>
-
+                        <div class="dashboard-empty-icon small">
+                            👥
                         </div>
 
-
-
-                        <!-- =====================================
-                             STUDENT PREVIEW
-                             ===================================== -->
-
-                        {% if student_preview %}
-
-                            <div class="d-grid gap-3 mb-4">
-
-                                {% for enrolment in student_preview %}
-
-                                    <div
-                                        class="
-                                            d-flex
-                                            align-items-center
-                                            gap-3
-                                        "
-                                    >
-
-
-                                        <!-- Profile picture -->
-
-                                        {% if enrolment.student.profile_picture %}
-
-                                            <img
-                                                src="{{ enrolment.student.profile_picture.url }}"
-                                                alt="{{ enrolment.student.username }}"
-                                                class="rounded-circle"
-                                                style="
-                                                    width: 44px;
-                                                    height: 44px;
-                                                    object-fit: cover;
-                                                "
-                                            >
-
-                                        {% else %}
-
-                                            <div
-                                                class="
-                                                    rounded-circle
-                                                    bg-primary-subtle
-                                                    text-primary
-                                                    d-flex
-                                                    align-items-center
-                                                    justify-content-center
-                                                    flex-shrink-0
-                                                "
-                                                style="
-                                                    width: 44px;
-                                                    height: 44px;
-                                                "
-                                            >
-                                                👤
-                                            </div>
-
-                                        {% endif %}
-
-
-
-                                        <!-- Student -->
-
-                                        <div class="flex-grow-1">
-
-                                            <a
-                                                href="{% url 'profile' enrolment.student.username %}"
-                                                class="
-                                                    fw-semibold
-                                                    text-dark
-                                                    text-decoration-none
-                                                "
-                                            >
-
-                                                {% if enrolment.student.first_name or enrolment.student.last_name %}
-
-                                                    {{ enrolment.student.first_name }}
-                                                    {{ enrolment.student.last_name }}
-
-                                                {% else %}
-
-                                                    {{ enrolment.student.username }}
-
-                                                {% endif %}
-
-                                            </a>
-
-
-                                            <div class="text-muted small">
-                                                @{{ enrolment.student.username }}
-                                            </div>
-
-                                        </div>
-
-
-
-                                        <!-- Profile -->
-
-                                        <a
-                                            href="{% url 'profile' enrolment.student.username %}"
-                                            class="
-                                                btn
-                                                btn-sm
-                                                btn-outline-secondary
-                                            "
-                                        >
-                                            Profile
-                                        </a>
-
-                                    </div>
-
-
-                                    {% if not forloop.last %}
-
-                                        <hr class="my-0">
-
-                                    {% endif %}
-
-                                {% endfor %}
-
-                            </div>
-
-
-
-                        {% else %}
-
-                            <!-- =================================
-                                 NO STUDENTS
-                                 ================================= -->
-
-                            <div class="text-center py-4">
-
-                                <div class="fs-2 mb-2">
-                                    👥
-                                </div>
-
-
-                                <h6 class="fw-semibold">
-                                    No students enrolled
-                                </h6>
-
-
-                                <p class="text-muted small mb-0">
-
-                                    Students who enrol in this course
-                                    will appear here.
-
-                                </p>
-
-                            </div>
-
-                        {% endif %}
-
-
-
-                        <!-- =====================================
-                             VIEW STUDENTS
-                             ===================================== -->
-
-                        <div class="d-grid">
-
-                            <a
-                                href="{% url 'course_students' course.id %}"
-                                class="btn btn-primary"
-                            >
-
-                                {% if student_count > 3 %}
-
-                                    View All {{ student_count }} Students
-
-                                {% else %}
-
-                                    View Students
-
-                                {% endif %}
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        {% endif %}
-
-    </div>
-
-
-
-    <!-- =========================================================
-         COURSE CONTENT
-         ========================================================= -->
-
-    <div class="row g-4">
-
-
-        <!-- =====================================================
-             COURSE MATERIALS
-             ===================================================== -->
-
-        <div class="col-lg-8">
-
-            <div class="card content-card h-100">
-
-                <div class="card-body p-4">
-
-
-                    <!-- Header -->
-
-                    <div class="mb-4">
-
-                        <h2 class="h4 fw-bold mb-1">
-                            Course Materials
-                        </h2>
-
-                        <p class="text-muted small mb-0">
-                            Files and teaching resources for this course.
+                        <h3>
+                            No students enrolled
+                        </h3>
+
+                        <p>
+                            Students will appear here once they enrol.
                         </p>
 
                     </div>
 
+                {% endif %}
 
 
-                    <!-- =================================================
-                         BLOCKED
-                         ================================================= -->
 
-                    {% if is_blocked %}
-
-                        <div class="text-center py-5">
-
-                            <div class="display-5 mb-3">
-                                🔒
-                            </div>
-
-
-                            <h5 class="fw-semibold">
-                                Materials Unavailable
-                            </h5>
-
-
-                            <p class="text-muted mb-0">
-
-                                You have been blocked from accessing
-                                materials for this course.
-
-                            </p>
-
-                        </div>
-
-
-
-                    <!-- =================================================
-                         MATERIAL LIST
-                         ================================================= -->
-
-                    {% elif materials %}
-
-                        <div class="list-group list-group-flush">
-
-                            {% for material in materials %}
-
-                                <div class="list-group-item px-0 py-3">
-
-                                    <div
-                                        class="
-                                            d-flex
-                                            justify-content-between
-                                            align-items-start
-                                            gap-3
-                                        "
-                                    >
-
-                                        <div class="flex-grow-1">
-
-
-                                            <h5 class="mb-1">
-                                                📄 {{ material.title }}
-                                            </h5>
-
-
-                                            {% if material.description %}
-
-                                                <p class="text-muted mb-2">
-                                                    {{ material.description }}
-                                                </p>
-
-                                            {% endif %}
-
-
-                                            <small class="text-muted d-block">
-
-                                                Uploaded by
-
-                                                <a
-                                                    href="{% url 'profile' course.teacher.username %}"
-                                                    class="text-decoration-none"
-                                                >
-                                                    {{ course.teacher.username }}
-                                                </a>
-
-                                            </small>
-
-
-                                            <small class="text-muted">
-
-                                                {{ material.uploaded_at|date:"d M Y, g:i A" }}
-
-                                            </small>
-
-                                        </div>
-
-
-                                        <a
-                                            href="{{ material.file.url }}"
-                                            target="_blank"
-                                            class="
-                                                btn
-                                                btn-outline-primary
-                                                btn-sm
-                                            "
-                                        >
-                                            View
-                                        </a>
-
-                                    </div>
-
-                                </div>
-
-                            {% endfor %}
-
-                        </div>
-
-
-
-                    <!-- =================================================
-                         NOT ENROLLED STUDENT
-                         ================================================= -->
-
-                    {% elif request.user.role == "student" and not is_enrolled %}
-
-                        <div class="text-center py-5">
-
-                            <div class="display-5 mb-3">
-                                🔒
-                            </div>
-
-
-                            <h5 class="fw-semibold">
-                                Enrol to Access Materials
-                            </h5>
-
-
-                            <p class="text-muted mb-0">
-
-                                Course materials are available
-                                to enrolled students.
-
-                            </p>
-
-                        </div>
-
-
-
-                    <!-- =================================================
-                         NO MATERIALS
-                         ================================================= -->
-
-                    {% else %}
-
-                        <div class="text-center py-5">
-
-                            <div class="display-5 mb-3">
-                                📂
-                            </div>
-
-
-                            <h5 class="fw-semibold">
-                                No materials yet
-                            </h5>
-
-
-                            {% if request.user == course.teacher %}
-
-                                <p class="text-muted mb-3">
-
-                                    Upload teaching materials
-                                    for your students.
-
-                                </p>
-
-
-                                <a
-                                    href="{% url 'upload_material' course.id %}"
-                                    class="
-                                        btn
-                                        btn-outline-success
-                                        btn-sm
-                                    "
-                                >
-                                    Upload First Material
-                                </a>
-
-
-                            {% else %}
-
-                                <p class="text-muted mb-0">
-                                    Teaching materials will appear here.
-                                </p>
-
-                            {% endif %}
-
-                        </div>
-
-                    {% endif %}
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- =====================================================
-             LIVE DISCUSSION
-             ===================================================== -->
-
-        <div class="col-lg-4">
-
-            <div class="card content-card h-100">
-
-                <div
-                    class="
-                        card-body
-                        d-flex
-                        flex-column
-                        p-4
-                    "
+                <a
+                    href="{% url 'course_students' course.id %}"
+                    class="students-view-btn"
                 >
 
+                    {% if student_count > 3 %}
 
-                    <!-- Icon -->
-
-                    <div
-                        class="
-                            rounded-circle
-                            bg-primary-subtle
-                            d-flex
-                            align-items-center
-                            justify-content-center
-                            mb-3
-                        "
-                        style="
-                            width: 52px;
-                            height: 52px;
-                            font-size: 1.4rem;
-                        "
-                    >
-                        💬
-                    </div>
-
-
-                    <h2 class="h4 fw-bold">
-                        Live Discussion
-                    </h2>
-
-
-                    <p class="text-muted flex-grow-1">
-
-                        Discuss this course with the teacher
-                        and enrolled students in real time.
-
-                    </p>
-
-
-
-                    <!-- =========================================
-                         BLOCKED STUDENT
-                         ========================================= -->
-
-                    {% if is_blocked %}
-
-                        <div class="alert alert-danger mb-0">
-
-                            You have been blocked from
-                            this course discussion.
-
-                        </div>
-
-
-
-                    <!-- =========================================
-                         ACCESS ALLOWED
-                         ========================================= -->
-
-                    {% elif request.user == course.teacher or is_enrolled %}
-
-                        <div class="d-grid">
-
-                            <a
-                                href="{% url 'course_chat' course.id %}"
-                                class="btn btn-primary"
-                            >
-                                Open Live Discussion
-                            </a>
-
-                        </div>
-
-
-
-                    <!-- =========================================
-                         NOT ENROLLED
-                         ========================================= -->
+                        View All {{ student_count }} Students
 
                     {% else %}
 
-                        <div class="alert alert-secondary mb-0">
-
-                            Enrol in this course to join
-                            the live discussion.
-
-                        </div>
+                        View All Students
 
                     {% endif %}
 
-                </div>
+                </a>
 
-            </div>
+            </section>
 
-        </div>
-
-    </div>
+        {% endif %}
 
 
 
-    <!-- =========================================================
-         COURSE / STUDENT FEEDBACK
-         ========================================================= -->
+        <!-- =================================================
+             FEEDBACK
+             ================================================= -->
 
-    <div class="card content-card mt-4">
+        <section class="course-dashboard-card">
 
-        <div class="card-body p-4">
 
-            <div
-                class="
-                    d-flex
-                    justify-content-between
-                    align-items-center
-                    flex-wrap
-                    gap-3
-                    mb-4
-                "
-            >
+            <div class="dashboard-card-header">
 
                 <div>
 
 
-                    <!-- Teacher wording -->
-
                     {% if request.user == course.teacher %}
 
-                        <h2 class="h4 fw-bold mb-1">
+                        <h2>
                             Student Feedback
                         </h2>
 
-                        <p class="text-muted mb-0">
-
-                            Reviews submitted by students
-                            enrolled in this course.
-
+                        <p>
+                            Reviews submitted by enrolled students.
                         </p>
-
-
-                    <!-- Student wording -->
 
                     {% else %}
 
-                        <h2 class="h4 fw-bold mb-1">
+                        <h2>
                             Course Feedback
                         </h2>
 
-                        <p class="text-muted mb-0">
+                        <p>
                             Read what students think about this course.
                         </p>
 
@@ -1116,21 +910,9 @@
                 </div>
 
 
-
-                <!-- =============================================
-                     LEAVE FEEDBACK
-                     ============================================= -->
-
-                {% if is_enrolled and not has_feedback and not is_blocked %}
-
-                    <a
-                        href="{% url 'create_feedback' course.id %}"
-                        class="btn btn-outline-primary"
-                    >
-                        Leave Feedback
-                    </a>
-
-                {% endif %}
+                <span class="dashboard-count">
+                    {{ feedback_list|length }}
+                </span>
 
             </div>
 
@@ -1142,71 +924,95 @@
 
             {% if feedback_list %}
 
-                <div class="row g-3">
+                <div class="feedback-list">
 
-                    {% for feedback in feedback_list %}
+                    {% for feedback in feedback_list|slice:":3" %}
 
-                        <div class="col-md-6">
+                        <div class="feedback-row">
 
-                            <div
-                                class="
-                                    border
-                                    rounded-3
-                                    p-3
-                                    h-100
-                                "
-                            >
+
+                            <div class="feedback-heading">
+
+                                <a
+                                    href="{% url 'profile' feedback.student.username %}"
+                                    class="feedback-user"
+                                >
+                                    {{ feedback.student.username }}
+                                </a>
+
+
 
                                 <div
-                                    class="
-                                        d-flex
-                                        justify-content-between
-                                        align-items-start
-                                        gap-2
-                                        mb-2
-                                    "
+                                    class="feedback-stars"
+                                    aria-label="{{ feedback.rating }} out of 5 stars"
                                 >
-
-                                    <div>
-
-                                        <a
-                                            href="{% url 'profile' feedback.student.username %}"
-                                            class="
-                                                fw-semibold
-                                                text-decoration-none
-                                                text-dark
-                                            "
-                                        >
-                                            {{ feedback.student.username }}
-                                        </a>
-
-                                    </div>
-
 
                                     <span
                                         class="
-                                            badge
-                                            text-bg-warning
+                                            {% if feedback.rating >= 1 %}
+                                                active
+                                            {% endif %}
                                         "
                                     >
-                                        ⭐ {{ feedback.rating }}/5
+                                        ★
+                                    </span>
+
+                                    <span
+                                        class="
+                                            {% if feedback.rating >= 2 %}
+                                                active
+                                            {% endif %}
+                                        "
+                                    >
+                                        ★
+                                    </span>
+
+                                    <span
+                                        class="
+                                            {% if feedback.rating >= 3 %}
+                                                active
+                                            {% endif %}
+                                        "
+                                    >
+                                        ★
+                                    </span>
+
+                                    <span
+                                        class="
+                                            {% if feedback.rating >= 4 %}
+                                                active
+                                            {% endif %}
+                                        "
+                                    >
+                                        ★
+                                    </span>
+
+                                    <span
+                                        class="
+                                            {% if feedback.rating >= 5 %}
+                                                active
+                                            {% endif %}
+                                        "
+                                    >
+                                        ★
                                     </span>
 
                                 </div>
 
-
-                                <p class="mb-3">
-                                    {{ feedback.comment }}
-                                </p>
-
-
-                                <small class="text-muted">
-
-                                    {{ feedback.created_at|date:"d M Y, g:i A" }}
-
-                                </small>
-
                             </div>
+
+
+
+                            <p>
+                                {{ feedback.comment }}
+                            </p>
+
+
+                            <span class="feedback-date">
+
+                                {{ feedback.created_at|date:"d M Y" }}
+
+                            </span>
 
                         </div>
 
@@ -1215,37 +1021,29 @@
                 </div>
 
 
-
-            <!-- =================================================
-                 NO FEEDBACK
-                 ================================================= -->
-
             {% else %}
 
-                <div class="text-center py-5">
+                <div class="dashboard-empty-state compact">
 
-                    <div class="display-5 mb-3">
+                    <div class="dashboard-empty-icon small">
                         ⭐
                     </div>
 
-
-                    <h5 class="fw-semibold">
+                    <h3>
                         No feedback yet
-                    </h5>
+                    </h3>
 
 
                     {% if request.user == course.teacher %}
 
-                        <p class="text-muted mb-0">
-
+                        <p>
                             Student reviews will appear here
                             once they submit feedback.
-
                         </p>
 
                     {% else %}
 
-                        <p class="text-muted mb-0">
+                        <p>
                             Student reviews will appear here.
                         </p>
 
@@ -1257,231 +1055,1182 @@
 
 
 
-            <!-- Already submitted -->
+            <!-- =================================================
+                 STUDENT LEAVE FEEDBACK
+                 ================================================= -->
+
+            {% if is_enrolled and not has_feedback and not is_blocked %}
+
+                <a
+                    href="{% url 'create_feedback' course.id %}"
+                    class="feedback-leave-btn"
+                >
+                    Leave Feedback
+                </a>
+
+            {% endif %}
+
+
 
             {% if is_enrolled and has_feedback and not is_blocked %}
 
-                <div class="alert alert-info mt-4 mb-0">
+                <div class="feedback-submitted-message">
 
-                    You have already submitted feedback
+                    ✓ You have already submitted feedback
                     for this course.
 
                 </div>
 
             {% endif %}
 
-        </div>
+        </section>
 
     </div>
 
-
-
-    <!-- =========================================================
-         BACK NAVIGATION
-         ========================================================= -->
-
-    <div class="mt-4">
-
-        {% if request.user == course.teacher %}
-
-            <a
-                href="{% url 'teacher_courses' %}"
-                class="btn btn-outline-secondary"
-            >
-                ← Back to My Courses
-            </a>
-
-
-        {% elif request.user.role == "student" and is_enrolled %}
-
-            <a
-                href="{% url 'student_courses' %}"
-                class="btn btn-outline-secondary"
-            >
-                ← Back to My Courses
-            </a>
-
-
-        {% else %}
-
-            <a
-                href="{% url 'course_list' %}"
-                class="btn btn-outline-secondary"
-            >
-                ← Back to Browse Courses
-            </a>
-
-        {% endif %}
-
-    </div>
+</div>
 
 
 
-    <!-- =========================================================
-         PAGE-SPECIFIC STYLING
-         ========================================================= -->
+<!-- =========================================================
+     BACK NAVIGATION
+     ========================================================= -->
 
-    <style>
+<div class="course-back-navigation">
 
-        /* =====================================================
-           COURSE ACCESS BAR
-           ===================================================== */
+    {% if request.user == course.teacher %}
 
-        .course-access-bar {
+        <a href="{% url 'teacher_courses' %}">
+            ← Back to My Courses
+        </a>
 
+    {% elif request.user.role == "student" and is_enrolled %}
+
+        <a href="{% url 'student_courses' %}">
+            ← Back to My Courses
+        </a>
+
+    {% else %}
+
+        <a href="{% url 'course_list' %}">
+            ← Back to Browse Courses
+        </a>
+
+    {% endif %}
+
+</div>
+
+
+
+<!-- =========================================================
+     PAGE STYLING
+     ========================================================= -->
+
+<style>
+
+
+    /* =========================================================
+       BREADCRUMB
+       ========================================================= */
+
+    .course-breadcrumb {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.4rem;
+
+        margin-bottom: 1rem;
+
+        color: #7c8797;
+
+        font-size: 0.82rem;
+    }
+
+
+    .course-breadcrumb a {
+        color: #315bd7;
+
+        text-decoration: none;
+    }
+
+
+    .course-breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+
+
+    /* =========================================================
+       ACCESS BAR
+       ========================================================= */
+
+    .course-access-bar {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.7rem;
+
+        margin-bottom: 1.4rem;
+
+        padding:
+            0.75rem
+            1rem;
+
+        color: #172033;
+
+        background: #eef3ff;
+
+        border:
+            1px solid
+            #cbd9ff;
+
+        border-radius: 9px;
+
+        font-size: 0.82rem;
+    }
+
+
+    .course-access-bar span {
+        margin-left: 0.25rem;
+
+        color: #677487;
+    }
+
+
+    .course-access-icon {
+        width: 26px;
+        height: 26px;
+
+        min-width: 26px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #ffffff;
+
+        background: #365bd8;
+
+        border-radius: 50%;
+
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+
+    .course-access-icon-success {
+        background: #239268;
+    }
+
+
+    .course-access-blocked {
+        background: #fff3f4;
+
+        border-color: #f4c9ce;
+    }
+
+
+    .course-access-icon-blocked {
+        background: #dc3545;
+    }
+
+
+
+    /* =========================================================
+       COURSE SUMMARY
+       ========================================================= */
+
+    .course-summary-card {
+        display: flex;
+
+        justify-content: space-between;
+        align-items: flex-start;
+
+        gap: 2rem;
+
+        margin-bottom: 1.4rem;
+
+        padding: 1.45rem;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #dce3eb;
+
+        border-radius: 12px;
+
+        box-shadow:
+            0 3px 12px
+            rgba(31, 41, 55, 0.035);
+    }
+
+
+    .course-summary-main {
+        min-width: 0;
+
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 1.3rem;
+
+        flex: 1;
+    }
+
+
+    .course-summary-cover {
+        width: 76px;
+        height: 76px;
+
+        min-width: 76px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        overflow: hidden;
+
+        color: #ffffff;
+
+        background:
+            linear-gradient(
+                135deg,
+                #365bd8,
+                #263f9b
+            );
+
+        border-radius: 12px;
+
+        font-size: 1.15rem;
+        font-weight: 700;
+    }
+
+
+    .course-summary-cover img {
+        width: 100%;
+        height: 100%;
+
+        display: block;
+
+        object-fit: cover;
+    }
+
+
+    .course-summary-content {
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .course-category-badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        padding:
+            0.2rem
+            0.55rem;
+
+        color: #85600c;
+
+        background: #fff4dc;
+
+        border:
+            1px solid
+            #f1ddb3;
+
+        border-radius: 999px;
+
+        font-size: 0.67rem;
+        font-weight: 600;
+    }
+
+
+    .course-summary-title {
+        margin:
+            0
+            0
+            0.35rem;
+
+        color: #111827;
+
+        font-size: 1.6rem;
+        font-weight: 700;
+
+        line-height: 1.25;
+    }
+
+
+    .course-summary-description {
+        margin-bottom: 1rem;
+
+        color: #6f7c8e;
+
+        font-size: 0.87rem;
+    }
+
+
+    .course-summary-meta {
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: 2.4rem;
+
+        padding-top: 0.95rem;
+
+        border-top:
+            1px solid
+            #e7ebf0;
+    }
+
+
+    .meta-label {
+        display: block;
+
+        margin-bottom: 0.15rem;
+
+        color: #8793a3;
+
+        font-size: 0.68rem;
+    }
+
+
+    .meta-value {
+        display: block;
+
+        color: #172033;
+
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+
+    .meta-link {
+        color: #315bd7;
+
+        text-decoration: none;
+    }
+
+
+    .meta-link:hover {
+        text-decoration: underline;
+    }
+
+
+    .course-summary-action {
+        width: 145px;
+
+        flex-shrink: 0;
+    }
+
+
+    .summary-edit-btn,
+    .summary-enrol-btn,
+    .summary-enrolled-btn,
+    .summary-blocked-btn {
+        width: 100%;
+
+        min-height: 42px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        padding:
+            0.55rem
+            0.8rem;
+
+        border-radius: 8px;
+
+        font-size: 0.8rem;
+        font-weight: 600;
+
+        text-decoration: none;
+    }
+
+
+    .summary-edit-btn {
+        color: #172033;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #d1d9e4;
+    }
+
+
+    .summary-edit-btn:hover {
+        color: #172033;
+
+        background: #f7f9fc;
+    }
+
+
+    .summary-enrol-btn {
+        color: #ffffff;
+
+        background: #365bd8;
+
+        border:
+            1px solid
+            #365bd8;
+    }
+
+
+    .summary-enrol-btn:hover {
+        color: #ffffff;
+
+        background: #294bc1;
+    }
+
+
+    .summary-enrolled-btn {
+        color: #ffffff;
+
+        background: #63ad8d;
+
+        border:
+            1px solid
+            #63ad8d;
+    }
+
+
+    .summary-blocked-btn {
+        color: #b42335;
+
+        background: #fff4f5;
+
+        border:
+            1px solid
+            #efc2c8;
+    }
+
+
+
+    /* =========================================================
+       DASHBOARD CARDS
+       ========================================================= */
+
+    .course-dashboard-grid {
+        margin-top: 0;
+    }
+
+
+    .course-dashboard-card {
+        padding: 1.4rem;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #dce3eb;
+
+        border-radius: 12px;
+
+        box-shadow:
+            0 3px 12px
+            rgba(31, 41, 55, 0.03);
+    }
+
+
+    .dashboard-card-header {
+        display: flex;
+
+        align-items: flex-start;
+        justify-content: space-between;
+
+        gap: 1rem;
+
+        margin-bottom: 1rem;
+    }
+
+
+    .dashboard-card-header h2 {
+        margin:
+            0
+            0
+            0.2rem;
+
+        color: #111827;
+
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+
+    .dashboard-card-header p {
+        margin: 0;
+
+        color: #738094;
+
+        font-size: 0.78rem;
+    }
+
+
+    .dashboard-count {
+        min-width: 25px;
+        height: 25px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        padding:
+            0
+            0.45rem;
+
+        color: #315bd7;
+
+        background: #e8eeff;
+
+        border-radius: 999px;
+
+        font-size: 0.7rem;
+        font-weight: 700;
+    }
+
+
+
+    /* =========================================================
+       MATERIALS
+       ========================================================= */
+
+    .material-list {
+        border-top:
+            1px solid
+            #edf0f4;
+    }
+
+
+    .material-row {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 1rem;
+
+        padding:
+            0.8rem
+            0;
+
+        border-bottom:
+            1px solid
+            #edf0f4;
+    }
+
+
+    .material-main {
+        min-width: 0;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.8rem;
+    }
+
+
+    .material-icon {
+        width: 38px;
+        height: 38px;
+
+        min-width: 38px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #dc514a;
+
+        background: #ffefee;
+
+        border-radius: 8px;
+    }
+
+
+    .material-icon span {
+        font-size: 0.58rem;
+        font-weight: 700;
+    }
+
+
+    .material-information {
+        min-width: 0;
+    }
+
+
+    .material-title {
+        overflow: hidden;
+
+        color: #172033;
+
+        font-size: 0.82rem;
+        font-weight: 600;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+    }
+
+
+    .material-description {
+        margin-top: 0.1rem;
+
+        color: #697586;
+
+        font-size: 0.72rem;
+    }
+
+
+    .material-meta {
+        margin-top: 0.1rem;
+
+        color: #8a95a5;
+
+        font-size: 0.69rem;
+    }
+
+
+    .material-download {
+        flex-shrink: 0;
+
+        color: #315bd7;
+
+        font-size: 0.74rem;
+        font-weight: 500;
+
+        text-decoration: none;
+    }
+
+
+    .material-download:hover {
+        text-decoration: underline;
+    }
+
+
+    .material-upload-link {
+        display: inline-flex;
+
+        margin-top: 0.9rem;
+
+        color: #315bd7;
+
+        font-size: 0.76rem;
+        font-weight: 500;
+
+        text-decoration: none;
+    }
+
+
+    .material-upload-link:hover {
+        text-decoration: underline;
+    }
+
+
+
+    /* =========================================================
+       STUDENTS
+       ========================================================= */
+
+    .student-list {
+        border-top:
+            1px solid
+            #edf0f4;
+    }
+
+
+    .student-row {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.7rem;
+
+        padding:
+            0.7rem
+            0;
+
+        border-bottom:
+            1px solid
+            #edf0f4;
+    }
+
+
+    .student-avatar {
+        width: 36px;
+        height: 36px;
+
+        min-width: 36px;
+
+        border-radius: 50%;
+
+        object-fit: cover;
+    }
+
+
+    .student-avatar-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #263750;
+
+        background: #e1e8f5;
+
+        font-size: 0.68rem;
+        font-weight: 700;
+    }
+
+
+    .student-information {
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .student-name {
+        color: #172033;
+
+        font-size: 0.78rem;
+        font-weight: 600;
+
+        text-decoration: none;
+    }
+
+
+    .student-name:hover {
+        color: #315bd7;
+    }
+
+
+    .student-joined {
+        flex-shrink: 0;
+
+        color: #8993a2;
+
+        font-size: 0.67rem;
+    }
+
+
+    .students-view-btn {
+        display: inline-flex;
+
+        margin-top: 0.9rem;
+
+        padding:
+            0.48rem
+            0.7rem;
+
+        color: #ffffff;
+
+        background: #365bd8;
+
+        border-radius: 6px;
+
+        font-size: 0.75rem;
+        font-weight: 600;
+
+        text-decoration: none;
+    }
+
+
+    .students-view-btn:hover {
+        color: #ffffff;
+
+        background: #294bc1;
+    }
+
+
+
+    /* =========================================================
+       LIVE DISCUSSION
+       ========================================================= */
+
+    .discussion-preview {
+        margin-bottom: 0.9rem;
+
+        padding: 0.85rem;
+
+        background: #fafbfe;
+
+        border:
+            1px solid
+            #dfe5ec;
+
+        border-radius: 8px;
+    }
+
+
+    .discussion-status {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.4rem;
+
+        margin-bottom: 0.45rem;
+
+        color: #627084;
+
+        font-size: 0.69rem;
+    }
+
+
+    .discussion-status-dot {
+        width: 7px;
+        height: 7px;
+
+        background: #299b70;
+
+        border-radius: 50%;
+    }
+
+
+    .discussion-preview-message {
+        margin-bottom: 0.2rem;
+
+        color: #344054;
+
+        font-size: 0.76rem;
+    }
+
+
+    .discussion-preview-message:last-child {
+        margin-bottom: 0;
+    }
+
+
+    .discussion-preview-message strong {
+        color: #172033;
+    }
+
+
+    .discussion-empty {
+        color: #778397;
+
+        font-size: 0.76rem;
+    }
+
+
+    .discussion-open-btn {
+        width: 100%;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 0.6rem;
+
+        color: #ffffff;
+
+        background: #365bd8;
+
+        border-radius: 7px;
+
+        font-size: 0.78rem;
+        font-weight: 600;
+
+        text-decoration: none;
+    }
+
+
+    .discussion-open-btn:hover {
+        color: #ffffff;
+
+        background: #294bc1;
+    }
+
+
+    .discussion-disabled {
+        padding: 0.9rem;
+
+        color: #687487;
+
+        background: #f7f8fa;
+
+        border:
+            1px solid
+            #e0e5eb;
+
+        border-radius: 8px;
+
+        font-size: 0.76rem;
+    }
+
+
+
+    /* =========================================================
+       FEEDBACK
+       ========================================================= */
+
+    .feedback-list {
+        border-top:
+            1px solid
+            #edf0f4;
+    }
+
+
+    .feedback-row {
+        padding:
+            0.75rem
+            0;
+
+        border-bottom:
+            1px solid
+            #edf0f4;
+    }
+
+
+    .feedback-heading {
+        display: flex;
+
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 1rem;
+
+        margin-bottom: 0.25rem;
+    }
+
+
+    .feedback-user {
+        color: #172033;
+
+        font-size: 0.77rem;
+        font-weight: 600;
+
+        text-decoration: none;
+    }
+
+
+    .feedback-user:hover {
+        color: #315bd7;
+    }
+
+
+    .feedback-stars {
+        display: flex;
+
+        flex-shrink: 0;
+
+        color: #d3d9e1;
+
+        font-size: 0.72rem;
+    }
+
+
+    .feedback-stars span.active {
+        color: #e5a123;
+    }
+
+
+    .feedback-row p {
+        margin:
+            0
+            0
+            0.2rem;
+
+        color: #687487;
+
+        font-size: 0.75rem;
+
+        line-height: 1.45;
+    }
+
+
+    .feedback-date {
+        color: #9aa3b0;
+
+        font-size: 0.65rem;
+    }
+
+
+    .feedback-leave-btn {
+        display: inline-flex;
+
+        margin-top: 0.9rem;
+
+        color: #315bd7;
+
+        font-size: 0.75rem;
+        font-weight: 600;
+
+        text-decoration: none;
+    }
+
+
+    .feedback-leave-btn:hover {
+        text-decoration: underline;
+    }
+
+
+    .feedback-submitted-message {
+        margin-top: 0.9rem;
+
+        padding: 0.75rem;
+
+        color: #36566f;
+
+        background: #edf6fb;
+
+        border:
+            1px solid
+            #cee6f3;
+
+        border-radius: 7px;
+
+        font-size: 0.73rem;
+    }
+
+
+
+    /* =========================================================
+       EMPTY STATES
+       ========================================================= */
+
+    .dashboard-empty-state {
+        padding:
+            2rem
+            1rem;
+
+        text-align: center;
+    }
+
+
+    .dashboard-empty-state.compact {
+        padding:
+            1rem
+            0;
+    }
+
+
+    .dashboard-empty-icon {
+        margin-bottom: 0.6rem;
+
+        font-size: 1.6rem;
+    }
+
+
+    .dashboard-empty-icon.small {
+        font-size: 1.3rem;
+    }
+
+
+    .dashboard-empty-state h3 {
+        margin-bottom: 0.25rem;
+
+        color: #172033;
+
+        font-size: 0.88rem;
+        font-weight: 600;
+    }
+
+
+    .dashboard-empty-state p {
+        margin: 0;
+
+        color: #7c8797;
+
+        font-size: 0.74rem;
+    }
+
+
+
+    /* =========================================================
+       BACK NAVIGATION
+       ========================================================= */
+
+    .course-back-navigation {
+        margin-top: 1.4rem;
+    }
+
+
+    .course-back-navigation a {
+        color: #6a7687;
+
+        font-size: 0.78rem;
+
+        text-decoration: none;
+    }
+
+
+    .course-back-navigation a:hover {
+        color: #315bd7;
+    }
+
+
+
+    /* =========================================================
+       TABLET / MOBILE
+       ========================================================= */
+
+    @media (max-width: 991.98px) {
+
+        .course-summary-card {
+            flex-direction: column;
+        }
+
+
+        .course-summary-action {
             width: 100%;
+        }
 
-            padding: 10px 16px;
+    }
 
-            background-color: #e7f1ff;
 
-            border: 1px solid #cfe2ff;
+    @media (max-width: 767.98px) {
 
-            border-radius: 10px;
+        .course-summary-main {
+            flex-direction: column;
         }
 
 
-        .course-access-description {
-
-            color: #5f6f82;
-
-            font-size: 0.9rem;
+        .course-summary-meta {
+            gap: 1.2rem;
         }
 
 
-
-        /* Access icon */
-
-        .course-access-icon {
-
-            width: 28px;
-            height: 28px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            flex-shrink: 0;
-
-            border-radius: 50%;
-
-            background-color: #0d6efd;
-
-            color: #ffffff;
-
-            font-size: 0.8rem;
-
-            font-weight: 700;
+        .student-joined {
+            display: none;
         }
 
 
+        .course-access-bar span {
+            display: block;
 
-        /* Enrolled */
-
-        .course-access-icon-success {
-
-            background-color: #198754;
+            margin:
+                0.1rem
+                0
+                0;
         }
 
 
-
-        /* =====================================================
-           BLOCKED ACCESS
-           ===================================================== */
-
-        .course-access-blocked {
-
-            background-color: #fff1f2;
-
-            border-color: #fecdd3;
+        .course-summary-title {
+            font-size: 1.4rem;
         }
 
 
-        .course-access-icon-blocked {
-
-            background-color: #dc3545;
+        .material-row {
+            align-items: flex-start;
         }
 
+    }
 
-
-        /* =====================================================
-           COURSE SQUARE THUMBNAIL
-           ===================================================== */
-
-        .course-thumbnail {
-
-            width: 170px;
-            height: 170px;
-
-            border-radius: 14px;
-
-            overflow: hidden;
-
-            border: 1px solid #dee2e6;
-
-            background: #f8f9fa;
-        }
-
-
-        .course-thumbnail-image {
-
-            width: 100%;
-            height: 100%;
-
-            object-fit: cover;
-        }
-
-
-        .course-thumbnail-placeholder {
-
-            width: 100%;
-            height: 100%;
-        }
-
-
-
-        /* =====================================================
-           CARDS
-           ===================================================== */
-
-        .content-card {
-
-            border: 0;
-        }
-
-
-
-        /* =====================================================
-           MOBILE
-           ===================================================== */
-
-        @media (max-width: 767.98px) {
-
-            .course-thumbnail {
-
-                width: 130px;
-                height: 130px;
-            }
-
-
-            .course-access-bar {
-
-                padding: 10px 12px;
-            }
-
-
-            .course-access-description {
-
-                display: block;
-
-                margin-left: 0 !important;
-
-                margin-top: 2px;
-            }
-
-        }
-
-    </style>
+</style>
 
 
 {% endblock %}

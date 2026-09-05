@@ -271,58 +271,6 @@
 
                         </p>
 
-
-
-                        <!-- =================================================
-                             COURSE META
-                             ================================================= -->
-
-                        <div class="student-course-meta">
-
-
-                            <!-- Teacher -->
-
-                            <div>
-
-                                <span class="course-meta-label">
-                                    Teacher
-                                </span>
-
-
-                                <a
-                                    href="{% url 'profile' enrolment.course.teacher.username %}"
-                                    class="course-teacher-link"
-                                >
-                                    {{ enrolment.course.teacher.username }}
-                                </a>
-
-                            </div>
-
-
-
-                            <!-- Enrolled Date -->
-
-                            <div>
-
-                                <span class="course-meta-label">
-                                    Enrolled
-                                </span>
-
-
-                                <span class="course-meta-value">
-                                    {{ enrolment.enrolled_at|date:"d M Y" }}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-
-                        <!-- =================================================
-                             CONTINUE COURSE
-                             ================================================= -->
-
                         <a
                             href="{% url 'course_detail' enrolment.course.id %}"
                             class="continue-course-btn"
@@ -750,7 +698,7 @@
        ========================================================= */
 
     .student-course-card {
-        height: 100%;
+        height: auto;
 
         display: flex;
 
@@ -850,8 +798,6 @@
 
         flex-direction: column;
 
-        flex: 1;
-
         padding: 1rem;
     }
 
@@ -905,8 +851,6 @@
     /* Description */
 
     .student-course-description {
-        min-height: 42px;
-
         margin-bottom: 1rem;
 
         color: #6f7c8e;

@@ -194,6 +194,7 @@ class CourseTests(TestCase):
     # -----------------------------------------
 
     def test_teacher_can_create_course(self):
+
         self.client.login(
             username="teacher1",
             password="testpass123",
@@ -202,10 +203,9 @@ class CourseTests(TestCase):
         response = self.client.post(
             reverse("create_course"),
             {
-                "title": "Web Development",
-                "description": (
-                    "A course about Django development."
-                ),
+                "title": "New Test Course",
+                "description": "A course created during testing.",
+                "category": "programming",
             },
         )
 
@@ -216,8 +216,9 @@ class CourseTests(TestCase):
 
         self.assertTrue(
             Course.objects.filter(
+                title="New Test Course",
                 teacher=self.teacher,
-                title="Web Development",
+                category="programming",
             ).exists()
         )
 

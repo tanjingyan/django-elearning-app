@@ -98,11 +98,21 @@ def logout_view(request):
 @login_required
 def student_dashboard(request):
 
+    # =========================================================
+    # ROLE CHECK
+    # =========================================================
+
     if request.user.role != "student":
         return redirect("teacher_dashboard")
 
+
+    # =========================================================
+    # STUDENT ENROLMENTS
+    # =========================================================
+
     enrolments = (
-        Enrolment.objects.filter(
+        Enrolment.objects
+        .filter(
             student=request.user
         )
         .select_related(
@@ -114,15 +124,77 @@ def student_dashboard(request):
         )
     )
 
-    featured_enrolment = enrolments.first()
+
+    # =========================================================
+    # ENROLLED COURSE COUNT
+    # =========================================================
+
+    enrolled_course_count = (
+        enrolments.count()
+    )
+
+
+    # =========================================================
+    # CONTINUE LEARNING
+    #
+    # First try to display the last enrolled course
+    # that the student actually opened.
+    # =========================================================
+
+    featured_enrolment = None
+
+
+    last_viewed_course_id = (
+        request.session.get(
+            "last_viewed_course_id"
+        )
+    )
+
+
+    # ---------------------------------------------------------
+    # LAST VIEWED COURSE
+    # ---------------------------------------------------------
+
+    if last_viewed_course_id:
+
+        featured_enrolment = (
+            enrolments
+            .filter(
+                course_id=last_viewed_course_id
+            )
+            .first()
+        )
+
+
+    # ---------------------------------------------------------
+    # FALLBACK
+    #
+    # If the student has never opened an enrolled course,
+    # show their most recently enrolled course instead.
+    # ---------------------------------------------------------
+
+    if featured_enrolment is None:
+
+        featured_enrolment = (
+            enrolments.first()
+        )
+
+
+    # =========================================================
+    # RENDER DASHBOARD
+    # =========================================================
 
     return render(
         request,
         "accounts/student_dashboard.html",
         {
             "enrolments": enrolments,
-            "featured_enrolment": featured_enrolment,
-            "enrolled_course_count": enrolments.count(),
+
+            "enrolled_course_count":
+                enrolled_course_count,
+
+            "featured_enrolment":
+                featured_enrolment,
         },
     )
 

@@ -38,6 +38,11 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    category_display = serializers.CharField(
+        source="get_category_display",
+        read_only=True,
+    )
+
     enrolment_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -47,6 +52,8 @@ class CourseSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "description",
+            "category",
+            "category_display",
             "image",
             "teacher_username",
             "created_at",

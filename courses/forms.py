@@ -11,21 +11,35 @@ class CourseForm(forms.ModelForm):
         fields = (
             "title",
             "description",
+            "category",
             "image",
         )
 
         widgets = {
-
             "title": forms.TextInput(
                 attrs={
-                    "placeholder": "Enter course title"
+                    "class": "form-control",
+                    "placeholder": "Enter course title",
                 }
             ),
 
             "description": forms.Textarea(
                 attrs={
+                    "class": "form-control",
                     "placeholder": "Enter course description",
                     "rows": 5,
+                }
+            ),
+
+            "category": forms.Select(
+                attrs={
+                    "class": "form-select",
+                }
+            ),
+
+            "image": forms.FileInput(
+                attrs={
+                    "class": "form-control",
                 }
             ),
         }

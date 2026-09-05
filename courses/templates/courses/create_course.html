@@ -108,6 +108,39 @@
 
             </div>
 
+            <!-- =========================================================
+                CATEGORY
+                ========================================================= -->
+
+            <div class="mb-4">
+
+                <label
+                    for="{{ form.category.id_for_label }}"
+                    class="form-label fw-semibold"
+                >
+                    Category
+                </label>
+
+                {{ form.category }}
+
+                <div class="form-text">
+                    Select the subject area that best describes this course.
+                </div>
+
+                {% if form.category.errors %}
+
+                    <div class="text-danger small mt-1">
+
+                        {% for error in form.category.errors %}
+                            {{ error }}
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
 
             <!-- Cover Image -->
             <div class="course-field">

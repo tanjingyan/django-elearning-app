@@ -8,6 +8,7 @@ from accounts.models import CustomUser
 
 
 class Course(models.Model):
+
     teacher = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
@@ -35,6 +36,23 @@ class Course(models.Model):
 
     def __str__(self):
         return self.title
+
+    CATEGORY_CHOICES = [
+        ("computer_science", "Computer Science"),
+        ("programming", "Programming"),
+        ("web_development", "Web Development"),
+        ("databases", "Databases"),
+        ("artificial_intelligence", "Artificial Intelligence"),
+        ("cybersecurity", "Cybersecurity"),
+        ("software_engineering", "Software Engineering"),
+        ("other", "Other"),
+    ]
+    
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        default="other",
+    )
 
 
 class Enrolment(models.Model):

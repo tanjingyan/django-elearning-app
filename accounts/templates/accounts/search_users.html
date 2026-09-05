@@ -1,221 +1,1162 @@
 {% extends "base.html" %}
 
+
 {% block title %}
     Search Users
 {% endblock %}
 
+
 {% block content %}
 
-    <div class="row justify-content-center">
-
-        <div class="col-lg-9">
-
-            <div class="mb-4">
-
-                <h1 class="page-heading">
-                    Search Users
-                </h1>
-
-                <p class="page-subheading">
-                    Search for students and other teachers by username.
-                </p>
-
-            </div>
+<div class="search-users-page">
 
 
-            <div class="card content-card mb-4">
+    <!-- =========================================================
+         PAGE HEADER
+         ========================================================= -->
 
-                <div class="card-body p-4">
+    <header class="search-users-header">
 
-                    <form
-                        method="get"
-                        class="row g-3"
+        <p class="search-users-label">
+            People
+        </p>
+
+        <h1>
+            Search Users
+        </h1>
+
+        <p>
+            Find students and teachers by username.
+        </p>
+
+    </header>
+
+
+
+    <!-- =========================================================
+         SEARCH PANEL
+         ========================================================= -->
+
+    <section class="search-panel">
+
+        <form method="get">
+
+
+            <div class="search-row">
+
+
+                <!-- Search Input -->
+
+                <div class="search-input-wrapper">
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
                     >
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
 
-                        <div class="col-md-9">
-
-                            <label
-                                for="search-query"
-                                class="form-label"
-                            >
-                                Username
-                            </label>
-
-                            <input
-                                id="search-query"
-                                name="q"
-                                type="text"
-                                class="form-control"
-                                value="{{ query }}"
-                                placeholder="Enter a username..."
-                                autocomplete="off"
-                            >
-
-                        </div>
-
-                        <div class="col-md-3 d-flex align-items-end">
-
-                            <button
-                                type="submit"
-                                class="btn btn-primary w-100"
-                            >
-                                Search
-                            </button>
-
-                        </div>
-
-                    </form>
+                    <input
+                        id="search-query"
+                        name="q"
+                        type="text"
+                        value="{{ query }}"
+                        placeholder="Search by username..."
+                        autocomplete="off"
+                    >
 
                 </div>
 
+
+                <!-- Search Button -->
+
+                <button
+                    type="submit"
+                    class="search-submit-btn"
+                >
+                    Search
+                </button>
+
+            </div>
+
+        </form>
+
+
+
+        <!-- =====================================================
+             FILTER BUTTONS
+             Client-side filters for returned results
+             ===================================================== -->
+
+        {% if query and users %}
+
+            <div class="user-filter-row">
+
+                <button
+                    type="button"
+                    class="user-filter-btn active"
+                    data-filter="all"
+                >
+                    All
+                </button>
+
+                <button
+                    type="button"
+                    class="user-filter-btn"
+                    data-filter="student"
+                >
+                    Students
+                </button>
+
+                <button
+                    type="button"
+                    class="user-filter-btn"
+                    data-filter="teacher"
+                >
+                    Teachers
+                </button>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- =========================================================
+         SEARCH RESULTS
+         ========================================================= -->
+
+    {% if query %}
+
+
+        <!-- =====================================================
+             RESULTS FOUND
+             ===================================================== -->
+
+        {% if users %}
+
+            <div class="results-heading">
+
+                <span id="visible-result-count">
+                    {{ users|length }}
+                </span>
+
+                result{% if users|length != 1 %}s{% endif %}
+                for
+
+                <strong>
+                    "{{ query }}"
+                </strong>
+
             </div>
 
 
-            {% if query %}
 
-                {% if users %}
+            <section
+                class="user-results-card"
+                id="user-results"
+            >
 
-                    <div class="row g-4">
+                {% for user in users %}
 
-                        {% for user in users %}
+                    <article
+                        class="user-result-row"
+                        data-role="{{ user.role }}"
+                    >
 
-                            <div class="col-md-6">
 
-                                <div class="card content-card h-100">
+                        <!-- =========================================
+                             USER DETAILS
+                             ========================================= -->
 
-                                    <div class="card-body">
+                        <div class="user-result-main">
 
-                                        <div class="d-flex align-items-center gap-3">
 
-                                            {% if user.profile_picture %}
+                            <!-- Avatar -->
 
-                                                <img
-                                                    src="{{ user.profile_picture.url }}"
-                                                    alt="{{ user.username }}"
-                                                    class="rounded-circle"
-                                                    style="
-                                                        width: 64px;
-                                                        height: 64px;
-                                                        object-fit: cover;
-                                                    "
-                                                >
+                            {% if user.profile_picture %}
 
+                                <img
+                                    src="{{ user.profile_picture.url }}"
+                                    alt="{{ user.username }}"
+                                    class="search-user-avatar"
+                                >
+
+                            {% else %}
+
+                                <div
+                                    class="
+                                        search-user-avatar
+                                        search-user-avatar-placeholder
+
+                                        {% if user.role == 'teacher' %}
+                                            teacher-avatar
+                                        {% else %}
+                                            student-avatar
+                                        {% endif %}
+                                    "
+                                >
+                                    {{ user.username|slice:":2"|upper }}
+                                </div>
+
+                            {% endif %}
+
+
+
+                            <!-- Name + Information -->
+
+                            <div class="user-result-information">
+
+
+                                <div class="user-name-row">
+
+                                    <a
+                                        href="{% url 'profile' user.username %}"
+                                        class="user-result-name"
+                                    >
+
+                                        {% if user.first_name or user.last_name %}
+
+                                            {{ user.first_name }}
+                                            {{ user.last_name }}
+
+                                        {% else %}
+
+                                            {{ user.username }}
+
+                                        {% endif %}
+
+                                    </a>
+
+
+
+                                    <!-- Role Badge -->
+
+                                    <span
+                                        class="
+                                            user-role-badge
+
+                                            {% if user.role == 'teacher' %}
+                                                teacher-role
                                             {% else %}
-
-                                                <div
-                                                    class="
-                                                        rounded-circle
-                                                        bg-primary-subtle
-                                                        text-primary
-                                                        d-flex
-                                                        align-items-center
-                                                        justify-content-center
-                                                        fw-bold
-                                                    "
-                                                    style="
-                                                        width: 64px;
-                                                        height: 64px;
-                                                        font-size: 1.3rem;
-                                                    "
-                                                >
-                                                    {{ user.username|first|upper }}
-                                                </div>
-
+                                                student-role
                                             {% endif %}
+                                        "
+                                    >
+                                        {{ user.role|upper }}
+                                    </span>
+
+                                </div>
 
 
-                                            <div class="flex-grow-1">
 
-                                                <h5 class="mb-1">
-                                                    {{ user.username }}
-                                                </h5>
+                                <!-- Username / subtitle -->
 
-                                                <span
-                                                    class="
-                                                        badge
+                                <div class="user-result-subtitle">
 
-                                                        {% if user.role == 'teacher' %}
-                                                            text-bg-primary
-                                                        {% else %}
-                                                            text-bg-success
-                                                        {% endif %}
-                                                    "
-                                                >
-                                                    {{ user.role|title }}
-                                                </span>
+                                    @{{ user.username }}
 
-                                                {% if user.email %}
+                                    <span class="subtitle-divider">
+                                        ·
+                                    </span>
 
-                                                    <p class="text-muted mb-0 mt-2">
-                                                        {{ user.email }}
-                                                    </p>
+                                    {% if user.role == "teacher" %}
 
-                                                {% endif %}
+                                        Teacher account
 
-                                            </div>
+                                    {% else %}
 
-                                        </div>
+                                        Student account
 
-                                    </div>
+                                    {% endif %}
 
                                 </div>
 
                             </div>
 
-                        {% endfor %}
-
-                    </div>
-
-                {% else %}
-
-                    <div class="card content-card">
-
-                        <div class="card-body text-center py-5">
-
-                            <div class="display-5 mb-3">
-                                🔎
-                            </div>
-
-                            <h4>
-                                No users found
-                            </h4>
-
-                            <p class="text-muted mb-0">
-                                No users matched "{{ query }}".
-                            </p>
-
                         </div>
 
-                    </div>
 
-                {% endif %}
 
-            {% else %}
+                        <!-- =========================================
+                             VIEW PROFILE
+                             ========================================= -->
 
-                <div class="card content-card">
+                        <a
+                            href="{% url 'profile' user.username %}"
+                            class="view-profile-btn"
+                        >
+                            View Profile
+                        </a>
 
-                    <div class="card-body text-center py-5">
+                    </article>
 
-                        <div class="display-5 mb-3">
-                            👥
-                        </div>
+                {% endfor %}
 
-                        <h4>
-                            Search for a user
-                        </h4>
+            </section>
 
-                        <p class="text-muted mb-0">
-                            Enter a username above to search for students and teachers.
-                        </p>
 
-                    </div>
 
+            <!-- FILTER EMPTY STATE -->
+
+            <div
+                id="filter-empty-state"
+                class="filter-empty-state"
+                hidden
+            >
+
+                <div class="filter-empty-icon">
+                    🔎
                 </div>
 
-            {% endif %}
+                <h3>
+                    No matching users
+                </h3>
 
-        </div>
+                <p>
+                    No users match the selected filter.
+                </p>
 
-    </div>
+            </div>
+
+
+        <!-- =====================================================
+             NO SEARCH RESULTS
+             ===================================================== -->
+
+        {% else %}
+
+            <section class="search-empty-card">
+
+                <div class="search-empty-icon">
+                    🔎
+                </div>
+
+                <h2>
+                    No users found
+                </h2>
+
+                <p>
+                    No students or teachers matched "{{ query }}".
+                </p>
+
+            </section>
+
+        {% endif %}
+
+
+
+    <!-- =========================================================
+         INITIAL STATE
+         ========================================================= -->
+
+    {% else %}
+
+        <section class="search-empty-card">
+
+            <h2>
+                Search for a user
+            </h2>
+
+            <p>
+                Enter a username above to search for students and teachers.
+            </p>
+
+        </section>
+
+    {% endif %}
+
+</div>
+
+
+
+<!-- =============================================================
+     PAGE STYLING
+     ============================================================= -->
+
+<style>
+
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .search-users-page {
+        max-width: 900px;
+
+        margin:
+            0
+            auto;
+
+        padding:
+            1rem
+            0
+            4rem;
+    }
+
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .search-users-header {
+        margin-bottom: 1.5rem;
+    }
+
+
+    .search-users-label {
+        margin-bottom: 0.35rem;
+
+        color: #315bd7;
+
+        font-size: 0.78rem;
+        font-weight: 500;
+    }
+
+
+    .search-users-header h1 {
+        margin:
+            0
+            0
+            0.35rem;
+
+        color: #172033;
+
+        font-size: 1.8rem;
+        font-weight: 700;
+
+        letter-spacing: -0.025em;
+    }
+
+
+    .search-users-header > p:last-child {
+        margin: 0;
+
+        color: #6f7c8e;
+
+        font-size: 0.88rem;
+    }
+
+
+
+    /* =========================================================
+       SEARCH PANEL
+       ========================================================= */
+
+    .search-panel {
+        margin-bottom: 1.4rem;
+
+        padding: 1.3rem;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #dbe2ea;
+
+        border-radius: 11px;
+
+        box-shadow:
+            0 3px 10px
+            rgba(31, 41, 55, 0.025);
+    }
+
+
+    .search-row {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.75rem;
+    }
+
+
+
+    /* Search input */
+
+    .search-input-wrapper {
+        position: relative;
+
+        min-width: 0;
+
+        flex: 1;
+    }
+
+
+    .search-input-wrapper svg {
+        position: absolute;
+
+        top: 50%;
+        left: 0.9rem;
+
+        transform: translateY(-50%);
+
+        color: #8793a5;
+
+        pointer-events: none;
+    }
+
+
+    .search-input-wrapper input {
+        width: 100%;
+        height: 46px;
+
+        padding:
+            0
+            1rem
+            0
+            2.6rem;
+
+        color: #263142;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #d4dce6;
+
+        border-radius: 8px;
+
+        font-size: 0.87rem;
+
+        outline: none;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+
+    .search-input-wrapper input::placeholder {
+        color: #a0a8b4;
+    }
+
+
+    .search-input-wrapper input:focus {
+        border-color: #86a7ff;
+
+        box-shadow:
+            0 0 0
+            0.18rem
+            rgba(54, 91, 216, 0.08);
+    }
+
+
+
+    /* Search button */
+
+    .search-submit-btn {
+        min-width: 105px;
+        height: 46px;
+
+        padding:
+            0
+            1.2rem;
+
+        color: #ffffff;
+
+        background: #365bd8;
+
+        border:
+            1px solid
+            #365bd8;
+
+        border-radius: 8px;
+
+        font-size: 0.85rem;
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition:
+            background-color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+
+    .search-submit-btn:hover {
+        background: #294bc1;
+
+        transform: translateY(-1px);
+    }
+
+
+
+    /* =========================================================
+       FILTERS
+       ========================================================= */
+
+    .user-filter-row {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.5rem;
+
+        margin-top: 0.9rem;
+    }
+
+
+    .user-filter-btn {
+        padding:
+            0.38rem
+            0.85rem;
+
+        color: #556173;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #d8dfe8;
+
+        border-radius: 999px;
+
+        font-size: 0.76rem;
+
+        cursor: pointer;
+
+        transition:
+            color 0.2s ease,
+            background-color 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+
+    .user-filter-btn:hover {
+        color: #315bd7;
+
+        border-color: #9eb4fa;
+    }
+
+
+    .user-filter-btn.active {
+        color: #315bd7;
+
+        background: #f2f5ff;
+
+        border-color: #5f7ee8;
+    }
+
+
+
+    /* =========================================================
+       RESULTS LABEL
+       ========================================================= */
+
+    .results-heading {
+        margin:
+            0
+            0
+            0.65rem
+            0.15rem;
+
+        color: #788496;
+
+        font-size: 0.76rem;
+    }
+
+
+    .results-heading strong {
+        color: #657185;
+
+        font-weight: 500;
+    }
+
+
+
+    /* =========================================================
+       RESULT LIST
+       ========================================================= */
+
+    .user-results-card {
+        overflow: hidden;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #dbe2ea;
+
+        border-radius: 11px;
+
+        box-shadow:
+            0 3px 10px
+            rgba(31, 41, 55, 0.025);
+    }
+
+
+    .user-result-row {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 1.5rem;
+
+        padding:
+            0.95rem
+            1.2rem;
+
+        border-bottom:
+            1px solid
+            #e7ebf0;
+
+        transition:
+            background-color 0.15s ease;
+    }
+
+
+    .user-result-row:last-child {
+        border-bottom: 0;
+    }
+
+
+    .user-result-row:hover {
+        background: #fafbfe;
+    }
+
+
+
+    /* =========================================================
+       USER INFORMATION
+       ========================================================= */
+
+    .user-result-main {
+        min-width: 0;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.9rem;
+
+        flex: 1;
+    }
+
+
+
+    /* Avatar */
+
+    .search-user-avatar {
+        width: 46px;
+        height: 46px;
+
+        min-width: 46px;
+
+        border-radius: 50%;
+
+        object-fit: cover;
+    }
+
+
+    .search-user-avatar-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #ffffff;
+
+        font-size: 0.74rem;
+        font-weight: 700;
+    }
+
+
+    .student-avatar {
+        background: #315bd7;
+    }
+
+
+    .teacher-avatar {
+        background: #7848dd;
+    }
+
+
+
+    /* Text */
+
+    .user-result-information {
+        min-width: 0;
+    }
+
+
+    .user-name-row {
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.55rem;
+
+        margin-bottom: 0.15rem;
+    }
+
+
+    .user-result-name {
+        color: #111827;
+
+        font-size: 0.88rem;
+        font-weight: 700;
+
+        text-decoration: none;
+    }
+
+
+    .user-result-name:hover {
+        color: #315bd7;
+    }
+
+
+
+    /* Role badges */
+
+    .user-role-badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        padding:
+            0.16rem
+            0.45rem;
+
+        border-radius: 999px;
+
+        font-size: 0.6rem;
+        font-weight: 700;
+    }
+
+
+    .student-role {
+        color: #198754;
+
+        background: #e5f6eb;
+    }
+
+
+    .teacher-role {
+        color: #7145d6;
+
+        background: #efe9ff;
+    }
+
+
+
+    /* Subtitle */
+
+    .user-result-subtitle {
+        color: #718094;
+
+        font-size: 0.74rem;
+    }
+
+
+    .subtitle-divider {
+        margin:
+            0
+            0.15rem;
+
+        color: #a2aab5;
+    }
+
+
+
+    /* =========================================================
+       VIEW PROFILE
+       ========================================================= */
+
+    .view-profile-btn {
+        min-width: 105px;
+
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        padding:
+            0.48rem
+            0.75rem;
+
+        color: #172033;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #d4dce6;
+
+        border-radius: 7px;
+
+        font-size: 0.75rem;
+        font-weight: 600;
+
+        text-decoration: none;
+
+        flex-shrink: 0;
+    }
+
+
+    .view-profile-btn:hover {
+        color: #315bd7;
+
+        background: #f8faff;
+
+        border-color: #a9b9e8;
+    }
+
+
+
+    /* =========================================================
+       EMPTY STATES
+       ========================================================= */
+
+    .search-empty-card,
+    .filter-empty-state {
+        padding:
+            3.5rem
+            1.5rem;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #dbe2ea;
+
+        border-radius: 11px;
+
+        text-align: center;
+
+        box-shadow:
+            0 3px 10px
+            rgba(31, 41, 55, 0.025);
+    }
+
+
+    .search-empty-icon,
+    .filter-empty-icon {
+        margin-bottom: 0.8rem;
+
+        font-size: 2rem;
+    }
+
+
+    .search-empty-card h2,
+    .filter-empty-state h3 {
+        margin-bottom: 0.4rem;
+
+        color: #172033;
+
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+
+    .search-empty-card p,
+    .filter-empty-state p {
+        margin: 0;
+
+        color: #748195;
+
+        font-size: 0.82rem;
+    }
+
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 767.98px) {
+
+        .search-users-page {
+            padding-top: 0.5rem;
+        }
+
+
+        .search-row {
+            align-items: stretch;
+
+            flex-direction: column;
+        }
+
+
+        .search-submit-btn {
+            width: 100%;
+        }
+
+
+        .user-result-row {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+
+        .view-profile-btn {
+            width: 100%;
+        }
+
+
+        .search-user-avatar {
+            width: 42px;
+            height: 42px;
+
+            min-width: 42px;
+        }
+
+    }
+
+</style>
+
+
+
+<!-- =============================================================
+     ROLE FILTER JAVASCRIPT
+     ============================================================= -->
+
+{% if query and users %}
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const filterButtons =
+                document.querySelectorAll(
+                    ".user-filter-btn"
+                );
+
+            const userRows =
+                document.querySelectorAll(
+                    ".user-result-row"
+                );
+
+            const resultCount =
+                document.getElementById(
+                    "visible-result-count"
+                );
+
+            const resultsCard =
+                document.getElementById(
+                    "user-results"
+                );
+
+            const emptyState =
+                document.getElementById(
+                    "filter-empty-state"
+                );
+
+
+            filterButtons.forEach(
+                function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            const selectedFilter =
+                                button.dataset.filter;
+
+
+                            /* Active button */
+
+                            filterButtons.forEach(
+                                function (item) {
+
+                                    item.classList.remove(
+                                        "active"
+                                    );
+
+                                }
+                            );
+
+                            button.classList.add(
+                                "active"
+                            );
+
+
+
+                            /* Filter rows */
+
+                            let visibleCount = 0;
+
+
+                            userRows.forEach(
+                                function (row) {
+
+                                    const userRole =
+                                        row.dataset.role;
+
+                                    const shouldShow =
+                                        selectedFilter === "all"
+                                        ||
+                                        userRole === selectedFilter;
+
+
+                                    row.hidden =
+                                        !shouldShow;
+
+
+                                    if (shouldShow) {
+                                        visibleCount++;
+                                    }
+
+                                }
+                            );
+
+
+
+                            /* Update count */
+
+                            if (resultCount) {
+
+                                resultCount.textContent =
+                                    visibleCount;
+
+                            }
+
+
+
+                            /* Empty state */
+
+                            if (resultsCard) {
+
+                                resultsCard.hidden =
+                                    visibleCount === 0;
+
+                            }
+
+
+                            if (emptyState) {
+
+                                emptyState.hidden =
+                                    visibleCount !== 0;
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
+
+</script>
+
+{% endif %}
+
 
 {% endblock %}
