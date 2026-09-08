@@ -1,15 +1,12 @@
 {% extends "base.html" %}
 
-
 {% block title %}
     Browse Courses
 {% endblock %}
 
-
 {% block content %}
 
 <div class="browse-course-page">
-
 
     <!-- =========================================================
          PAGE HEADER
@@ -32,335 +29,431 @@
     </header>
 
 
-
     <!-- =========================================================
-         SEARCH + CATEGORY FILTER
+         SEARCH
          ========================================================= -->
 
-    <section class="course-controls">
+    <div class="course-search-wrapper">
+
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <circle
+                cx="11"
+                cy="11"
+                r="8"
+            ></circle>
+
+            <path
+                d="m21 21-4.3-4.3"
+            ></path>
+        </svg>
+
+        <input
+            type="search"
+            id="course-search"
+            placeholder="Search courses..."
+            autocomplete="off"
+            aria-label="Search courses"
+        >
+
+    </div>
 
 
-        <!-- Search -->
+    <!-- =========================================================
+         MAIN LAYOUT
+         ========================================================= -->
 
-        <div class="course-search-wrapper">
-
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.3-4.3"></path>
-            </svg>
+    <div class="browse-layout">
 
 
-            <input
-                type="search"
-                id="course-search"
-                placeholder="Search courses..."
-                autocomplete="off"
-                aria-label="Search courses"
-            >
+        <!-- =====================================================
+             CATEGORY SIDE PANEL
+             ===================================================== -->
 
-        </div>
+        <aside class="category-panel">
 
+            <div class="category-panel-header">
 
+                <h2>
+                    Categories
+                </h2>
 
-        <!-- Categories -->
+                <p>
+                    Filter courses by subject.
+                </p>
 
-        <div class="category-filter-row">
-
-            <button
-                type="button"
-                class="category-filter active"
-                data-category="all"
-            >
-                All
-            </button>
+            </div>
 
 
-            {% for value, label in categories %}
+            <div class="category-list">
 
                 <button
                     type="button"
-                    class="category-filter"
-                    data-category="{{ value }}"
+                    class="category-filter active"
+                    data-category="all"
                 >
-                    {{ label }}
+
+                    <span class="category-filter-name">
+                        All Courses
+                    </span>
+
+                    <span class="category-filter-arrow">
+                        ›
+                    </span>
+
                 </button>
 
-            {% endfor %}
 
-        </div>
+                {% for value, label in categories %}
 
-    </section>
+                    <button
+                        type="button"
+                        class="category-filter"
+                        data-category="{{ value }}"
+                    >
+
+                        <span class="category-filter-name">
+                            {{ label }}
+                        </span>
+
+                        <span class="category-filter-arrow">
+                            ›
+                        </span>
+
+                    </button>
+
+                {% endfor %}
+
+            </div>
+
+        </aside>
 
 
+        <!-- =====================================================
+             COURSE RESULTS
+             ===================================================== -->
 
-    <!-- =========================================================
-         COURSE GRID
-         ========================================================= -->
+        <main class="course-results">
 
-    {% if course_cards %}
 
-        <div
-            class="course-catalog-grid"
-            id="course-grid"
-        >
+            <!-- Results Header -->
 
-            {% for item in course_cards %}
+            <div class="course-results-header">
 
-                <article
-                    class="catalog-course-card course-grid-item"
-                    data-title="{{ item.course.title|lower }}"
-                    data-description="{{ item.course.description|lower }}"
-                    data-category="{{ item.course.category }}"
+                <div>
+
+                    <h2 id="results-title">
+                        All Courses
+                    </h2>
+
+                    <p>
+                        Browse available courses below.
+                    </p>
+
+                </div>
+
+
+                <span
+                    id="visible-course-count"
+                    class="course-count"
+                >
+                    {{ course_cards|length }}
+                    course{% if course_cards|length != 1 %}s{% endif %}
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 COURSE GRID
+                 ================================================= -->
+
+            {% if course_cards %}
+
+                <div
+                    class="course-catalog-grid"
+                    id="course-grid"
                 >
 
+                    {% for item in course_cards %}
 
-                    <!-- =================================================
-                         TOP ACCENT
-                         ================================================= -->
+                        <div
+                            class="course-grid-item"
+                            data-title="{{ item.course.title|default:''|lower }}"
+                            data-description="{{ item.course.description|default:''|lower }}"
+                            data-category="{{ item.course.category }}"
+                        >
 
-                    <div class="course-card-accent"></div>
+                            <article class="browse-course-card">
 
 
-
-                    <!-- =================================================
-                         CARD CONTENT
-                         ================================================= -->
-
-                    <div class="catalog-card-content">
-
-
-                        <!-- Header -->
-
-                        <div class="catalog-card-header">
-
-
-                            <!-- Course Initial -->
-
-                            <div class="course-initial">
-
-                                {{ item.course.title|slice:":2"|upper }}
-
-                            </div>
-
-
-
-                            <!-- Category -->
-
-                            <span class="catalog-category">
-
-                                {{ item.course.get_category_display }}
-
-                            </span>
-
-                        </div>
-
-
-
-                        <!-- Course title -->
-
-                        <h2 class="catalog-course-title">
-
-                            <a
-                                href="{% url 'course_detail' item.course.id %}"
-                            >
-                                {{ item.course.title }}
-                            </a>
-
-                        </h2>
-
-
-
-                        <!-- Description -->
-
-                        <p class="catalog-course-description">
-
-                            {% if item.course.description %}
-
-                                {{ item.course.description|truncatechars:95 }}
-
-                            {% else %}
-
-                                No course description available.
-
-                            {% endif %}
-
-                        </p>
-
-
-
-                        <!-- Teacher -->
-
-                        <p class="catalog-course-teacher">
-
-                            Taught by
-
-                            <a
-                                href="{% url 'profile' item.course.teacher.username %}"
-                            >
-                                {{ item.course.teacher.username }}
-                            </a>
-
-                        </p>
-
-
-
-                        <!-- =================================================
-                             STATISTICS
-                             ================================================= -->
-
-                        <div class="catalog-course-stats">
-
-
-                            <!-- Enrolments -->
-
-                            <span>
-
-                                {{ item.enrolment_count }}
-
-                                enrolled
-
-                            </span>
-
-
-
-                            <!-- Rating -->
-
-                            <span>
-
-                                {% if item.average_rating %}
-
-                                    {{ item.average_rating|floatformat:1 }}
-
-                                    <span class="rating-star">
-                                        ★
-                                    </span>
-
-                                    ({{ item.rating_count }})
-
-                                {% else %}
-
-                                    No ratings yet
-
-                                {% endif %}
-
-                            </span>
-
-                        </div>
-
-
-
-                        <!-- =================================================
-                             ACTION BUTTON
-                             ================================================= -->
-
-                        {% if request.user.role == "student" %}
-
-
-                            {% if item.is_enrolled %}
+                                <!-- =========================================
+                                     COURSE IMAGE
+                                     ========================================= -->
 
                                 <a
                                     href="{% url 'course_detail' item.course.id %}"
-                                    class="course-enrolled-btn"
+                                    class="browse-course-cover"
                                 >
-                                    ✓ Enrolled
+
+                                    {% if item.course.image %}
+
+                                        <img
+                                            src="{{ item.course.image.url }}"
+                                            alt="{{ item.course.title }}"
+                                            class="browse-course-image"
+                                        >
+
+                                    {% else %}
+
+                                        <div class="browse-course-placeholder">
+
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="42"
+                                                height="42"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="1.7"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            >
+                                                <path
+                                                    d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"
+                                                ></path>
+
+                                                <path
+                                                    d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                                                ></path>
+                                            </svg>
+
+                                        </div>
+
+                                    {% endif %}
+
                                 </a>
 
 
-                            {% else %}
+                                <!-- =========================================
+                                     COURSE BODY
+                                     ========================================= -->
 
-                                <a
-                                    href="{% url 'enrol_course' item.course.id %}"
-                                    class="course-enrol-btn"
-                                >
-                                    Enrol
-                                </a>
-
-                            {% endif %}
+                                <div class="browse-course-body">
 
 
-                        {% else %}
+                                    <!-- Badges -->
 
-                            <a
-                                href="{% url 'course_detail' item.course.id %}"
-                                class="course-enrol-btn"
-                            >
-                                View Course
-                            </a>
+                                    <div class="browse-course-badges">
 
-                        {% endif %}
+                                        {% if item.is_enrolled %}
+
+                                            <span class="enrolled-badge">
+                                                Enrolled
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="available-badge">
+                                                Available
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        <span class="course-category-badge">
+                                            {{ item.course.get_category_display }}
+                                        </span>
+
+                                    </div>
+
+
+                                    <!-- Course Title -->
+
+                                    <h2 class="browse-course-title">
+
+                                        <a
+                                            href="{% url 'course_detail' item.course.id %}"
+                                        >
+                                            {{ item.course.title }}
+                                        </a>
+
+                                    </h2>
+
+
+                                    <!-- Description -->
+
+                                    <p class="browse-course-description">
+
+                                        {% if item.course.description %}
+
+                                            {{ item.course.description|truncatechars:105 }}
+
+                                        {% else %}
+
+                                            No course description available.
+
+                                        {% endif %}
+
+                                    </p>
+
+
+                                    <!-- Action -->
+
+                                    <div class="browse-course-action">
+
+                                        {% if request.user.role == "student" %}
+
+                                            {% if item.is_enrolled %}
+
+                                                <a
+                                                    href="{% url 'course_detail' item.course.id %}"
+                                                    class="continue-course-btn"
+                                                >
+                                                    Continue Course
+                                                </a>
+
+                                            {% else %}
+
+                                                <a
+                                                    href="{% url 'enrol_course' item.course.id %}"
+                                                    class="enrol-course-btn"
+                                                >
+                                                    Enrol
+                                                </a>
+
+                                            {% endif %}
+
+                                        {% else %}
+
+                                            <a
+                                                href="{% url 'course_detail' item.course.id %}"
+                                                class="continue-course-btn"
+                                            >
+                                                View Course
+                                            </a>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- =================================================
+                     FILTER EMPTY STATE
+                     ================================================= -->
+
+                <div
+                    id="course-empty-state"
+                    class="course-empty-state"
+                    hidden
+                >
+
+                    <div class="course-empty-icon">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="38"
+                            height="38"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle
+                                cx="11"
+                                cy="11"
+                                r="8"
+                            ></circle>
+
+                            <path
+                                d="m21 21-4.3-4.3"
+                            ></path>
+                        </svg>
 
                     </div>
 
-                </article>
+                    <h3>
+                        No matching courses
+                    </h3>
 
-            {% endfor %}
+                    <p>
+                        Try another search or select a different category.
+                    </p>
 
-        </div>
-
-
-
-        <!-- =====================================================
-             FILTER EMPTY STATE
-             ===================================================== -->
-
-        <div
-            id="course-empty-state"
-            class="course-empty-state"
-            hidden
-        >
-
-            <div class="course-empty-icon">
-                🔎
-            </div>
-
-            <h3>
-                No matching courses
-            </h3>
-
-            <p>
-                Try another search or select a different category.
-            </p>
-
-        </div>
+                </div>
 
 
-    {% else %}
+            {% else %}
 
 
-        <!-- =====================================================
-             NO COURSES IN DATABASE
-             ===================================================== -->
+                <!-- =================================================
+                     NO COURSES
+                     ================================================= -->
 
-        <div class="course-empty-state">
+                <div class="course-empty-state">
 
-            <div class="course-empty-icon">
-                📚
-            </div>
+                    <div class="course-empty-icon">
 
-            <h3>
-                No courses available
-            </h3>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="42"
+                            height="42"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"
+                            ></path>
 
-            <p>
-                Courses created by teachers will appear here.
-            </p>
+                            <path
+                                d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                            ></path>
+                        </svg>
 
-        </div>
+                    </div>
 
-    {% endif %}
+                    <h3>
+                        No courses available
+                    </h3>
+
+                    <p>
+                        Courses created by teachers will appear here.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </main>
+
+    </div>
 
 </div>
-
 
 
 <!-- =============================================================
@@ -368,7 +461,6 @@
      ============================================================= -->
 
 <style>
-
 
     /* =========================================================
        PAGE
@@ -384,13 +476,12 @@
     }
 
 
-
     /* =========================================================
-       PAGE HEADER
+       HEADER
        ========================================================= */
 
     .browse-course-header {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.35rem;
     }
 
 
@@ -400,10 +491,10 @@
             0
             0.45rem;
 
-        color: #315bd7;
+        color: #1d4ed8;
 
         font-size: 0.76rem;
-        font-weight: 500;
+        font-weight: 600;
     }
 
 
@@ -425,38 +516,23 @@
     .browse-subtitle {
         margin: 0;
 
-        color: #6f7c8e;
+        color: #4b5563;
 
         font-size: 0.88rem;
     }
 
 
-
     /* =========================================================
-       SEARCH + FILTERS
+       SEARCH
        ========================================================= */
-
-    .course-controls {
-        display: flex;
-
-        align-items: center;
-        justify-content: space-between;
-
-        gap: 1.5rem;
-
-        margin-bottom: 1.25rem;
-    }
-
-
-
-    /* Search */
 
     .course-search-wrapper {
         position: relative;
 
-        width: 340px;
+        width: 100%;
+        max-width: 430px;
 
-        flex-shrink: 0;
+        margin-bottom: 1.4rem;
     }
 
 
@@ -468,7 +544,7 @@
 
         transform: translateY(-50%);
 
-        color: #8793a4;
+        color: #6b7280;
 
         pointer-events: none;
     }
@@ -476,7 +552,7 @@
 
     .course-search-wrapper input {
         width: 100%;
-        height: 39px;
+        height: 41px;
 
         padding:
             0
@@ -484,7 +560,7 @@
             0
             2.35rem;
 
-        color: #344054;
+        color: #1f2937;
 
         background: #ffffff;
 
@@ -505,7 +581,7 @@
 
 
     .course-search-wrapper input::placeholder {
-        color: #8994a4;
+        color: #6b7280;
     }
 
 
@@ -513,67 +589,258 @@
         border-color: #82a1fb;
 
         box-shadow:
-            0 0 0
+            0
+            0
+            0
             0.18rem
             rgba(49, 91, 215, 0.07);
     }
 
 
+    /* =========================================================
+       MAIN LAYOUT
+       ========================================================= */
 
-    /* Category filter */
+    .browse-layout {
+        display: grid;
 
-    .category-filter-row {
-        display: flex;
+        grid-template-columns:
+            220px
+            minmax(
+                0,
+                1fr
+            );
 
-        justify-content: flex-end;
+        align-items: start;
 
-        flex-wrap: wrap;
-
-        gap: 0.55rem;
+        gap: 1.5rem;
     }
 
 
-    .category-filter {
-        padding:
-            0.43rem
-            0.95rem;
+    /* =========================================================
+       CATEGORY SIDE PANEL
+       ========================================================= */
 
-        color: #5d6878;
+    .category-panel {
+        position: sticky;
+
+        top: 85px;
+
+        overflow: hidden;
 
         background: #ffffff;
 
         border:
             1px solid
-            #dce2ea;
+            #dfe5ec;
 
-        border-radius: 999px;
+        border-radius: 11px;
+
+        box-shadow:
+            0
+            2px
+            8px
+            rgba(31, 41, 55, 0.03);
+    }
+
+
+    .category-panel-header {
+        padding:
+            1rem
+            1rem
+            0.85rem;
+
+        border-bottom:
+            1px solid
+            #edf0f4;
+    }
+
+
+    .category-panel-header h2 {
+        margin:
+            0
+            0
+            0.2rem;
+
+        color: #111827;
+
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+
+    .category-panel-header p {
+        margin: 0;
+
+        color: #6b7280;
+
+        font-size: 0.68rem;
+    }
+
+
+    /* =========================================================
+       CATEGORY LIST
+       ========================================================= */
+
+    .category-list {
+        padding: 0.55rem;
+    }
+
+
+    .category-filter {
+        width: 100%;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 0.6rem;
+
+        margin-bottom: 0.15rem;
+
+        padding:
+            0.62rem
+            0.7rem;
+
+        color: #374151;
+
+        background: transparent;
+
+        border: 0;
+
+        border-radius: 6px;
 
         font-size: 0.74rem;
+
+        text-align: left;
 
         cursor: pointer;
 
         transition:
             color 0.2s ease,
-            background-color 0.2s ease,
-            border-color 0.2s ease;
+            background-color 0.2s ease;
+    }
+
+
+    .category-filter:last-child {
+        margin-bottom: 0;
     }
 
 
     .category-filter:hover {
-        color: #315bd7;
+        color: #1d4ed8;
 
-        border-color: #9fb2f5;
+        background: #f5f7fb;
     }
 
 
     .category-filter.active {
-        color: #315bd7;
+        color: #1d4ed8;
 
-        background: #f2f5ff;
+        background: #edf2ff;
 
-        border-color: #5476eb;
+        font-weight: 600;
     }
 
+
+    .category-filter-name {
+        color: #374151;
+    }
+
+
+    .category-filter:hover
+    .category-filter-name {
+        color: #1d4ed8;
+    }
+
+
+    .category-filter.active
+    .category-filter-name {
+        color: #1d4ed8;
+    }
+
+
+    .category-filter-arrow {
+        color: #6b7280;
+
+        font-size: 1rem;
+
+        line-height: 1;
+    }
+
+
+    .category-filter:hover
+    .category-filter-arrow,
+    .category-filter.active
+    .category-filter-arrow {
+        color: #1d4ed8;
+    }
+
+
+    /* =========================================================
+       COURSE RESULTS
+       ========================================================= */
+
+    .course-results {
+        min-width: 0;
+    }
+
+
+    .course-results-header {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 1rem;
+
+        margin-bottom: 1rem;
+    }
+
+
+    .course-results-header h2 {
+        margin:
+            0
+            0
+            0.2rem;
+
+        color: #111827;
+
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+
+    .course-results-header p {
+        margin: 0;
+
+        color: #6b7280;
+
+        font-size: 0.7rem;
+    }
+
+
+    .course-count {
+        flex-shrink: 0;
+
+        padding:
+            0.28rem
+            0.55rem;
+
+        color: #4b5563;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #dde3ea;
+
+        border-radius: 999px;
+
+        font-size: 0.68rem;
+        font-weight: 500;
+    }
 
 
     /* =========================================================
@@ -586,22 +853,27 @@
         grid-template-columns:
             repeat(
                 3,
-                minmax(0, 1fr)
+                minmax(
+                    0,
+                    1fr
+                )
             );
 
         gap: 1.2rem;
     }
 
 
+    .course-grid-item {
+        min-width: 0;
+    }
+
 
     /* =========================================================
        COURSE CARD
        ========================================================= */
 
-    .catalog-course-card {
-        position: relative;
-
-        min-width: 0;
+    .browse-course-card {
+        height: 100%;
 
         display: flex;
 
@@ -613,13 +885,15 @@
 
         border:
             1px solid
-            #dbe2ea;
+            #dce3eb;
 
-        border-radius: 10px;
+        border-radius: 11px;
 
         box-shadow:
-            0 2px 8px
-            rgba(31, 41, 55, 0.025);
+            0
+            2px
+            7px
+            rgba(31, 41, 55, 0.035);
 
         transition:
             transform 0.2s ease,
@@ -627,150 +901,158 @@
     }
 
 
-    .catalog-course-card:hover {
-        transform: translateY(-2px);
+    .browse-course-card:hover {
+        transform:
+            translateY(-2px);
 
         box-shadow:
-            0 8px 20px
+            0
+            7px
+            18px
             rgba(31, 41, 55, 0.07);
     }
 
 
+    /* =========================================================
+       COURSE COVER
+       ========================================================= */
 
-    /* Top coloured line */
+    .browse-course-cover {
+        display: block;
 
-    .course-card-accent {
+        overflow: hidden;
+
+        text-decoration: none;
+    }
+
+
+    .browse-course-image,
+    .browse-course-placeholder {
         width: 100%;
-        height: 5px;
 
-        background: #365bd8;
+        height: 150px;
     }
 
 
-    .course-grid-item:nth-child(4n + 1)
-    .course-card-accent {
-        background: #7446e8;
+    .browse-course-image {
+        display: block;
+
+        object-fit: cover;
+
+        transition:
+            transform
+            0.25s
+            ease;
     }
 
 
-    .course-grid-item:nth-child(4n + 2)
-    .course-card-accent {
-        background: #365bd8;
+    .browse-course-card:hover
+    .browse-course-image {
+        transform:
+            scale(1.02);
     }
 
 
-    .course-grid-item:nth-child(4n + 3)
-    .course-card-accent {
-        background: #22905f;
+    .browse-course-placeholder {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        color: #2d65ad;
+
+        background:
+            linear-gradient(
+                135deg,
+                #dbe8f8,
+                #edf4fc
+            );
     }
 
 
-    .course-grid-item:nth-child(4n + 4)
-    .course-card-accent {
-        background: #c07911;
-    }
+    /* =========================================================
+       COURSE BODY
+       ========================================================= */
 
-
-
-    /* Content */
-
-    .catalog-card-content {
+    .browse-course-body {
         display: flex;
 
         flex-direction: column;
 
         flex: 1;
 
-        padding: 1.25rem;
+        padding: 1rem;
     }
 
 
-
     /* =========================================================
-       CARD HEADER
+       BADGES
        ========================================================= */
 
-    .catalog-card-header {
+    .browse-course-badges {
         display: flex;
 
         align-items: center;
         justify-content: space-between;
 
-        gap: 0.8rem;
+        gap: 0.4rem;
 
-        margin-bottom: 0.9rem;
+        margin-bottom: 0.65rem;
     }
 
 
-
-    /* Initial */
-
-    .course-initial {
-        width: 42px;
-        height: 42px;
-
-        min-width: 42px;
-
-        display: flex;
+    .enrolled-badge,
+    .available-badge,
+    .course-category-badge {
+        display: inline-flex;
 
         align-items: center;
-        justify-content: center;
 
-        color: #ffffff;
+        padding:
+            0.2rem
+            0.45rem;
 
-        background: #365bd8;
+        border-radius: 5px;
 
-        border-radius: 9px;
-
-        font-size: 0.78rem;
-        font-weight: 700;
+        font-size: 0.62rem;
+        font-weight: 600;
     }
 
 
-    .course-grid-item:nth-child(4n + 1)
-    .course-initial {
-        background: #7446e8;
+    .enrolled-badge {
+        color: #166534;
+
+        background: #e6f5ec;
+
+        border:
+            1px solid
+            #c9ead6;
     }
 
 
-    .course-grid-item:nth-child(4n + 2)
-    .course-initial {
-        background: #365bd8;
+    .available-badge {
+        color: #1d4ed8;
+
+        background: #edf2ff;
+
+        border:
+            1px solid
+            #d3ddff;
     }
 
 
-    .course-grid-item:nth-child(4n + 3)
-    .course-initial {
-        background: #22905f;
-    }
-
-
-    .course-grid-item:nth-child(4n + 4)
-    .course-initial {
-        background: #c07911;
-    }
-
-
-
-    /* Category */
-
-    .catalog-category {
+    .course-category-badge {
         max-width: 65%;
 
         overflow: hidden;
 
-        padding:
-            0.24rem
-            0.6rem;
+        color: #374151;
 
-        color: #315bd7;
+        background: #f5f7fa;
 
-        background: #edf2ff;
-
-        border-radius: 999px;
-
-        font-size: 0.65rem;
-        font-weight: 500;
+        border:
+            1px solid
+            #e1e6ed;
 
         text-overflow: ellipsis;
 
@@ -778,69 +1060,50 @@
     }
 
 
-    .course-grid-item:nth-child(4n + 1)
-    .catalog-category {
-        color: #7446e8;
-
-        background: #f2edff;
-    }
-
-
-    .course-grid-item:nth-child(4n + 3)
-    .catalog-category {
-        color: #198754;
-
-        background: #e9f7ef;
-    }
-
-
-    .course-grid-item:nth-child(4n + 4)
-    .catalog-category {
-        color: #9a620d;
-
-        background: #fff3df;
-    }
-
-
-
     /* =========================================================
-       COURSE INFORMATION
+       COURSE TITLE
        ========================================================= */
 
-    .catalog-course-title {
+    .browse-course-title {
         margin:
             0
             0
-            0.45rem;
+            0.4rem;
 
-        font-size: 1rem;
+        color: #111827;
+
+        font-size: 0.95rem;
         font-weight: 700;
 
         line-height: 1.35;
     }
 
 
-    .catalog-course-title a {
-        color: #111827;
+    .browse-course-title a {
+        color: inherit;
 
         text-decoration: none;
     }
 
 
-    .catalog-course-title a:hover {
-        color: #315bd7;
+    .browse-course-title a:hover {
+        color: #1d4ed8;
     }
 
 
-    .catalog-course-description {
+    /* =========================================================
+       COURSE DESCRIPTION
+       ========================================================= */
+
+    .browse-course-description {
         min-height: 42px;
 
         margin:
             0
             0
-            0.75rem;
+            1rem;
 
-        color: #697586;
+        color: #4b5563;
 
         font-size: 0.76rem;
 
@@ -848,74 +1111,20 @@
     }
 
 
-    .catalog-course-teacher {
-        margin:
-            auto
-            0
-            0.85rem;
-
-        color: #7c8797;
-
-        font-size: 0.71rem;
-    }
-
-
-    .catalog-course-teacher a {
-        color: #111827;
-
-        font-weight: 600;
-
-        text-decoration: none;
-    }
-
-
-    .catalog-course-teacher a:hover {
-        color: #315bd7;
-    }
-
-
-
     /* =========================================================
-       COURSE STATS
+       ACTION BUTTONS
        ========================================================= */
 
-    .catalog-course-stats {
-        display: flex;
-
-        align-items: center;
-        justify-content: space-between;
-
-        gap: 0.75rem;
-
-        margin-bottom: 0.9rem;
-
-        padding-top: 0.8rem;
-
-        color: #697586;
-
-        border-top:
-            1px solid
-            #e5e9ef;
-
-        font-size: 0.7rem;
+    .browse-course-action {
+        margin-top: auto;
     }
 
 
-    .rating-star {
-        color: #df9a22;
-    }
-
-
-
-    /* =========================================================
-       BUTTONS
-       ========================================================= */
-
-    .course-enrol-btn,
-    .course-enrolled-btn {
+    .continue-course-btn,
+    .enrol-course-btn {
         width: 100%;
 
-        min-height: 38px;
+        min-height: 36px;
 
         display: flex;
 
@@ -923,57 +1132,61 @@
         justify-content: center;
 
         padding:
-            0.45rem
+            0.48rem
             0.75rem;
 
-        border-radius: 7px;
+        border-radius: 5px;
 
-        font-size: 0.78rem;
+        font-size: 0.74rem;
         font-weight: 600;
 
         text-decoration: none;
 
         transition:
+            color 0.2s ease,
             background-color 0.2s ease,
             border-color 0.2s ease;
     }
 
 
-    .course-enrol-btn {
-        color: #ffffff;
+    .continue-course-btn {
+        color: #1f2937;
 
-        background: #365bd8;
+        background: #ffffff;
 
         border:
             1px solid
-            #365bd8;
+            #64748b;
     }
 
 
-    .course-enrol-btn:hover {
+    .continue-course-btn:hover {
+        color: #ffffff;
+
+        background: #315bd7;
+
+        border-color: #315bd7;
+    }
+
+
+    .enrol-course-btn {
+        color: #ffffff;
+
+        background: #315bd7;
+
+        border:
+            1px solid
+            #315bd7;
+    }
+
+
+    .enrol-course-btn:hover {
         color: #ffffff;
 
         background: #294bc1;
+
+        border-color: #294bc1;
     }
-
-
-    .course-enrolled-btn {
-        color: #198754;
-
-        background: #eaf7f0;
-
-        border:
-            1px solid
-            #b9e1ca;
-    }
-
-
-    .course-enrolled-btn:hover {
-        color: #166f46;
-
-        background: #dff2e8;
-    }
-
 
 
     /* =========================================================
@@ -985,21 +1198,23 @@
             4rem
             1.5rem;
 
+        color: #4b5563;
+
         text-align: center;
     }
 
 
     .course-empty-icon {
-        margin-bottom: 0.7rem;
+        margin-bottom: 0.8rem;
 
-        font-size: 2rem;
+        color: #1d4ed8;
     }
 
 
     .course-empty-state h3 {
         margin-bottom: 0.35rem;
 
-        color: #172033;
+        color: #111827;
 
         font-size: 1rem;
         font-weight: 700;
@@ -1009,46 +1224,89 @@
     .course-empty-state p {
         margin: 0;
 
-        color: #778396;
+        color: #4b5563;
 
         font-size: 0.8rem;
     }
 
+
+    /* =========================================================
+       SMALL DESKTOP / TABLET
+       ========================================================= */
+
+    @media (max-width: 1199.98px) {
+
+        .course-catalog-grid {
+            grid-template-columns:
+                repeat(
+                    2,
+                    minmax(
+                        0,
+                        1fr
+                    )
+                );
+        }
+
+    }
 
 
     /* =========================================================
        TABLET
        ========================================================= */
 
-    @media (max-width: 991.98px) {
+    @media (max-width: 767.98px) {
 
-        .course-controls {
-            align-items: stretch;
-
-            flex-direction: column;
-        }
-
-
-        .course-search-wrapper {
-            width: 100%;
-        }
-
-
-        .category-filter-row {
-            justify-content: flex-start;
-        }
-
-
-        .course-catalog-grid {
+        .browse-layout {
             grid-template-columns:
-                repeat(
-                    2,
-                    minmax(0, 1fr)
-                );
+                1fr;
+        }
+
+
+        .category-panel {
+            position: static;
+        }
+
+
+        .category-list {
+            display: flex;
+
+            gap: 0.4rem;
+
+            overflow-x: auto;
+        }
+
+
+        .category-filter {
+            width: auto;
+
+            flex-shrink: 0;
+
+            margin: 0;
+
+            padding:
+                0.5rem
+                0.8rem;
+
+            border:
+                1px solid
+                #dce2ea;
+
+            border-radius: 999px;
+
+            white-space: nowrap;
+        }
+
+
+        .category-filter-arrow {
+            display: none;
+        }
+
+
+        .category-panel-header {
+            padding-bottom: 0.7rem;
         }
 
     }
-
 
 
     /* =========================================================
@@ -1062,28 +1320,32 @@
         }
 
 
+        .course-search-wrapper {
+            max-width: none;
+        }
+
+
         .course-catalog-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns:
+                1fr;
         }
 
 
-        .category-filter-row {
-            flex-wrap: nowrap;
+        .course-results-header {
+            align-items: flex-start;
 
-            overflow-x: auto;
-
-            padding-bottom: 0.25rem;
+            flex-direction: column;
         }
 
 
-        .category-filter {
-            white-space: nowrap;
+        .browse-course-image,
+        .browse-course-placeholder {
+            height: 180px;
         }
 
     }
 
 </style>
-
 
 
 <!-- =============================================================
@@ -1095,7 +1357,6 @@
 document.addEventListener(
     "DOMContentLoaded",
     function () {
-
 
         const searchInput =
             document.getElementById(
@@ -1121,9 +1382,49 @@ document.addEventListener(
             );
 
 
+        const visibleCourseCount =
+            document.getElementById(
+                "visible-course-count"
+            );
+
+
+        const resultsTitle =
+            document.getElementById(
+                "results-title"
+            );
+
+
         let selectedCategory =
             "all";
 
+
+        let selectedCategoryLabel =
+            "All Courses";
+
+
+        /* =====================================================
+           UPDATE COURSE COUNT
+           ===================================================== */
+
+        function updateCount(
+            visibleCount
+        ) {
+
+            if (!visibleCourseCount) {
+                return;
+            }
+
+
+            visibleCourseCount.textContent =
+                visibleCount
+                +
+                (
+                    visibleCount === 1
+                        ? " course"
+                        : " courses"
+                );
+
+        }
 
 
         /* =====================================================
@@ -1140,23 +1441,26 @@ document.addEventListener(
                     : "";
 
 
-            let visibleCount = 0;
+            let visibleCount =
+                0;
 
 
             courseItems.forEach(
                 function (course) {
 
-
                     const title =
-                        course.dataset.title || "";
+                        course.dataset.title
+                        || "";
 
 
                     const description =
-                        course.dataset.description || "";
+                        course.dataset.description
+                        || "";
 
 
                     const category =
-                        course.dataset.category || "";
+                        course.dataset.category
+                        || "";
 
 
                     const matchesSearch =
@@ -1170,9 +1474,13 @@ document.addEventListener(
 
 
                     const matchesCategory =
-                        selectedCategory === "all"
+                        selectedCategory
+                        ===
+                        "all"
                         ||
-                        category === selectedCategory;
+                        category
+                        ===
+                        selectedCategory;
 
 
                     const shouldShow =
@@ -1186,10 +1494,15 @@ document.addEventListener(
 
 
                     if (shouldShow) {
-                        visibleCount++;
+                        visibleCount += 1;
                     }
 
                 }
+            );
+
+
+            updateCount(
+                visibleCount
             );
 
 
@@ -1201,7 +1514,6 @@ document.addEventListener(
             }
 
         }
-
 
 
         /* =====================================================
@@ -1218,7 +1530,6 @@ document.addEventListener(
         }
 
 
-
         /* =====================================================
            CATEGORY FILTER
            ===================================================== */
@@ -1229,7 +1540,6 @@ document.addEventListener(
                 button.addEventListener(
                     "click",
                     function () {
-
 
                         categoryButtons.forEach(
                             function (item) {
@@ -1251,6 +1561,26 @@ document.addEventListener(
                             button.dataset.category;
 
 
+                        const nameElement =
+                            button.querySelector(
+                                ".category-filter-name"
+                            );
+
+
+                        selectedCategoryLabel =
+                            nameElement
+                                ? nameElement.textContent.trim()
+                                : "All Courses";
+
+
+                        if (resultsTitle) {
+
+                            resultsTitle.textContent =
+                                selectedCategoryLabel;
+
+                        }
+
+
                         filterCourses();
 
                     }
@@ -1263,6 +1593,5 @@ document.addEventListener(
 );
 
 </script>
-
 
 {% endblock %}
