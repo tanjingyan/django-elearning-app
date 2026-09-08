@@ -9,8 +9,10 @@ class Notification(models.Model):
     MATERIAL = "material"
 
     NOTIFICATION_TYPES = [
-        (ENROLMENT, "Enrolment"),
-        (MATERIAL, "New Material"),
+        ("enrolment", "Enrolment"),
+        ("material", "Material"),
+        ("block", "Course Blocked"),
+        ("unblock", "Course Unblocked"),
     ]
 
     recipient = models.ForeignKey(
@@ -30,7 +32,6 @@ class Notification(models.Model):
     notification_type = models.CharField(
         max_length=20,
         choices=NOTIFICATION_TYPES,
-        default=ENROLMENT,
     )
 
     message = models.CharField(

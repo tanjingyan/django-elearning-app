@@ -66,6 +66,12 @@ urlpatterns = [
     ),
 
     path(
+        "<int:course_id>/students/<int:student_id>/unblock/",
+        views.unblock_student,
+        name="unblock_student"
+    ),
+
+    path(
         "<int:course_id>/materials/upload/",
         views.upload_material,
         name="upload_material"

@@ -530,15 +530,29 @@
         <div class="section-header mb-3">
 
             <h2>
-                Courses you're enrolled in
+                {% if request.user == profile_user %}
+                    Courses You're Enrolled In
+                {% else %}
+                    {{ profile_user.username }}'s Enrolled Courses
+                {% endif %}
             </h2>
 
 
             <p>
 
-                {{ enrolments|length }}
-                course{% if enrolments|length != 1 %}s{% endif %}
-                currently enrolled.
+                {% if request.user == profile_user %}
+
+                    You are currently enrolled in
+                    {{ enrolments|length }}
+                    course{% if enrolments|length != 1 %}s{% endif %}.
+
+                {% else %}
+
+                    {{ profile_user.username }} is currently enrolled in
+                    {{ enrolments|length }}
+                    course{% if enrolments|length != 1 %}s{% endif %}.
+
+                {% endif %}
 
             </p>
 
@@ -673,8 +687,18 @@
 
 
                 <p>
-                    {{ profile_user.username }}
-                    is not enrolled in any courses yet.
+
+                    {% if request.user == profile_user %}
+
+                        You are not enrolled in any courses yet.
+
+                    {% else %}
+
+                        {{ profile_user.username }}
+                        is not enrolled in any courses yet.
+
+                    {% endif %}
+
                 </p>
 
             </div>
@@ -698,15 +722,29 @@
         <div class="section-header mb-3">
 
             <h2>
-                Courses you teach
+                {% if request.user == profile_user %}
+                    Courses You've Created
+                {% else %}
+                    {{ profile_user.username }}'s Courses
+                {% endif %}
             </h2>
 
 
             <p>
 
-                {{ courses_created|length }}
-                course{% if courses_created|length != 1 %}s{% endif %}
-                created by {{ profile_user.username }}.
+                {% if request.user == profile_user %}
+
+                    You have created
+                    {{ courses_created|length }}
+                    course{% if courses_created|length != 1 %}s{% endif %}.
+
+                {% else %}
+
+                    {{ profile_user.username }} has created
+                    {{ courses_created|length }}
+                    course{% if courses_created|length != 1 %}s{% endif %}.
+
+                {% endif %}
 
             </p>
 
@@ -828,8 +866,18 @@
 
 
                 <p>
-                    {{ profile_user.username }}
-                    has not created any courses yet.
+
+                    {% if request.user == profile_user %}
+
+                        You have not created any courses yet.
+
+                    {% else %}
+
+                        {{ profile_user.username }}
+                        has not created any courses yet.
+
+                    {% endif %}
+
                 </p>
 
             </div>

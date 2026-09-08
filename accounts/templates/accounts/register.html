@@ -1,413 +1,97 @@
 {% extends "base.html" %}
 
-
 {% block title %}
     Register
 {% endblock %}
 
-
 {% block content %}
 
-    <div class="row justify-content-center">
+<div class="register-page">
 
-        <div class="col-lg-7 col-xl-6">
+    <div class="register-layout">
 
-            <div class="card content-card">
 
-                <div class="card-body p-4 p-md-5">
+        <!-- =========================================================
+             LEFT SIDE
+             ========================================================= -->
 
-                    <!-- =========================================
-                         HEADER
-                         ========================================= -->
+        <div class="register-left">
 
-                    <div class="mb-4">
+            <h1 class="register-main-title">
+                Join <span>LearnSpace.</span>
+                
+            </h1>
 
-                        <h1 class="h3 fw-bold mb-2">
-                            Create Account
-                        </h1>
 
-                        <p class="text-muted mb-0">
-                            Create your LearnSpace student account.
-                        </p>
+            <p class="register-description">
+                Create your LearnSpace student account and start
+                accessing courses, learning materials and real-time
+                discussions.
+            </p>
 
-                    </div>
 
+            <!-- Feature 1 -->
 
-                    <!-- =========================================
-                         REGISTRATION FORM
-                         ========================================= -->
+            <div class="register-feature">
 
-                    <form
-                        method="POST"
-                        enctype="multipart/form-data"
-                    >
+                <div class="feature-check">
+                    ✓
+                </div>
 
-                        {% csrf_token %}
+                <div>
 
+                    <strong>
+                        Browse and enrol in courses
+                    </strong>
 
-                        <!-- Non-field errors -->
+                    <p>
+                        Find courses that match your learning interests.
+                    </p>
 
-                        {% if form.non_field_errors %}
+                </div>
 
-                            <div class="alert alert-danger">
+            </div>
 
-                                {% for error in form.non_field_errors %}
 
-                                    <div>
-                                        {{ error }}
-                                    </div>
+            <!-- Feature 2 -->
 
-                                {% endfor %}
+            <div class="register-feature">
 
-                            </div>
+                <div class="feature-check">
+                    ✓
+                </div>
 
-                        {% endif %}
+                <div>
 
+                    <strong>
+                        Access course materials
+                    </strong>
 
-                        <!-- =====================================
-                             USERNAME
-                             ===================================== -->
+                    <p>
+                        Keep your learning resources in one place.
+                    </p>
 
-                        <div class="mb-3">
+                </div>
 
-                            <label
-                                for="{{ form.username.id_for_label }}"
-                                class="form-label fw-semibold"
-                            >
-                                Username
-                            </label>
+            </div>
 
-                            <input
-                                type="text"
-                                name="{{ form.username.html_name }}"
-                                id="{{ form.username.id_for_label }}"
-                                value="{{ form.username.value|default:'' }}"
-                                class="form-control"
-                                required
-                            >
 
-                            {% if form.username.help_text %}
+            <!-- Feature 3 -->
 
-                                <div class="form-text">
-                                    {{ form.username.help_text }}
-                                </div>
+            <div class="register-feature">
 
-                            {% endif %}
+                <div class="feature-check">
+                    ✓
+                </div>
 
+                <div>
 
-                            {% for error in form.username.errors %}
+                    <strong>
+                        Join real-time discussions
+                    </strong>
 
-                                <div class="text-danger small mt-1">
-                                    {{ error }}
-                                </div>
-
-                            {% endfor %}
-
-                        </div>
-
-
-                        <!-- =====================================
-                             FIRST / LAST NAME
-                             ===================================== -->
-
-                        <div class="row">
-
-                            <div class="col-md-6">
-
-                                <div class="mb-3">
-
-                                    <label
-                                        for="{{ form.first_name.id_for_label }}"
-                                        class="form-label fw-semibold"
-                                    >
-                                        First Name
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        name="{{ form.first_name.html_name }}"
-                                        id="{{ form.first_name.id_for_label }}"
-                                        value="{{ form.first_name.value|default:'' }}"
-                                        class="form-control"
-                                    >
-
-                                    {% for error in form.first_name.errors %}
-
-                                        <div class="text-danger small mt-1">
-                                            {{ error }}
-                                        </div>
-
-                                    {% endfor %}
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-6">
-
-                                <div class="mb-3">
-
-                                    <label
-                                        for="{{ form.last_name.id_for_label }}"
-                                        class="form-label fw-semibold"
-                                    >
-                                        Last Name
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        name="{{ form.last_name.html_name }}"
-                                        id="{{ form.last_name.id_for_label }}"
-                                        value="{{ form.last_name.value|default:'' }}"
-                                        class="form-control"
-                                    >
-
-                                    {% for error in form.last_name.errors %}
-
-                                        <div class="text-danger small mt-1">
-                                            {{ error }}
-                                        </div>
-
-                                    {% endfor %}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- =====================================
-                             EMAIL
-                             ===================================== -->
-
-                        <div class="mb-3">
-
-                            <label
-                                for="{{ form.email.id_for_label }}"
-                                class="form-label fw-semibold"
-                            >
-                                Email Address
-                            </label>
-
-                            <input
-                                type="email"
-                                name="{{ form.email.html_name }}"
-                                id="{{ form.email.id_for_label }}"
-                                value="{{ form.email.value|default:'' }}"
-                                class="form-control"
-                            >
-
-                            {% for error in form.email.errors %}
-
-                                <div class="text-danger small mt-1">
-                                    {{ error }}
-                                </div>
-
-                            {% endfor %}
-
-                        </div>
-
-
-                        <!-- =====================================
-                             PROFILE PICTURE
-                             ===================================== -->
-
-                        <div class="mb-3">
-
-                            <label
-                                for="{{ form.profile_picture.id_for_label }}"
-                                class="form-label fw-semibold"
-                            >
-                                Profile Picture
-                            </label>
-
-                            <input
-                                type="file"
-                                name="{{ form.profile_picture.html_name }}"
-                                id="{{ form.profile_picture.id_for_label }}"
-                                class="form-control"
-                                accept="image/*"
-                            >
-
-                            {% for error in form.profile_picture.errors %}
-
-                                <div class="text-danger small mt-1">
-                                    {{ error }}
-                                </div>
-
-                            {% endfor %}
-
-                        </div>
-
-
-                        <!-- =====================================
-                             BIO
-                             ===================================== -->
-
-                        <div class="mb-3">
-
-                            <label
-                                for="{{ form.bio.id_for_label }}"
-                                class="form-label fw-semibold"
-                            >
-                                Bio
-                            </label>
-
-                            <textarea
-                                name="{{ form.bio.html_name }}"
-                                id="{{ form.bio.id_for_label }}"
-                                class="form-control"
-                                rows="4"
-                                placeholder="Tell us a little about yourself..."
-                            >{{ form.bio.value|default:'' }}</textarea>
-
-                            {% for error in form.bio.errors %}
-
-                                <div class="text-danger small mt-1">
-                                    {{ error }}
-                                </div>
-
-                            {% endfor %}
-
-                        </div>
-
-
-                        <!-- =====================================
-                             PASSWORD
-                             ===================================== -->
-
-                        <div class="mb-3">
-
-                            <label
-                                for="{{ form.password1.id_for_label }}"
-                                class="form-label fw-semibold"
-                            >
-                                Password
-                            </label>
-
-                            <input
-                                type="password"
-                                name="{{ form.password1.html_name }}"
-                                id="{{ form.password1.id_for_label }}"
-                                class="form-control"
-                                required
-                            >
-
-                            {% if form.password1.help_text %}
-
-                                <div class="form-text">
-                                    {{ form.password1.help_text|safe }}
-                                </div>
-
-                            {% endif %}
-
-
-                            {% for error in form.password1.errors %}
-
-                                <div class="text-danger small mt-1">
-                                    {{ error }}
-                                </div>
-
-                            {% endfor %}
-
-                        </div>
-
-
-                        <!-- =====================================
-                             PASSWORD CONFIRMATION
-                             ===================================== -->
-
-                        <div class="mb-4">
-
-                            <label
-                                for="{{ form.password2.id_for_label }}"
-                                class="form-label fw-semibold"
-                            >
-                                Confirm Password
-                            </label>
-
-                            <input
-                                type="password"
-                                name="{{ form.password2.html_name }}"
-                                id="{{ form.password2.id_for_label }}"
-                                class="form-control"
-                                required
-                            >
-
-                            {% if form.password2.help_text %}
-
-                                <div class="form-text">
-                                    {{ form.password2.help_text }}
-                                </div>
-
-                            {% endif %}
-
-
-                            {% for error in form.password2.errors %}
-
-                                <div class="text-danger small mt-1">
-                                    {{ error }}
-                                </div>
-
-                            {% endfor %}
-
-                        </div>
-
-
-                        <!-- =====================================
-                             ACCOUNT TYPE INFORMATION
-                             ===================================== -->
-
-                        <div class="alert alert-light border mb-4">
-
-                            <small class="text-muted">
-
-                                New accounts are registered as
-                                <strong>Student</strong> accounts.
-
-                            </small>
-
-                        </div>
-
-
-                        <!-- =====================================
-                             REGISTER
-                             ===================================== -->
-
-                        <div class="d-grid">
-
-                            <button
-                                type="submit"
-                                class="btn btn-primary"
-                            >
-                                Create Account
-                            </button>
-
-                        </div>
-
-                    </form>
-
-
-                    <hr class="my-4">
-
-
-                    <!-- =========================================
-                         LOGIN
-                         ========================================= -->
-
-                    <p class="text-center text-muted mb-0">
-
-                        Already have an account?
-
-                        <a
-                            href="{% url 'login' %}"
-                            class="text-decoration-none fw-semibold"
-                        >
-                            Login
-                        </a>
-
+                    <p>
+                        Communicate with teachers and other students.
                     </p>
 
                 </div>
@@ -416,6 +100,834 @@
 
         </div>
 
+
+
+        <!-- =========================================================
+             RIGHT SIDE - REGISTER FORM
+             ========================================================= -->
+
+        <div class="register-card">
+
+
+            <!-- Header -->
+
+            <div class="register-header">
+
+                <div class="register-icon">
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+
+                        <circle
+                            cx="12"
+                            cy="7"
+                            r="4"
+                        ></circle>
+
+                        <line
+                            x1="19"
+                            y1="8"
+                            x2="19"
+                            y2="14"
+                        ></line>
+
+                        <line
+                            x1="22"
+                            y1="11"
+                            x2="16"
+                            y2="11"
+                        ></line>
+
+                    </svg>
+
+                </div>
+
+
+                <div>
+
+                    <h2>
+                        Create Account
+                    </h2>
+
+                    <p>
+                        Create your LearnSpace student account.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =====================================================
+                 FORM
+                 ===================================================== -->
+
+            <form method="post">
+
+                {% csrf_token %}
+
+
+                <!-- Non-field errors -->
+
+                {% if form.non_field_errors %}
+
+                    <div class="alert alert-danger py-2">
+
+                        {{ form.non_field_errors }}
+
+                    </div>
+
+                {% endif %}
+
+
+
+                <div class="row g-3">
+
+
+                    <!-- =================================================
+                         USERNAME
+                         ================================================= -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="{{ form.username.id_for_label }}"
+                            class="form-label"
+                        >
+                            Username
+                        </label>
+
+
+                        {{ form.username }}
+
+
+                        {% if form.username.help_text %}
+
+                            <div class="form-text">
+                                {{ form.username.help_text|safe }}
+                            </div>
+
+                        {% endif %}
+
+
+                        {% for error in form.username.errors %}
+
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         EMAIL
+                         ================================================= -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="{{ form.email.id_for_label }}"
+                            class="form-label"
+                        >
+                            Email Address
+                        </label>
+
+
+                        {{ form.email }}
+
+
+                        {% for error in form.email.errors %}
+
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         FIRST NAME
+                         ================================================= -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="{{ form.first_name.id_for_label }}"
+                            class="form-label"
+                        >
+                            First Name
+                        </label>
+
+
+                        {{ form.first_name }}
+
+
+                        {% for error in form.first_name.errors %}
+
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         LAST NAME
+                         ================================================= -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="{{ form.last_name.id_for_label }}"
+                            class="form-label"
+                        >
+                            Last Name
+                        </label>
+
+
+                        {{ form.last_name }}
+
+
+                        {% for error in form.last_name.errors %}
+
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         PASSWORD
+                         ================================================= -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="{{ form.password1.id_for_label }}"
+                            class="form-label"
+                        >
+                            Password
+                        </label>
+
+
+                        {{ form.password1 }}
+
+
+                        {% if form.password1.help_text %}
+
+                            <div class="form-text password-help">
+                                {{ form.password1.help_text|safe }}
+                            </div>
+
+                        {% endif %}
+
+
+                        {% for error in form.password1.errors %}
+
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         CONFIRM PASSWORD
+                         ================================================= -->
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="{{ form.password2.id_for_label }}"
+                            class="form-label"
+                        >
+                            Confirm Password
+                        </label>
+
+
+                        {{ form.password2 }}
+
+
+                        {% if form.password2.help_text %}
+
+                            <div class="form-text">
+                                {{ form.password2.help_text|safe }}
+                            </div>
+
+                        {% endif %}
+
+
+                        {% for error in form.password2.errors %}
+
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =====================================================
+                     STUDENT NOTICE
+                     ===================================================== -->
+
+                <div class="student-notice">
+
+                    New accounts are registered as
+                    <strong>Student</strong>
+                    accounts.
+
+                </div>
+
+
+
+                <!-- =====================================================
+                     CREATE ACCOUNT BUTTON
+                     ===================================================== -->
+
+                <button
+                    type="submit"
+                    class="btn btn-primary w-100 register-button"
+                >
+                    Create Account
+
+                    <span>
+                        →
+                    </span>
+
+                </button>
+
+
+
+                <!-- =====================================================
+                     LOGIN LINK
+                     ===================================================== -->
+
+                <p class="register-login mb-0">
+
+                    Already have an account?
+
+                    <a
+                        href="{% url 'login' %}"
+                        class="text-decoration-none fw-semibold"
+                    >
+                        Login
+                    </a>
+
+                </p>
+
+            </form>
+
+        </div>
+
     </div>
+
+</div>
+
+
+
+<!-- =============================================================
+     PAGE STYLING
+     ============================================================= -->
+
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .page-container {
+        max-width: 1050px;
+
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
+
+    .register-page {
+        min-height:
+            calc(
+                100vh - 40px
+            );
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+    }
+
+
+
+    /* =========================================================
+       LANDSCAPE LAYOUT
+       ========================================================= */
+
+    .register-layout {
+        width: 100%;
+
+        display: grid;
+
+        grid-template-columns:
+            0.8fr
+            1.2fr;
+
+        align-items: center;
+
+        gap: 45px;
+    }
+
+
+
+    /* =========================================================
+       LEFT SIDE
+       ========================================================= */
+
+    .register-left {
+        padding:
+            20px
+            10px;
+    }
+
+
+    .register-eyebrow {
+        margin-bottom: 12px;
+
+        color: #0d6efd;
+
+        font-size: 0.72rem;
+        font-weight: 800;
+
+        letter-spacing: 0.1em;
+    }
+
+
+    .register-main-title {
+        max-width: 430px;
+
+        margin-bottom: 16px;
+
+        color: #1f2937;
+
+        font-size: 3.1rem;
+        font-weight: 800;
+
+        line-height: 1.05;
+
+        letter-spacing: -1.5px;
+    }
+
+
+    .register-main-title span {
+        display: block;
+
+        color: #0d6efd;
+    }
+
+
+    .register-description {
+        max-width: 430px;
+
+        margin-bottom: 25px;
+
+        color: #6c7890;
+
+        font-size: 0.9rem;
+
+        line-height: 1.65;
+    }
+
+
+
+    /* =========================================================
+       LEFT FEATURES
+       ========================================================= */
+
+    .register-feature {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 12px;
+
+        margin-bottom: 16px;
+    }
+
+
+    .feature-check {
+        width: 27px;
+        height: 27px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        color: #0d6efd;
+
+        background: #e4efff;
+
+        border-radius: 50%;
+
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+
+    .register-feature strong {
+        display: block;
+
+        margin-bottom: 2px;
+
+        color: #253047;
+
+        font-size: 0.82rem;
+    }
+
+
+    .register-feature p {
+        margin: 0;
+
+        color: #7d899a;
+
+        font-size: 0.72rem;
+    }
+
+
+
+    /* =========================================================
+       FORM CARD
+       ========================================================= */
+
+    .register-card {
+        width: 100%;
+
+        padding:
+            25px
+            28px;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #e0e5ec;
+
+        border-radius: 16px;
+
+        box-shadow:
+            0 6px 24px
+            rgba(
+                0,
+                0,
+                0,
+                0.07
+            );
+    }
+
+
+
+    /* =========================================================
+       CARD HEADER
+       ========================================================= */
+
+    .register-header {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        margin-bottom: 20px;
+    }
+
+
+    .register-icon {
+        width: 42px;
+        height: 42px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        color: #0d6efd;
+
+        background: #eaf2ff;
+
+        border-radius: 11px;
+    }
+
+
+    .register-header h2 {
+        margin:
+            0
+            0
+            2px;
+
+        color: #1f2937;
+
+        font-size: 1.45rem;
+        font-weight: 700;
+    }
+
+
+    .register-header p {
+        margin: 0;
+
+        color: #7c8798;
+
+        font-size: 0.76rem;
+    }
+
+
+
+    /* =========================================================
+       FORM
+       ========================================================= */
+
+    .register-card .form-label {
+        margin-bottom: 4px;
+
+        color: #273449;
+
+        font-size: 0.76rem;
+        font-weight: 600;
+    }
+
+
+    .register-card input,
+    .register-card select {
+        width: 100%;
+
+        min-height: 37px;
+
+        padding:
+            7px
+            10px;
+
+        color: #283548;
+
+        background: #ffffff;
+
+        border:
+            1px solid
+            #ced7e2;
+
+        border-radius: 6px;
+
+        font-size: 0.78rem;
+
+        outline: none;
+    }
+
+
+    .register-card input:focus,
+    .register-card select:focus {
+        border-color: #86b7fe;
+
+        box-shadow:
+            0 0 0
+            0.15rem
+            rgba(
+                13,
+                110,
+                253,
+                0.12
+            );
+    }
+
+
+
+    /* =========================================================
+       HELP TEXT
+       ========================================================= */
+
+    .register-card .form-text {
+        margin-top: 3px;
+
+        color: #7b8798;
+
+        font-size: 0.62rem;
+
+        line-height: 1.3;
+    }
+
+
+    .password-help ul {
+        margin:
+            3px
+            0
+            0;
+
+        padding-left: 16px;
+    }
+
+
+    .password-help li {
+        margin-bottom: 1px;
+    }
+
+
+
+    /* =========================================================
+       STUDENT NOTICE
+       ========================================================= */
+
+    .student-notice {
+        margin-top: 18px;
+
+        padding:
+            9px
+            11px;
+
+        color: #667386;
+
+        background: #f8f9fa;
+
+        border:
+            1px solid
+            #dee2e6;
+
+        border-radius: 7px;
+
+        font-size: 0.73rem;
+    }
+
+
+
+    /* =========================================================
+       BUTTON
+       ========================================================= */
+
+    .register-button {
+        min-height: 39px;
+
+        margin-top: 12px;
+
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+
+    .register-button span {
+        margin-left: 5px;
+    }
+
+
+
+    /* =========================================================
+       LOGIN
+       ========================================================= */
+
+    .register-login {
+        margin-top: 14px;
+
+        padding-top: 13px;
+
+        border-top:
+            1px solid
+            #e4e8ed;
+
+        color: #788596;
+
+        text-align: center;
+
+        font-size: 0.73rem;
+    }
+
+
+
+    /* =========================================================
+       TABLET
+       ========================================================= */
+
+    @media (max-width: 991.98px) {
+
+        .register-layout {
+            max-width: 680px;
+
+            grid-template-columns: 1fr;
+
+            gap: 20px;
+        }
+
+
+        .register-left {
+            padding-bottom: 0;
+        }
+
+
+        .register-main-title {
+            font-size: 2.4rem;
+        }
+
+
+        .register-feature {
+            display: none;
+        }
+
+
+        .register-description {
+            margin-bottom: 0;
+        }
+
+    }
+
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 575.98px) {
+
+        .register-card {
+            padding:
+                20px
+                18px;
+        }
+
+
+        .register-main-title {
+            font-size: 2rem;
+        }
+
+    }
+
+</style>
 
 {% endblock %}

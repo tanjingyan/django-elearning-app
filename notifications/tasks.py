@@ -1,6 +1,8 @@
 from celery import shared_task
 
+from accounts.models import CustomUser
 from courses.models import (
+    Course,
     CourseMaterial,
     Enrolment,
 )
@@ -78,4 +80,48 @@ def create_material_notifications(
 
     Notification.objects.bulk_create(
         notifications
+    )
+
+@shared_task
+def create_block_notification(student_id, course_id):
+
+    student = CustomUser.objects.get(
+        id=student_id
+    )
+
+    course = Course.objects.get(
+        id=course_id
+    )
+
+    Notification.objects.create(
+        recipient=student,
+        course=course,
+        notification_type="block",
+        message=(
+            f"You have been blocked from "
+            f"{course.title}. You can no longer "
+            f"access or enrol in this course."
+        ),
+    )
+    
+@shared_task
+def create_unblock_notification(student_id, course_id):
+
+    student = CustomUser.objects.get(
+        id=student_id
+    )
+
+    course = Course.objects.get(
+        id=course_id
+    )
+
+    Notification.objects.create(
+        recipient=student,
+        course=course,
+        notification_type="unblock",
+        message=(
+            f"You have been unblocked from "
+            f"{course.title}. You can now enrol "
+            f"in this course again."
+        ),
     )

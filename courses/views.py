@@ -20,6 +20,8 @@ from accounts.models import CustomUser
 from notifications.tasks import (
     create_enrolment_notification,
     create_material_notifications,
+    create_block_notification,
+    create_unblock_notification,
 )
 
 from chat.models import ChatMessage
@@ -637,73 +639,45 @@ def create_feedback(request, course_id):
 @login_required
 def course_students(request, course_id):
 
+    # Only teachers can access this page
     if request.user.role != "teacher":
-
-        return redirect(
-            "student_dashboard"
-        )
-
+        return redirect("student_dashboard")
 
     course = get_object_or_404(
         Course,
-        id=course_id,
+        id=course_id
     )
 
-
-
-    # ---------------------------------------------------------
-    # ONLY COURSE OWNER CAN MANAGE STUDENTS
-    # ---------------------------------------------------------
-
+    # Only the teacher who owns the course
+    # can manage its students
     if course.teacher != request.user:
+        return redirect("teacher_courses")
 
-        return redirect(
-            "teacher_courses"
-        )
-
-
-
+    # Students currently enrolled
     enrolments = (
         Enrolment.objects
-        .filter(
-            course=course
-        )
-        .select_related(
-            "student"
-        )
-        .order_by(
-            "-enrolled_at"
-        )
+        .filter(course=course)
+        .select_related("student")
+        .order_by("-enrolled_at")
     )
 
-
-
+    # Students currently blocked from this course
     blocked_students = (
         CourseBlock.objects
-        .filter(
-            course=course
-        )
-        .select_related(
-            "student"
-        )
+        .filter(course=course)
+        .select_related("student")
+        .order_by("-blocked_at")
     )
-
-
 
     return render(
         request,
         "courses/course_students.html",
         {
             "course": course,
-
-            "enrolments":
-                enrolments,
-
-            "blocked_students":
-                blocked_students,
-        },
+            "enrolments": enrolments,
+            "blocked_students": blocked_students,
+        }
     )
-
 
 
 # =========================================================
@@ -842,9 +816,107 @@ def block_student(
     return redirect(
         "course_students",
         course_id=course.id,
+    )@login_required
+def block_student(request, course_id, student_id):
+
+    # Only teachers can block students
+    if request.user.role != "teacher":
+        return redirect("student_dashboard")
+
+    # Only accept POST requests
+    if request.method != "POST":
+        return redirect(
+            "course_students",
+            course_id=course_id,
+        )
+
+    course = get_object_or_404(
+        Course,
+        id=course_id,
     )
 
+    # Only the teacher who owns the course
+    # can block students
+    if course.teacher != request.user:
+        return redirect("teacher_courses")
 
+    student = get_object_or_404(
+        CustomUser,
+        id=student_id,
+        role="student",
+    )
+
+    # Create the block if it does not already exist
+    block, created = CourseBlock.objects.get_or_create(
+        student=student,
+        course=course,
+    )
+
+    # Remove the student from the course
+    Enrolment.objects.filter(
+        course=course,
+        student=student,
+    ).delete()
+
+    # Notify only when a new block is created
+    if created:
+        create_block_notification.delay(
+            student.id,
+            course.id,
+        )
+
+    return redirect(
+        "course_students",
+        course_id=course.id,
+    )
+
+@login_required
+def unblock_student(request, course_id, student_id):
+
+    # Only teachers can unblock students
+    if request.user.role != "teacher":
+        return redirect("student_dashboard")
+
+    # Only accept POST requests
+    if request.method != "POST":
+        return redirect(
+            "course_students",
+            course_id=course_id,
+        )
+
+    course = get_object_or_404(
+        Course,
+        id=course_id
+    )
+
+    # Only the teacher who owns this course
+    # can unblock students
+    if course.teacher != request.user:
+        return redirect("teacher_courses")
+
+    student = get_object_or_404(
+        CustomUser,
+        id=student_id,
+        role="student",
+    )
+
+    # Remove the block
+    deleted_count, _ = CourseBlock.objects.filter(
+        course=course,
+        student=student,
+    ).delete()
+
+    # Only notify if a block actually existed
+    if deleted_count > 0:
+        create_unblock_notification.delay(
+            student.id,
+            course.id,
+        )
+
+    return redirect(
+        "course_students",
+        course_id=course.id,
+    )
 
 # =========================================================
 # UPLOAD MATERIAL
