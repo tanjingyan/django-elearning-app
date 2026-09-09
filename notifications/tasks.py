@@ -103,7 +103,7 @@ def create_block_notification(student_id, course_id):
             f"access or enrol in this course."
         ),
     )
-    
+
 @shared_task
 def create_unblock_notification(student_id, course_id):
 
@@ -123,5 +123,28 @@ def create_unblock_notification(student_id, course_id):
             f"You have been unblocked from "
             f"{course.title}. You can now enrol "
             f"in this course again."
+        ),
+    )
+
+@shared_task
+def create_removal_notification(student_id, course_id):
+
+    student = CustomUser.objects.get(
+        id=student_id
+    )
+
+    course = Course.objects.get(
+        id=course_id
+    )
+
+    Notification.objects.create(
+        recipient=student,
+        course=course,
+        notification_type="remove",
+        message=(
+            f"You have been removed from "
+            f"{course.title}. You are no longer "
+            f"enrolled in this course, but you "
+            f"can enrol again."
         ),
     )

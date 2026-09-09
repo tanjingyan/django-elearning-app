@@ -9,10 +9,11 @@ class Notification(models.Model):
     MATERIAL = "material"
 
     NOTIFICATION_TYPES = [
-        ("enrolment", "Enrolment"),
-        ("material", "Material"),
+        ("enrolment", "Course Enrolment"),
+        ("material", "New Material"),
         ("block", "Course Blocked"),
         ("unblock", "Course Unblocked"),
+        ("remove", "Removed from Course"),
     ]
 
     recipient = models.ForeignKey(

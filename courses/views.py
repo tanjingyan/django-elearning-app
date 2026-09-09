@@ -22,6 +22,7 @@ from notifications.tasks import (
     create_material_notifications,
     create_block_notification,
     create_unblock_notification,
+    create_removal_notification,
 )
 
 from chat.models import ChatMessage
@@ -685,58 +686,55 @@ def course_students(request, course_id):
 # =========================================================
 
 @login_required
-def remove_student(
-    request,
-    course_id,
-    student_id,
-):
+def remove_student(request, course_id, student_id):
 
+    # Only teachers can remove students
     if request.user.role != "teacher":
+        return redirect("student_dashboard")
 
-        return redirect(
-            "student_dashboard"
-        )
-
-
+    # Removal must be submitted through POST
     if request.method != "POST":
-
         return redirect(
             "course_students",
             course_id=course_id,
         )
 
-
+    # Get the course
     course = get_object_or_404(
         Course,
         id=course_id,
     )
 
-
-
-    # ---------------------------------------------------------
-    # CHECK COURSE OWNERSHIP
-    # ---------------------------------------------------------
-
+    # Only the teacher who owns the course
+    # can remove students from it
     if course.teacher != request.user:
+        return redirect("teacher_courses")
 
-        return redirect(
-            "teacher_courses"
-        )
+    # Get the student
+    student = get_object_or_404(
+        CustomUser,
+        id=student_id,
+        role="student",
+    )
 
-
-
-    Enrolment.objects.filter(
+    # Remove the student's enrolment
+    deleted_count, _ = Enrolment.objects.filter(
         course=course,
-        student_id=student_id,
+        student=student,
     ).delete()
 
+    # Only notify if an enrolment was actually removed
+    if deleted_count > 0:
 
+        create_removal_notification.delay(
+            student.id,
+            course.id,
+        )
 
     return redirect(
         "course_students",
         course_id=course.id,
     )
-
 
 
 # =========================================================
