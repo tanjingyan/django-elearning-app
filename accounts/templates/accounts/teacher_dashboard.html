@@ -8,6 +8,36 @@
 
 {% block content %}
 
+    <style>
+        .quick-action-link {
+            display: block;
+            height: 100%;
+        }
+
+        .quick-action-card {
+            background-color: #ffffff;
+            cursor: pointer;
+            transition:
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .quick-action-link:hover .quick-action-card,
+        .quick-action-link:focus-visible .quick-action-card {
+            background-color: #f0f6ff;
+            border-color: #0d6efd !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .quick-action-link:hover,
+        .quick-action-link:focus-visible {
+            color: inherit;
+        }
+    </style>
+
     <!-- =========================================================
          HEADER
          ========================================================= -->
@@ -352,6 +382,7 @@
                     <a
                         href="{% url 'teacher_courses' %}"
                         class="
+                            quick-action-link
                             text-decoration-none
                             text-dark
                         "
@@ -359,6 +390,7 @@
 
                         <div
                             class="
+                                quick-action-card
                                 border
                                 rounded-3
                                 p-3
@@ -393,6 +425,7 @@
                     <a
                         href="{% url 'create_course' %}"
                         class="
+                            quick-action-link
                             text-decoration-none
                             text-dark
                         "
@@ -400,6 +433,7 @@
 
                         <div
                             class="
+                                quick-action-card
                                 border
                                 rounded-3
                                 p-3
@@ -434,6 +468,7 @@
                     <a
                         href="{% url 'search_users' %}"
                         class="
+                            quick-action-link
                             text-decoration-none
                             text-dark
                         "
@@ -441,6 +476,7 @@
 
                         <div
                             class="
+                                quick-action-card
                                 border
                                 rounded-3
                                 p-3
@@ -475,6 +511,7 @@
                     <a
                         href="{% url 'profile' request.user.username %}"
                         class="
+                            quick-action-link
                             text-decoration-none
                             text-dark
                         "
@@ -482,6 +519,7 @@
 
                         <div
                             class="
+                                quick-action-card
                                 border
                                 rounded-3
                                 p-3
@@ -864,24 +902,28 @@
 
                         </div>
 
-
+                    
                     {% else %}
 
-                        <div class="text-center py-5">
-
-                            <div class="display-6 mb-3">
-                                👥
-                            </div>
+                        <div
+                            class="
+                                d-flex
+                                flex-column
+                                justify-content-center
+                                align-items-center
+                                text-center
+                                h-10
+                            "
+                            style="min-height: 420px;"
+                        >
 
                             <h5 class="fw-semibold">
                                 No student enrolments yet
                             </h5>
 
                             <p class="text-muted mb-0">
-
                                 Students who enrol in your courses
                                 will appear here.
-
                             </p>
 
                         </div>
