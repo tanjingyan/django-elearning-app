@@ -15,14 +15,14 @@
 
 <div class="discussion-page">
 
-    <div class="row g-4 align-items-stretch">
+    <div class="discussion-layout">
 
 
         <!-- =====================================================
              LEFT - COURSE INFORMATION
              ===================================================== -->
 
-        <div class="col-md-3">
+        <div class="discussion-left-column">
 
             <aside class="discussion-sidebar">
 
@@ -292,7 +292,7 @@
              MIDDLE - CHAT
              ===================================================== -->
 
-        <div class="col-md-6">
+        <div class="discussion-main-column">
 
             <section class="discussion-chat-card">
 
@@ -425,6 +425,7 @@
 
                             <div
                                 data-message-id="{{ chat_message.id }}"
+                                data-created-at="{{ chat_message.created_at|date:'c' }}"
                                 class="
                                     message-row
 
@@ -486,8 +487,10 @@
                                         </div>
 
 
-                                        <span class="message-time">
-                                            {{ chat_message.created_at|date:"g:i A" }}
+                                        <span
+                                            class="message-time browser-local-time"
+                                            data-created-at="{{ chat_message.created_at|date:'c' }}"
+                                        >
                                         </span>
 
                                     </div>
@@ -629,7 +632,7 @@
              RIGHT - ONLINE USERS
              ===================================================== -->
 
-        <div class="col-md-3">
+        <div class="discussion-right-column">
 
             <aside class="online-members-panel">
 
@@ -744,8 +747,44 @@
 <style>
 
     .discussion-page {
-        max-width: 1420px;
-        margin: 0 auto;
+        width: min(
+            1420px,
+            calc(100vw - 32px)
+        );
+
+        max-width: none;
+
+        position: relative;
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        margin: 0;
+    }
+
+
+    /* =========================================================
+       THREE-COLUMN DISCUSSION LAYOUT
+       ========================================================= */
+
+    .discussion-layout {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 0.95fr)
+            minmax(0, 2.15fr)
+            minmax(0, 0.95fr);
+
+        gap: 0.9rem;
+
+        align-items: stretch;
+    }
+
+
+    .discussion-left-column,
+    .discussion-main-column,
+    .discussion-right-column {
+        min-width: 0;
     }
 
 
@@ -1320,6 +1359,51 @@
         color: #939daa;
 
         font-size: 0.69rem;
+    }
+
+
+
+    /* =========================================================
+       DATE SEPARATOR
+       ========================================================= */
+
+    .chat-date-separator {
+        width: 100%;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.75rem;
+
+        margin:
+            0.45rem
+            0
+            1rem;
+
+        color: #8a94a3;
+
+        font-size: 0.62rem;
+        font-weight: 600;
+
+        text-align: center;
+    }
+
+
+    .chat-date-separator::before,
+    .chat-date-separator::after {
+        content: "";
+
+        flex: 1;
+
+        height: 1px;
+
+        background: #d7dee8;
+    }
+
+
+    .chat-date-separator span {
+        flex-shrink: 0;
     }
 
 
@@ -1973,7 +2057,562 @@
        RESPONSIVE
        ========================================================= */
 
-    @media (max-width: 767.98px) {
+    @media (max-width: 991.98px) {
+
+        /*
+         * Use nearly the entire browser window when Chrome is
+         * snapped to one side of the screen.
+         */
+        .discussion-page {
+            width: calc(100vw - 18px);
+        }
+
+
+        /*
+         * Keep Course | Chat | Online in one horizontal row.
+         */
+        .discussion-layout {
+            grid-template-columns:
+                minmax(0, 0.92fr)
+                minmax(0, 2.25fr)
+                minmax(0, 0.92fr);
+
+            gap: 0.55rem;
+        }
+
+
+        /*
+         * Keep all three cards the same compact height so the
+         * discussion fits within a normal split-screen browser.
+         */
+        .discussion-sidebar,
+        .online-members-panel,
+        .discussion-chat-card {
+            height: clamp(
+                470px,
+                calc(100vh - 150px),
+                620px
+            );
+        }
+
+
+        /* LEFT / RIGHT PANELS */
+
+        .discussion-sidebar,
+        .online-members-panel {
+            padding: 0.75rem;
+
+            border-radius: 11px;
+        }
+
+
+        .discussion-sidebar-label,
+        .discussion-info-label,
+        .online-section-label {
+            font-size: 0.5rem;
+        }
+
+
+        .discussion-course-title {
+            margin-bottom: 0.3rem;
+
+            font-size: 0.95rem;
+
+            line-height: 1.22;
+        }
+
+
+        .discussion-course-description {
+            margin-bottom: 0.65rem;
+
+            font-size: 0.58rem;
+
+            line-height: 1.4;
+        }
+
+
+        .discussion-info-block {
+            padding:
+                0.55rem
+                0;
+        }
+
+
+        .discussion-info-label {
+            margin-bottom: 0.35rem;
+        }
+
+
+        .sidebar-user-avatar {
+            width: 30px;
+            height: 30px;
+
+            font-size: 0.62rem;
+        }
+
+
+        .discussion-teacher,
+        .discussion-current-user {
+            gap: 0.4rem;
+        }
+
+
+        .discussion-teacher strong,
+        .discussion-current-user strong {
+            font-size: 0.59rem;
+        }
+
+
+        .discussion-teacher small,
+        .discussion-current-user small {
+            font-size: 0.5rem;
+        }
+
+
+        .discussion-feature-box {
+            gap: 0.4rem;
+
+            margin:
+                0.4rem
+                0;
+
+            padding: 0.5rem;
+
+            border-radius: 7px;
+        }
+
+
+        .discussion-feature-icon {
+            width: 27px;
+            height: 27px;
+
+            border-radius: 7px;
+        }
+
+
+        .discussion-feature-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+
+        .discussion-feature-box strong {
+            font-size: 0.55rem;
+        }
+
+
+        .discussion-feature-box p {
+            font-size: 0.48rem;
+
+            line-height: 1.3;
+        }
+
+
+        .discussion-guidelines {
+            padding:
+                0.55rem
+                0;
+        }
+
+
+        .discussion-guidelines h2 {
+            margin-bottom: 0.4rem;
+
+            font-size: 0.58rem;
+        }
+
+
+        .guideline-item {
+            gap: 0.3rem;
+
+            margin-bottom: 0.3rem;
+
+            font-size: 0.49rem;
+
+            line-height: 1.3;
+        }
+
+
+        .back-course-btn {
+            gap: 0.25rem;
+
+            padding:
+                0.4rem
+                0.45rem;
+
+            font-size: 0.56rem;
+        }
+
+
+        .back-course-btn svg {
+            width: 12px;
+            height: 12px;
+        }
+
+
+        /* CHAT HEADER */
+
+        .discussion-chat-header {
+            min-height: 58px;
+
+            gap: 0.45rem;
+
+            padding:
+                0.65rem
+                0.75rem;
+        }
+
+
+        .discussion-chat-heading {
+            min-width: 0;
+
+            gap: 0.45rem;
+        }
+
+
+        .discussion-chat-icon {
+            width: 31px;
+            height: 31px;
+
+            flex-shrink: 0;
+
+            border-radius: 8px;
+        }
+
+
+        .discussion-chat-icon svg {
+            width: 17px;
+            height: 17px;
+        }
+
+
+        .discussion-chat-heading > div:last-child {
+            min-width: 0;
+        }
+
+
+        .discussion-chat-heading h2 {
+            overflow: hidden;
+
+            font-size: 0.72rem;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+        }
+
+
+        .discussion-chat-heading p {
+            overflow: hidden;
+
+            margin-top: 0.05rem;
+
+            font-size: 0.5rem;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+        }
+
+
+        .connection-status {
+            flex-shrink: 0;
+
+            gap: 0.25rem;
+
+            padding:
+                0.25rem
+                0.4rem;
+
+            font-size: 0.48rem;
+        }
+
+
+        .connection-status::before {
+            width: 5px;
+            height: 5px;
+        }
+
+
+        /* CHAT MESSAGES */
+
+        .chat-error {
+            padding:
+                0.45rem
+                0.7rem;
+
+            font-size: 0.52rem;
+        }
+
+
+        .chat-messages {
+            padding: 0.7rem;
+        }
+
+
+        .chat-date-separator {
+            gap: 0.45rem;
+
+            margin:
+                0.25rem
+                0
+                0.55rem;
+
+            font-size: 0.47rem;
+        }
+
+
+        .message-row {
+            margin-bottom: 0.55rem;
+        }
+
+
+        .message-bubble {
+            max-width: 86%;
+            min-width: 0;
+
+            padding:
+                0.48rem
+                0.58rem;
+
+            border-radius:
+                4px
+                9px
+                9px
+                9px;
+        }
+
+
+        .own-message .message-bubble {
+            border-radius:
+                9px
+                4px
+                9px
+                9px;
+        }
+
+
+        .message-meta {
+            gap: 0.35rem;
+
+            margin-bottom: 0.25rem;
+        }
+
+
+        .message-sender {
+            gap: 0.2rem;
+        }
+
+
+        .message-sender strong {
+            font-size: 0.51rem;
+        }
+
+
+        .message-role-icon {
+            font-size: 0.54rem;
+        }
+
+
+        .message-role-badge {
+            padding:
+                0.08rem
+                0.2rem;
+
+            font-size: 0.39rem;
+        }
+
+
+        .message-time {
+            font-size: 0.43rem;
+        }
+
+
+        .message-text {
+            font-size: 0.58rem;
+
+            line-height: 1.35;
+        }
+
+
+        /* CHAT FOOTER */
+
+        .chat-footer {
+            padding:
+                0.6rem
+                0.65rem;
+        }
+
+
+        .message-form {
+            gap: 0.4rem;
+        }
+
+
+        .message-input {
+            height: 36px;
+
+            padding:
+                0
+                0.6rem;
+
+            font-size: 0.58rem;
+        }
+
+
+        .send-button {
+            height: 36px;
+
+            gap: 0.25rem;
+
+            padding:
+                0
+                0.65rem;
+
+            font-size: 0.57rem;
+        }
+
+
+        .send-button svg {
+            width: 14px;
+            height: 14px;
+        }
+
+
+        .message-footer-info {
+            margin-top: 0.3rem;
+
+            font-size: 0.46rem;
+        }
+
+
+        /* ONLINE USERS */
+
+        .online-members-header {
+            gap: 0.35rem;
+
+            padding-bottom: 0.55rem;
+        }
+
+
+        .online-members-header h2 {
+            font-size: 0.68rem;
+
+            line-height: 1.15;
+        }
+
+
+        .online-members-header p {
+            font-size: 0.49rem;
+        }
+
+
+        .online-count {
+            min-width: 22px;
+            height: 21px;
+
+            font-size: 0.5rem;
+        }
+
+
+        .online-section-label {
+            gap: 0.25rem;
+
+            padding:
+                0.55rem
+                0
+                0.25rem;
+        }
+
+
+        .online-status-dot {
+            width: 5px;
+            height: 5px;
+        }
+
+
+        .online-member {
+            gap: 0.4rem;
+
+            padding:
+                0.4rem
+                0.15rem;
+        }
+
+
+        .online-avatar,
+        .online-avatar-placeholder {
+            width: 30px;
+            height: 30px;
+        }
+
+
+        .online-avatar-dot {
+            width: 9px;
+            height: 9px;
+        }
+
+
+        .online-member-name {
+            gap: 0.2rem;
+        }
+
+
+        .online-member-name strong {
+            font-size: 0.53rem;
+        }
+
+
+        .online-role {
+            font-size: 0.45rem;
+        }
+
+
+        .online-role-badge,
+        .online-you-badge {
+            padding:
+                0.07rem
+                0.2rem;
+
+            font-size: 0.38rem;
+        }
+
+
+        .online-info-box {
+            gap: 0.3rem;
+
+            padding: 0.5rem;
+
+            font-size: 0.45rem;
+
+            line-height: 1.3;
+        }
+
+
+        .online-info-box svg {
+            width: 13px;
+            height: 13px;
+        }
+
+    }
+
+
+    /*
+     * Only stack on a real phone-sized browser.
+     */
+    @media (max-width: 430px) {
+
+        .discussion-page {
+            width: calc(100vw - 16px);
+        }
+
+
+        .discussion-layout {
+            grid-template-columns: 1fr;
+
+            gap: 0.75rem;
+        }
+
 
         .discussion-sidebar,
         .online-members-panel {
@@ -1982,36 +2621,49 @@
 
 
         .discussion-chat-card {
-            height: 620px;
+            height: 560px;
         }
 
 
+        .discussion-sidebar,
         .online-members-panel {
-            min-height: 250px;
+            padding: 1rem;
+        }
+
+
+        .discussion-course-title {
+            font-size: 1.15rem;
+        }
+
+
+        .discussion-course-description {
+            font-size: 0.72rem;
+        }
+
+
+        .discussion-chat-heading h2 {
+            font-size: 0.9rem;
+        }
+
+
+        .discussion-chat-heading p {
+            font-size: 0.62rem;
+        }
+
+
+        .message-text {
+            font-size: 0.72rem;
         }
 
     }
 
 
-    @media (max-width: 575.98px) {
+    @media (max-width: 575.98px) and (min-width: 431px) {
 
-        .discussion-chat-card {
-            height: 600px;
-        }
-
-
-        .discussion-chat-header {
-            align-items: flex-start;
-
-            flex-direction: column;
-        }
-
-
-        .message-bubble {
-            max-width: 90%;
-        }
-
-
+        /*
+         * Keep the desktop-style three-column view for split-screen
+         * browser windows, but hide a few non-essential labels.
+         */
         .message-footer-info span:first-child {
             display: none;
         }
@@ -2019,6 +2671,13 @@
 
         .send-button span {
             display: none;
+        }
+
+
+        .send-button {
+            padding:
+                0
+                0.5rem;
         }
 
     }
@@ -2919,7 +3578,115 @@
 
     }
 
+    /* =========================================================
+    CONVERT EXISTING DJANGO MESSAGES TO BROWSER LOCAL TIME
+    ========================================================= */
 
+    document
+        .querySelectorAll(
+            ".browser-local-time"
+        )
+        .forEach(
+            function (element) {
+
+                const createdAt =
+                    element.dataset.createdAt;
+
+                element.textContent =
+                    formatBrowserTime(
+                        createdAt
+                    );
+
+            }
+        );
+    
+        let previousDateKey =
+            null;
+
+
+        document
+            .querySelectorAll(
+                ".message-row[data-created-at]"
+            )
+            .forEach(
+                function (messageRow) {
+
+                    const createdAt =
+                        messageRow.dataset.createdAt;
+
+
+                    const messageDate =
+                        new Date(
+                            createdAt
+                        );
+
+
+                    if (
+                        Number.isNaN(
+                            messageDate.getTime()
+                        )
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const dateKey =
+                        formatDateKey(
+                            messageDate
+                        );
+
+
+                    if (
+                        dateKey !==
+                        previousDateKey
+                    ) {
+
+                        const separator =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        separator.className =
+                            "chat-date-separator";
+
+
+                        separator.dataset.chatDate =
+                            dateKey;
+
+
+                        const label =
+                            document.createElement(
+                                "span"
+                            );
+
+
+                        label.textContent =
+                            formatDateLabel(
+                                messageDate
+                            );
+
+
+                        separator.appendChild(
+                            label
+                        );
+
+
+                        chatMessages.insertBefore(
+                            separator,
+                            messageRow
+                        );
+
+
+                        previousDateKey =
+                            dateKey;
+
+                    }
+
+                }
+            );
 
     /* =========================================================
        MESSAGE DISPLAY
@@ -2945,6 +3712,238 @@
     }
 
 
+
+    function formatDateKey(
+        date
+    ) {
+
+        const year =
+            date.getFullYear();
+
+
+        const month =
+            String(
+                date.getMonth() + 1
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        const day =
+            String(
+                date.getDate()
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        return (
+            `${year}-${month}-${day}`
+        );
+
+    }
+
+
+
+    function formatDateLabel(
+        date
+    ) {
+
+        return new Intl.DateTimeFormat(
+            "en-GB",
+            {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            }
+        ).format(
+            date
+        );
+
+    }
+
+    function getIncomingMessageDate(
+        data
+    ) {
+
+        const possibleDate =
+            data.created_at ||
+            null;
+
+
+        if (possibleDate) {
+
+            const parsedDate =
+                new Date(
+                    possibleDate
+                );
+
+
+            if (
+                !Number.isNaN(
+                    parsedDate.getTime()
+                )
+            ) {
+
+                return parsedDate;
+
+            }
+
+        }
+
+
+        return new Date();
+
+    }
+
+
+
+    function ensureDateSeparator(
+        date
+    ) {
+
+        const dateKey =
+            formatDateKey(
+                date
+            );
+
+
+        const separators =
+            chatMessages.querySelectorAll(
+                ".chat-date-separator"
+            );
+
+
+        const lastSeparator =
+            separators.length > 0
+                ? separators[
+                    separators.length - 1
+                ]
+                : null;
+
+
+        /*
+         * Do not create another separator when the newest
+         * messages are already under the same date.
+         */
+        if (
+            lastSeparator &&
+            lastSeparator.dataset.chatDate ===
+                dateKey
+        ) {
+
+            return;
+
+        }
+
+
+        const separator =
+            document.createElement(
+                "div"
+            );
+
+
+        separator.className =
+            "chat-date-separator";
+
+
+        separator.dataset.chatDate =
+            dateKey;
+
+
+        const label =
+            document.createElement(
+                "span"
+            );
+
+
+        label.textContent =
+            formatDateLabel(
+                date
+            );
+
+
+        separator.appendChild(
+            label
+        );
+
+
+        chatMessages.appendChild(
+            separator
+        );
+
+    }
+
+    function formatBrowserTime(
+        dateString
+    ) {
+
+        const date =
+            new Date(
+                dateString
+            );
+
+
+        return date.toLocaleTimeString(
+            [],
+            {
+                hour: "numeric",
+                minute: "2-digit",
+            }
+        );
+
+    }
+
+
+
+    function formatBrowserDate(
+        date
+    ) {
+
+        return date.toLocaleDateString(
+            [],
+            {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+            }
+        );
+
+    }
+
+
+
+    function getBrowserDateKey(
+        date
+    ) {
+
+        const year =
+            date.getFullYear();
+
+
+        const month =
+            String(
+                date.getMonth() + 1
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        const day =
+            String(
+                date.getDate()
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        return `${year}-${month}-${day}`;
+
+    }
 
     function displayMessage(
         data
@@ -3123,11 +4122,7 @@
         timestamp.className =
             "message-time";
 
-
-        timestamp.textContent =
-            data.created_at;
-
-
+            
         const message =
             document.createElement(
                 "p"
@@ -3183,6 +4178,26 @@
 
         messageRow.appendChild(
             bubble
+        );
+
+
+        const messageDate =
+            new Date(
+                data.created_at
+            );
+
+
+        timestamp.textContent =
+            messageDate.toLocaleTimeString(
+                [],
+                {
+                    hour: "numeric",
+                    minute: "2-digit",
+                }
+            );
+
+        ensureDateSeparator(
+            messageDate
         );
 
 

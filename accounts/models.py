@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
+from datetime import timedelta
+from django.utils import timezone
 
 class CustomUser(AbstractUser):
     STUDENT = "student"
@@ -35,19 +36,17 @@ class StatusUpdate(models.Model):
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="status_updates",
     )
 
-    content = models.TextField(
-        max_length=500,
-    )
+    content = models.TextField()
 
     created_at = models.DateTimeField(
-        auto_now_add=True,
+        auto_now_add=True
     )
 
-    class Meta:
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return f"{self.user.username}: {self.content[:30]}"
+    @property
+    def is_older_than_24_hours(self):
+        return (
+            timezone.now() - self.created_at
+            >= timedelta(hours=24)
+        )

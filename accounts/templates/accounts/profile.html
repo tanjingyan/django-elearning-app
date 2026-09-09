@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load status_filters %}
 
 {% block title %}
     {{ profile_user.username }} - Profile
@@ -451,7 +451,15 @@
 
 
                                 <small class="timeline-date">
-                                    {{ status.created_at|timesince }} ago
+                                    {% if status.is_older_than_24_hours %}
+
+                                        {{ status.created_at|date:"j F Y" }}
+
+                                    {% else %}
+
+                                        {{ status.created_at|timesince }} ago
+
+                                    {% endif %}
                                 </small>
 
                             </div>

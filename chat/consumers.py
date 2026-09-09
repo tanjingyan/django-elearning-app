@@ -583,24 +583,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "id": (
                 chat_message.id
             ),
+
             "message": (
                 chat_message.message
             ),
+
             "username": (
                 chat_message
                 .sender
                 .username
             ),
+
             "role": (
                 chat_message
                 .sender
                 .role
             ),
+
             "created_at": (
                 chat_message
                 .created_at
-                .strftime(
-                    "%I:%M %p"
-                )
+                .isoformat()
             ),
         }
