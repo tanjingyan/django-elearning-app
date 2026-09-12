@@ -67,68 +67,47 @@ class StatusUpdateForm(forms.ModelForm):
         return content
 
 
+from django import forms
+
+from .models import CustomUser
+
+
 class EditProfileForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
 
-        fields = (
+        fields = [
             "first_name",
             "last_name",
             "email",
             "profile_picture",
             "bio",
-        )
+        ]
 
-        widgets = {
-            "first_name": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Enter your first name",
-                }
-            ),
-
-            "last_name": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Enter your last name",
-                }
-            ),
-
-            "email": forms.EmailInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Enter your email address",
-                }
-            ),
-
-            "profile_picture": forms.ClearableFileInput(
-                attrs={
-                    "class": "form-control",
-                    "accept": "image/*",
-                }
-            ),
-
-            "bio": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 5,
-                    "placeholder": "Write a short bio",
-                }
-            ),
-        }
 
     def clean_email(self):
-        email = self.cleaned_data.get("email")
+        email = (
+            self.cleaned_data
+            .get("email", "")
+            .strip()
+            .lower()
+        )
 
+        # Current user's existing email is allowed.
         if (
-            email
-            and CustomUser.objects.filter(
-                email=email
-            )
-            .exclude(
-                pk=self.instance.pk
-            )
+            self.instance
+            and self.instance.pk
+            and self.instance.email
+            and self.instance.email.lower() == email
+        ):
+            return email
+
+        # Another user cannot have the same email.
+        if (
+            CustomUser.objects
+            .filter(email__iexact=email)
+            .exclude(pk=self.instance.pk)
             .exists()
         ):
             raise forms.ValidationError(
@@ -137,6 +116,36 @@ class EditProfileForm(forms.ModelForm):
 
         return email
 
+    def clean_email(self):
+        email = (
+            self.cleaned_data
+            .get("email", "")
+            .strip()
+            .lower()
+        )
+
+        # Allow the current user to keep their own email.
+        if (
+            self.instance
+            and self.instance.pk
+            and self.instance.email
+            and self.instance.email.lower() == email
+        ):
+            return email
+
+        # Reject the email only if ANOTHER user owns it.
+        if (
+            CustomUser.objects
+            .filter(email__iexact=email)
+            .exclude(pk=self.instance.pk)
+            .exists()
+        ):
+            raise forms.ValidationError(
+                "This email address is already being used."
+            )
+
+        return email
+    
     def clean_bio(self):
         bio = self.cleaned_data.get(
             "bio",
