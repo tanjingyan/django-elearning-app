@@ -3,78 +3,144 @@ from django.contrib.auth.forms import UserCreationForm
 
 from .models import CustomUser, StatusUpdate
 
+
+# =========================================================
+# USER REGISTRATION FORM
+# =========================================================
+
 class CustomUserCreationForm(UserCreationForm):
 
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(
+            attrs={
+                "autocomplete": "email",
+            }
+        ),
+    )
+
+    first_name = forms.CharField(
+        required=True,
+        max_length=150,
+    )
+
+    last_name = forms.CharField(
+        required=True,
+        max_length=150,
+    )
+
+
     class Meta:
+
         model = CustomUser
 
         fields = (
             "username",
+            "email",
             "first_name",
             "last_name",
-            "email",
-            "profile_picture",
-            "bio",
+            "password1",
+            "password2",
         )
 
-    def save(self, commit=True):
 
-        user = super().save(commit=False)
+    def clean_email(self):
 
-        # All users who register publicly are Students.
-        # Teacher accounts must be created/assigned by an administrator.
+        email = (
+            self.cleaned_data
+            .get(
+                "email",
+                "",
+            )
+            .strip()
+            .lower()
+        )
+
+        if not email:
+
+            raise forms.ValidationError(
+                "Please enter an email address."
+            )
+
+        if (
+            CustomUser.objects
+            .filter(
+                email__iexact=email
+            )
+            .exists()
+        ):
+
+            raise forms.ValidationError(
+                "An account with this email address already exists."
+            )
+
+        return email
+
+
+    def save(
+        self,
+        commit=True,
+    ):
+
+        user = super().save(
+            commit=False
+        )
+
+        user.email = (
+            self.cleaned_data["email"]
+        )
+
+        user.first_name = (
+            self.cleaned_data["first_name"]
+        )
+
+        user.last_name = (
+            self.cleaned_data["last_name"]
+        )
+
         user.role = "student"
 
         if commit:
+
             user.save()
 
         return user
 
+
+
+# =========================================================
+# STATUS UPDATE FORM
+# =========================================================
+
 class StatusUpdateForm(forms.ModelForm):
 
     class Meta:
+
         model = StatusUpdate
 
-        fields = (
+        fields = [
             "content",
-        )
+        ]
 
         widgets = {
             "content": forms.Textarea(
                 attrs={
-                    "placeholder": "What's on your mind?",
-                    "rows": 4,
+                    "rows": 3,
+                    "placeholder": "Share an update...",
                 }
-            )
+            ),
         }
 
-    def clean_content(self):
-        content = self.cleaned_data.get(
-            "content",
-            "",
-        ).strip()
-
-        if not content:
-            raise forms.ValidationError(
-                "Status update cannot be empty."
-            )
-
-        if len(content) > 500:
-            raise forms.ValidationError(
-                "Status update cannot exceed 500 characters."
-            )
-
-        return content
 
 
-from django import forms
-
-from .models import CustomUser
-
+# =========================================================
+# EDIT PROFILE FORM
+# =========================================================
 
 class EditProfileForm(forms.ModelForm):
 
     class Meta:
+
         model = CustomUser
 
         fields = [
@@ -85,76 +151,48 @@ class EditProfileForm(forms.ModelForm):
             "bio",
         ]
 
+        widgets = {
+            "bio": forms.Textarea(
+                attrs={
+                    "rows": 4,
+                }
+            ),
+        }
+
 
     def clean_email(self):
+
         email = (
             self.cleaned_data
-            .get("email", "")
+            .get(
+                "email",
+                "",
+            )
             .strip()
             .lower()
         )
 
-        # Current user's existing email is allowed.
-        if (
-            self.instance
-            and self.instance.pk
-            and self.instance.email
-            and self.instance.email.lower() == email
-        ):
-            return email
+        if not email:
 
-        # Another user cannot have the same email.
-        if (
-            CustomUser.objects
-            .filter(email__iexact=email)
-            .exclude(pk=self.instance.pk)
-            .exists()
-        ):
             raise forms.ValidationError(
-                "This email address is already being used."
+                "Please enter an email address."
             )
 
-        return email
-
-    def clean_email(self):
-        email = (
-            self.cleaned_data
-            .get("email", "")
-            .strip()
-            .lower()
+        duplicate_email = (
+            CustomUser.objects
+            .filter(
+                email__iexact=email
+            )
+            .exclude(
+                pk=self.instance.pk
+            )
+            .exists()
         )
 
-        # Allow the current user to keep their own email.
-        if (
-            self.instance
-            and self.instance.pk
-            and self.instance.email
-            and self.instance.email.lower() == email
-        ):
-            return email
+        if duplicate_email:
 
-        # Reject the email only if ANOTHER user owns it.
-        if (
-            CustomUser.objects
-            .filter(email__iexact=email)
-            .exclude(pk=self.instance.pk)
-            .exists()
-        ):
             raise forms.ValidationError(
-                "This email address is already being used."
+                "An account with this email address already exists."
             )
 
         return email
-    
-    def clean_bio(self):
-        bio = self.cleaned_data.get(
-            "bio",
-            "",
-        ).strip()
-
-        if len(bio) > 500:
-            raise forms.ValidationError(
-                "Bio cannot exceed 500 characters."
-            )
-
-        return bio
